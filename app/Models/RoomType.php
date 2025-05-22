@@ -9,4 +9,6 @@ class RoomType extends Model
 {
     /** @use HasFactory<\Database\Factories\RoomTypeFactory> */
     use HasFactory;
+
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }
