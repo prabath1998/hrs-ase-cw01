@@ -9,4 +9,6 @@ class Customer extends Model
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
     use HasFactory;
+
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }

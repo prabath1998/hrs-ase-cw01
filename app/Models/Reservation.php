@@ -9,4 +9,6 @@ class Reservation extends Model
 {
     /** @use HasFactory<\Database\Factories\ReservationFactory> */
     use HasFactory;
+
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }
