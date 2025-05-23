@@ -45,7 +45,7 @@ class RolesService
 
     /**
      * Get permissions by group
-     * 
+     *
      * @param string $groupName
      * @return array|null
      */
@@ -100,7 +100,7 @@ class RolesService
 
     /**
      * Count users in a specific role
-     * 
+     *
      * @param Role|string $role
      * @return int
      */
@@ -118,7 +118,7 @@ class RolesService
 
     /**
      * Get roles with user counts
-     * 
+     *
      * @param string|null $search
      * @param int $perPage
      * @return LengthAwarePaginator
@@ -143,7 +143,7 @@ class RolesService
 
     /**
      * Create predefined roles with their permissions
-     * 
+     *
      * @return array
      */
     public function createPredefinedRoles(): array
@@ -169,39 +169,70 @@ class RolesService
         $adminPermissions = array_diff($adminPermissions, $adminExcludedPermissions);
         $roles['admin'] = $this->createRole('Admin', $adminPermissions);
 
-        // 3. Editor role - can manage content but not users/settings
-        $editorPermissions = [
+        // 3. Manager role
+        $managerPermissions = [
             'dashboard.view',
-            // Blog permissions
-            'blog.create',
-            'blog.view',
-            'blog.edit',
-            // Profile permissions
-            'profile.view',
-            'profile.edit',
-            'profile.update',
-            // Translations
-            'translations.view',
+            'customer.create',
+            'customer.view',
+            'customer.edit',
+            'travel_company.view',
+            'room.manage',
+            'room.update_status',
+            'room.update_pricing',
+            'room_type.manage',
+            'optional_service.manage',
+            'optional_service.update_pricing',
+            'reservation.manage',
+            'billing.manage',
+
         ];
 
-        $roles['editor'] = $this->createRole('Editor', $editorPermissions);
+        $roles['manager'] = $this->createRole('Manager', $managerPermissions);
 
-        // 4. Subscriber role - basic user role
-        $subscriberPermissions = [
+        // 4. Reservation Clerk Role
+        $clerkPermissions = [
             'dashboard.view',
-            'profile.view',
-            'profile.edit',
-            'profile.update',
+            'customer.create',
+            'customer.view',
+            'customer.edit',
+            'travel_company.view',
+            'room.manage',
+            'room.update_status',
+            'room_type.manage',
+            'optional_service.manage',
+            'reservation.manage',
+            'billing.manage',
+            'billing.generate_bill',
+            'billing.record_payment',
         ];
 
-        $roles['subscriber'] = $this->createRole('Subscriber', $subscriberPermissions);
+        $roles['clerk'] = $this->createRole('Clerk', $clerkPermissions);
+
+        // 5. Travel Company Role
+        $travelCompanyPermissions = [
+            'reservation.create',
+            'reservation.view',
+            'reservation.edit',
+            'reservation.cancel',
+        ];
+        $roles['travel_company'] = $this->createRole('Travel Company', $travelCompanyPermissions);
+
+        // 6. Customer Role
+        $customerPermissions = [
+            'reservation.create',
+            'reservation.view',
+            'reservation.edit',
+            'reservation.cancel',
+        ];
+
+        $roles['customer'] = $this->createRole('Customer', $customerPermissions);
 
         return $roles;
     }
 
     /**
      * Get a specific predefined role's permissions
-     * 
+     *
      * @param string $roleName
      * @return array
      */

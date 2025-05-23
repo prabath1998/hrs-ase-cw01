@@ -6,7 +6,6 @@ namespace Database\Seeders;
 use App\Models\Customer;
 use App\Models\TravelCompany;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,24 +16,24 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::insert([
-            [
-                'name' => 'Super Admin',
-                'email' => 'superadmin@example.com',
-                'username' => 'superadmin',
-                'password' => Hash::make('12345678'),
-            ],
-            [
-                'name' => 'Subscriber',
-                'email' => 'subscriber@example.com',
-                'username' => 'subscriber',
-                'password' => Hash::make('12345678'),
-            ],
-        ]);
+        // User::insert([
+        //     [
+        //         'name' => 'Super Admin',
+        //         'email' => 'superadmin@example.com',
+        //         'username' => 'superadmin',
+        //         'password' => Hash::make('12345678'),
+        //     ],
+        //     [
+        //         'name' => 'Subscriber',
+        //         'email' => 'subscriber@example.com',
+        //         'username' => 'subscriber',
+        //         'password' => Hash::make('12345678'),
+        //     ],
+        // ]);
 
-        // Run factory to create additional users with unique details.
-        User::factory()->count(500)->create();
-        $this->command->info('Users table seeded with 502 users!');
+        // // Run factory to create additional users with unique details.
+        // User::factory()->count(10)->create();
+        // $this->command->info('Users table seeded with 10 users!');
 
 
 
@@ -46,17 +45,19 @@ class UserSeeder extends Seeder
             ['email' => 'admin@hotel.com'],
             [
                 'name' => 'System Administrator',
+                'username' => 'admin',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
             ]
         );
-        $admin->assignRole('Admin');
+        $admin->assignRole('Superadmin');
 
         // Manager
         $manager = User::firstOrCreate(
             ['email' => 'manager@hotel.com'],
             [
                 'name' => 'Hotel Manager',
+                'username' => 'manager',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
             ]
@@ -68,6 +69,7 @@ class UserSeeder extends Seeder
             ['email' => 'clerk@hotel.com'],
             [
                 'name' => 'Reservation Clerk',
+                'username' => 'clerk',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
             ]
@@ -79,6 +81,7 @@ class UserSeeder extends Seeder
             ['email' => 'customer@example.com'],
             [
                 'name' => 'John Doe',
+                'username' => 'customer',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
             ]
@@ -100,6 +103,7 @@ class UserSeeder extends Seeder
             ['email' => 'travel@example.com'],
             [
                 'name' => 'Travel Agent Contact',
+                'username' => 'travel_agent',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
             ]

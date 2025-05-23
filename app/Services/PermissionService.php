@@ -12,7 +12,7 @@ class PermissionService
 {
     /**
      * Get all permissions organized by groups
-     * 
+     *
      * @return array
      */
     public function getAllPermissions(): array
@@ -20,34 +20,97 @@ class PermissionService
         $permissions = [
             [
                 'group_name' => 'dashboard',
-                'permissions' => [
+                'permissions' => [  // Clerk, Manager, Admin
                     'dashboard.view',
                 ],
             ],
             [
-                'group_name' => 'blog',
-                'permissions' => [
-                    'blog.create',
-                    'blog.view',
-                    'blog.edit',
-                    'blog.delete',
-                    'blog.approve',
-                ],
-            ],
-            [
                 'group_name' => 'user',
-                'permissions' => [
+                'permissions' => [  // Admin
                     'user.create',
                     'user.view',
                     'user.edit',
                     'user.delete',
-                    'user.approve',
+                    'user.manage',
                     'user.login_as',
                 ],
             ],
             [
+                'group_name' => 'customer',
+                'permissions' => [ // Clerk, Manager, Admin
+                    'customer.create',
+                    'customer.view',
+                    'customer.edit',
+                    'customer.delete',
+                    'customer.manage',
+                    'customer.login_as',
+                ],
+            ],
+            [
+                'group_name' => 'travel_company',
+                'permissions' => [  // Admin
+                    'travel_company.create',
+                    'travel_company.view',
+                    'travel_company.edit',
+                    'travel_company.delete',
+                    'travel_company.manage',
+                    'travel_company.login_as',
+                ],
+            ],
+            [
+                'group_name' => 'room',
+                'permissions' => [  // Clerk, Manager, Admin
+                    'room.manage',
+                    'room.update_status',
+                    'room.update_pricing',
+                ],
+            ],
+            [
+                'group_name' => 'room_type',
+                'permissions' => [  // Clerk, Manager, Admin
+                    'room_type.manage',
+                ],
+            ],
+            [
+                'group_name' => 'optional_service',
+                'permissions' => [  // Clerk, Manager, Admin
+                    'optional_service.manage',
+                    'optional_service.update_pricing',
+                ],
+            ],
+            [
+                'group_name' => 'reservation',
+                'permissions' => [  // Clerk, Manager, Admin
+                    'reservation.create',
+                    'reservation.view',
+                    'reservation.edit',
+                    'reservation.delete',
+                    'reservation.cancel',
+                    'reservation.check_in',
+                    'reservation.check_out',
+                    'reservation.manage',
+                ],
+            ],
+            [
+                'group_name' => 'billing',
+                'permissions' => [  // Clerk, Manager, Admin
+                    'billing.manage',
+                    'billing.generate_bill',
+                    'billing.record_payment',
+                ],
+            ],
+            [
+                'group_name' => 'reporting',
+                'permissions' => [  // Manager, Admin
+                    'reporting.view_occupancy_reports',
+                    'reporting.view_revenue_reports',
+                    'reporting.view_financial_reports',
+                    'reporting.view_booking_forecasts',
+                ],
+            ],
+            [
                 'group_name' => 'role',
-                'permissions' => [
+                'permissions' => [  // Admin
                     'role.create',
                     'role.view',
                     'role.edit',
@@ -56,17 +119,8 @@ class PermissionService
                 ],
             ],
             [
-                'group_name' => 'module',
-                'permissions' => [
-                    'module.create',
-                    'module.view',
-                    'module.edit',
-                    'module.delete',
-                ],
-            ],
-            [
                 'group_name' => 'profile',
-                'permissions' => [
+                'permissions' => [  // All users
                     'profile.view',
                     'profile.edit',
                     'profile.delete',
@@ -75,21 +129,21 @@ class PermissionService
             ],
             [
                 'group_name' => 'monitoring',
-                'permissions' => [
+                'permissions' => [  // Admin
                     'pulse.view',
                     'actionlog.view',
                 ],
             ],
             [
                 'group_name' => 'settings',
-                'permissions' => [
+                'permissions' => [  // Admin
                     'settings.view',
                     'settings.edit',
                 ],
             ],
             [
                 'group_name' => 'translations',
-                'permissions' => [
+                'permissions' => [  // Admin
                     'translations.view',
                     'translations.edit',
                 ],
@@ -101,7 +155,7 @@ class PermissionService
 
     /**
      * Get a specific set of permissions by group name
-     * 
+     *
      * @param string $groupName
      * @return array|null
      */
@@ -120,7 +174,7 @@ class PermissionService
 
     /**
      * Get all permission group names
-     * 
+     *
      * @return array
      */
     public function getPermissionGroups(): array
@@ -132,7 +186,7 @@ class PermissionService
 
         return $groups;
     }
-    
+
     /**
      * Get all permission models from database
      *
@@ -142,7 +196,7 @@ class PermissionService
     {
         return Permission::all();
     }
-    
+
     /**
      * Get permissions by group name from database
      *
@@ -155,7 +209,7 @@ class PermissionService
             ->where('group_name', $group_name)
             ->get();
     }
-    
+
     /**
      * Get permission groups from database
      *
@@ -167,32 +221,32 @@ class PermissionService
             ->groupBy('group_name')
             ->get();
     }
-    
+
     /**
      * Create all permissions from the definitions
-     * 
+     *
      * @return array Created permissions
      */
     public function createPermissions(): array
     {
         $createdPermissions = [];
         $permissions = $this->getAllPermissions();
-        
+
         foreach ($permissions as $permissionGroup) {
             $groupName = $permissionGroup['group_name'];
-            
+
             foreach ($permissionGroup['permissions'] as $permissionName) {
                 $permission = $this->findOrCreatePermission($permissionName, $groupName);
                 $createdPermissions[] = $permission;
             }
         }
-        
+
         return $createdPermissions;
     }
-    
+
     /**
      * Find or create a permission
-     * 
+     *
      * @param string $name
      * @param string $groupName
      * @return Permission
@@ -208,10 +262,10 @@ class PermissionService
             ]
         );
     }
-    
+
     /**
      * Get all permission objects by their names
-     * 
+     *
      * @param array $permissionNames
      * @return array
      */
@@ -233,7 +287,7 @@ class PermissionService
 
         if ($search) {
             $query->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('group_name', 'like', '%' . $search . '%');
+                ->orWhere('group_name', 'like', '%' . $search . '%');
         }
 
         $permissions = $query->paginate($perPage ?? config('settings.default_pagination'));
@@ -243,7 +297,7 @@ class PermissionService
             $roles = $permission->roles()->get();
             $permission->role_count = $roles->count();
             $permission->roles_list = $roles->pluck('name')->take(5)->implode(', ');
-            
+
             if ($permission->role_count > 5) {
                 $permission->roles_list .= ', ...';
             }
@@ -254,7 +308,7 @@ class PermissionService
 
     /**
      * Get roles for permission
-     * 
+     *
      * @param Permission $permission
      * @return Collection
      */
