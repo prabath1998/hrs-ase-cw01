@@ -17,7 +17,7 @@ class Authenticate extends Middleware
     {
         // If the request does not expect JSON, redirect to the appropriate login page.
         if (! $request->expectsJson()) {
-            return route('admin.login');
+            // return route('admin.login');
         }
     }
 }
