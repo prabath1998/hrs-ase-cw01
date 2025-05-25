@@ -70,6 +70,16 @@ class AdminMenuService
         ]);
 
         $this->addMenuItem([
+            'label' => __('Hotels'),
+            'icon' => 'dashboard.svg',
+            'route' => route('admin.hotels.index'),
+            'active' => Route::is('admin.hotels.index'),
+            'id' => 'hotel',
+            'priority' => 1,
+            'permissions' => 'dashboard.view'
+        ]);
+
+        $this->addMenuItem([
             'label' => __('Roles & Permissions'),
             'icon' => 'key.svg',
             'id' => 'roles-submenu',
@@ -233,7 +243,7 @@ class AdminMenuService
 
             // Apply filters that might add/modify menu items.
             $filteredItems = ld_apply_filters('sidebar_menu_' . strtolower($group), $filteredItems);
-            
+
             // Only add the group if it has items after filtering.
             if (!empty($filteredItems)) {
                 $result[$group] = $filteredItems;

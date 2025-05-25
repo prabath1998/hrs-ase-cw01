@@ -13,6 +13,7 @@ use App\Http\Controllers\Backend\ProfilesController;
 use App\Http\Controllers\Backend\TranslationController;
 use App\Http\Controllers\Backend\UserLoginAsController;
 use App\Http\Controllers\Backend\LocaleController;
+use App\Http\Controllers\HotelController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,7 +36,13 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('roles', RolesController::class);
-    
+
+    // Hotel Routes.
+    Route::get('/hotels', [HotelController::class, 'index'])->name('hotels.index');
+    Route::get('/hotels/create', [HotelController::class, 'index'])->name('hotels.create');
+    Route::get('/hotels/{id}', [HotelController::class, 'index'])->name('hotels.edit');
+    Route::delete('/hotels/{id}', [HotelController::class, 'index'])->name('hotels.destroy');
+
     // Permissions Routes.
     Route::get('/permissions', [PermissionsController::class, 'index'])->name('permissions.index');
     Route::get('/permissions/{id}', [PermissionsController::class, 'show'])->name('permissions.show');
