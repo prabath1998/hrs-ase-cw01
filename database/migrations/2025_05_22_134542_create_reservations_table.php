@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('cascade');
             $table->foreignId('travel_company_id')->nullable()->constrained('travel_companies')->onDelete('cascade');
             $table->foreignId('room_id')->nullable()->constrained('rooms')->onDelete('set null');
+            $table->foreignId('hotel_id')->nullable()->constrained('hotels')->onDelete('set null');
             $table->foreignId('room_type_id')->constrained('room_types')->onDelete('restrict');
             $table->datetime('check_in_date');
             $table->datetime('check_out_date');

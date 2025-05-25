@@ -176,6 +176,7 @@ class RolesService
             'customer.view',
             'customer.edit',
             'travel_company.view',
+            'hotel.view',
             'room.manage',
             'room.update_status',
             'room.update_pricing',

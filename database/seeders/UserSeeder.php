@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Customer;
+use App\Models\Hotel;
 use App\Models\TravelCompany;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -39,6 +40,7 @@ class UserSeeder extends Seeder
 
 
         $defaultPassword = Hash::make('password');
+        $hotel = Hotel::find(1);
 
         // Admin
         $admin = User::firstOrCreate(
@@ -48,6 +50,7 @@ class UserSeeder extends Seeder
                 'username' => 'admin',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
+                'hotel_id' => null // Admins are not associated with a specific hotel
             ]
         );
         $admin->assignRole('Superadmin');
@@ -60,6 +63,7 @@ class UserSeeder extends Seeder
                 'username' => 'manager',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
+                'hotel_id' => $hotel->id
             ]
         );
         $manager->assignRole('Manager');
@@ -72,6 +76,7 @@ class UserSeeder extends Seeder
                 'username' => 'clerk',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
+                'hotel_id' => $hotel->id
             ]
         );
         $clerk->assignRole('Clerk');
@@ -84,6 +89,7 @@ class UserSeeder extends Seeder
                 'username' => 'customer',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
+                'hotel_id' => $hotel->id
             ]
         );
         $customerUser->assignRole('Customer');
@@ -106,6 +112,7 @@ class UserSeeder extends Seeder
                 'username' => 'travel_agent',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
+                'hotel_id' => $hotel->id
             ]
         );
         $travelUser->assignRole('Travel Company');

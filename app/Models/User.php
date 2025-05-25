@@ -69,4 +69,29 @@ class User extends Authenticatable
             $this->notify(new DefaultResetPassword($token));
         }
     }
+
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    public function travelCompany()
+    {
+        return $this->hasOne(TravelCompany::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'booked_by_user_id');
+    }
+
+    public function bills()
+    {
+        return $this->hasMany(Bill::class, 'generated_by_user_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'processed_by_user_id');
+    }
 }

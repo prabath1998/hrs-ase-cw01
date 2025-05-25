@@ -11,4 +11,14 @@ class RoomType extends Model
     use HasFactory;
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    public function rooms()
+    {
+        return $this->hasMany(Room::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }

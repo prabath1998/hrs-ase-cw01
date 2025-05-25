@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_type_id')->constrained('room_types')->onDelete('restrict');
+            $table->foreignId('hotel_id')->nullable()->constrained('hotels')->onDelete('set null');
             $table->string('room_number')->unique();
             $table->integer('floor')->nullable();
             $table->string('status')->default('available'); // Enum: available, occupied, maintenance, cleaning, out_of_service

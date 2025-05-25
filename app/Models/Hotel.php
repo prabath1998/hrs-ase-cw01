@@ -5,20 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Room extends Model
+class Hotel extends Model
 {
-    /** @use HasFactory<\Database\Factories\RoomFactory> */
+    /** @use HasFactory<\Database\Factories\HotelFactory> */
     use HasFactory;
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
-    protected $casts = [
-        'features' => 'array', // Or 'object'
-    ];
-
-    public function roomType()
+    public function rooms()
     {
-        return $this->belongsTo(RoomType::class);
+        return $this->hasMany(Room::class);
     }
 
     public function reservations()

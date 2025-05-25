@@ -57,6 +57,16 @@ class PermissionService
                     'travel_company.login_as',
                 ],
             ],
+             [
+                'group_name' => 'hotel',
+                'permissions' => [  // Admin
+                    'hotel.create',
+                    'hotel.view',
+                    'hotel.edit',
+                    'hotel.delete',
+                    'hotel.manage',
+                ],
+            ],
             [
                 'group_name' => 'room',
                 'permissions' => [  // Clerk, Manager, Admin
