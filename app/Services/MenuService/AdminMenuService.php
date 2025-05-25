@@ -71,7 +71,7 @@ class AdminMenuService
 
         $this->addMenuItem([
             'label' => __('Hotels'),
-            'icon' => 'dashboard.svg',
+            'icon' => 'hotel.svg',
             'route' => route('admin.hotels.index'),
             'active' => Route::is('admin.hotels.index'),
             'id' => 'hotel',
