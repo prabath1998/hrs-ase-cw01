@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'HomeController@redirectAdmin')->name('index');
+Route::get('/', 'HomeController@landingPage')->name('index');
 Route::get('/home', 'HomeController@index')->name('home');
 
 /**
