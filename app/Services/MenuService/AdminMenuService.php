@@ -80,6 +80,26 @@ class AdminMenuService
         ]);
 
         $this->addMenuItem([
+            'label' => __('Room Types'),
+            'icon' => 'dashboard.svg',
+            'route' => route('admin.room-types.index'),
+            'active' => Route::is('admin.room-types.index'),
+            'id' => 'room-type',
+            'priority' => 2,
+            'permissions' => 'dashboard.view'
+        ]);
+
+        $this->addMenuItem([
+            'label' => __('Rooms'),
+            'icon' => 'dashboard.svg',
+            'route' => route('admin.rooms.index'),
+            'active' => Route::is('admin.rooms.index'),
+            'id' => 'room',
+            'priority' => 2,
+            'permissions' => 'dashboard.view'
+        ]);
+
+        $this->addMenuItem([
             'label' => __('Roles & Permissions'),
             'icon' => 'key.svg',
             'id' => 'roles-submenu',

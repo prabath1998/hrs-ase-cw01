@@ -14,6 +14,8 @@ use App\Http\Controllers\Backend\TranslationController;
 use App\Http\Controllers\Backend\UserLoginAsController;
 use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\HotelController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,6 +46,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::get('/hotels/{hotel}/edit', [HotelController::class, 'edit'])->name('hotels.edit');
     Route::put('/hotels/{hotel}', [HotelController::class, 'update'])->name('hotels.update');
     Route::delete('/hotels/{hotel}', [HotelController::class, 'destroy'])->name('hotels.destroy');
+
+     // Room-Type Routes.
+    Route::resource('room-types', RoomTypeController::class)->except(['show']);
+    Route::resource('rooms', RoomController::class)->except(['show']);
 
     // Permissions Routes.
     Route::get('/permissions', [PermissionsController::class, 'index'])->name('permissions.index');
