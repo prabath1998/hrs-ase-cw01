@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('hotel_id')->nullable()->constrained('hotels')->onDelete('set null');
             $table->string('room_number')->unique();
             $table->integer('floor')->nullable();
-            $table->string('status')->default('available'); // Enum: available, occupied, maintenance, cleaning, out_of_service
+            $table->string('status')->default('available'); // Enum: available, occupied, maintenance, blocked
             $table->json('features')->nullable();
             $table->timestamps();
         });
