@@ -13,17 +13,13 @@ use Illuminate\Http\Request;
 class HotelController extends Controller
 {
     public function __construct(
-        private readonly UserService $userService,
-        private readonly RolesService $rolesService,
         private readonly HotelService $hotelService
     ) {}
     public function index()
     {
         $this->checkAuthorization(auth()->user(), ['dashboard.view']);
-       
+
         return view('backend.pages.hotels.index', [
-            'users' => $this->userService->getUsers(),
-            'roles' => $this->rolesService->getRolesDropdown(),
             'hotels' => $this->hotelService->getHotels(),
         ]);
     }
@@ -32,11 +28,7 @@ class HotelController extends Controller
     {
         $this->checkAuthorization(auth()->user(), ['user.create']);
 
-        ld_do_action('user_create_page_before');
-
-        return view('backend.pages.hotels.create', [
-            'roles' => $this->rolesService->getRolesDropdown(),
-        ]);
+        return view('backend.pages.hotels.create');
     }
 
     public function store(Request $request)
@@ -51,7 +43,7 @@ class HotelController extends Controller
             'contact_email' => 'nullable|email|unique:hotels,contact_email',
             'phone_number' => 'nullable|string|max:20',
             'default_check_in_time' => 'required|date',
-            'default_check_out_time' => 'required|date|after_or_equal:default_check_in_time',
+            'default_check_out_time' => 'required|date',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -79,7 +71,7 @@ class HotelController extends Controller
             'contact_email' => 'nullable|email|unique:hotels,contact_email,' . $hotel->id,
             'phone_number' => 'nullable|string|max:20',
             'default_check_in_time' => 'required|date',
-            'default_check_out_time' => 'required|date|after_or_equal:default_check_in_time',
+            'default_check_out_time' => 'required|date',
             'is_active' => 'boolean',
         ]);
 
