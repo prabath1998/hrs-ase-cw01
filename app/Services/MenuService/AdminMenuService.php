@@ -91,11 +91,21 @@ class AdminMenuService
 
         $this->addMenuItem([
             'label' => __('Rooms'),
-            'icon' => 'dashboard.svg',
+            'icon' => 'rooms.svg',
             'route' => route('admin.rooms.index'),
             'active' => Route::is('admin.rooms.index'),
             'id' => 'room',
             'priority' => 2,
+            'permissions' => 'dashboard.view'
+        ]);
+
+        $this->addMenuItem([
+            'label' => __('Optional Services'),
+            'icon' => 'optional-services.svg',
+            'route' => route('admin.optional-services.index'),
+            'active' => Route::is('admin.optional-services.index'),
+            'id' => 'optional-services',
+            'priority' => 1,
             'permissions' => 'dashboard.view'
         ]);
 

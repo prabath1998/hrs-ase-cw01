@@ -54,16 +54,17 @@
                     @include('backend.layouts.partials.messages')
                     <table class="w-full dark:text-gray-400">
                         <thead class="bg-light text-capitalize">
-                            <tr class="border-b border-gray-100 dark:border-gray-800">
-                                <th class="p-2 px-5">{{ __('#') }}</th>
-                                <th class="p-2 px-5">{{ __('Name') }}</th>
-                                <th class="p-2 px-5">{{ __('Email') }}</th>
-                                <th class="p-2 px-5">{{ __('Phone') }}</th>
-                                <th class="p-2 px-5">{{ __('Address') }}</th>
-                                <th class="p-2 px-5">{{ __('Check-in') }}</th>
-                                <th class="p-2 px-5">{{ __('Check-out') }}</th>
-                                <th class="p-2 px-5">{{ __('Status') }}</th>
-                                <th class="p-2 px-5">{{ __('Action') }}</th>
+                            <tr class="border-b border-gray-100 dark:border-gray-800 text-left">
+                                <th class="p-3 px-5">{{ __('#') }}</th>
+                                <th class="p-3 px-5">{{ __('Name') }}</th>
+                                <th class="p-3 px-5">{{ __('Email') }}</th>
+                                <th class="p-3 px-5">{{ __('Phone') }}</th>
+                                <th class="p-3 px-5">{{ __('Address') }}</th>
+                                <th class="p-3 px-5">{{ __('Check-in') }}</th>
+                                <th class="p-3 px-5">{{ __('Check-out') }}</th>
+                                <th class="p-3 px-5">{{ __('Status') }}</th>
+                                <th class="p-3 px-5 text-center">{{ __('Action') }}</th>
+                                <!-- Action should be centered -->
                             </tr>
                         </thead>
                         <tbody>
@@ -75,19 +76,17 @@
                                     <td class="px-5 py-4">{{ $hotel->phone_number }}</td>
                                     <td class="px-5 py-4">{{ $hotel->address }}</td>
                                     <td class="px-5 py-4">
-                                        {{ \Carbon\Carbon::parse($hotel->default_check_in_time)->format('H:i') }}
-                                    </td>
+                                        {{ \Carbon\Carbon::parse($hotel->default_check_in_time)->format('H:i') }}</td>
                                     <td class="px-5 py-4">
-                                        {{ \Carbon\Carbon::parse($hotel->default_check_out_time)->format('H:i') }}
-                                    </td>
+                                        {{ \Carbon\Carbon::parse($hotel->default_check_out_time)->format('H:i') }}</td>
                                     <td class="px-5 py-4">
                                         <span
                                             class="px-2 py-1 text-xs font-semibold rounded-full {{ $hotel->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                             {{ $hotel->is_active ? __('Active') : __('Inactive') }}
                                         </span>
                                     </td>
-                                    <td class="px-5 py-4">
-                                        <div class="flex gap-2">
+                                    <td class="px-5 py-4 text-center">
+                                        <div class="flex justify-center gap-2">
                                             <!-- Edit Button -->
                                             <a href="{{ route('admin.hotels.edit', $hotel->id) }}" class="btn-default !p-3"
                                                 title="{{ __('Edit') }}">
@@ -136,8 +135,7 @@
                                                         </svg>
                                                         <h3
                                                             class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                                                            {{ __('Are you sure you want to delete this hotel?') }}
-                                                        </h3>
+                                                            {{ __('Are you sure you want to delete this hotel?') }}</h3>
                                                         <form action="{{ route('admin.hotels.destroy', $hotel->id) }}"
                                                             method="POST">
                                                             @csrf
@@ -165,8 +163,8 @@
                                 </tr>
                             @endforelse
                         </tbody>
-
                     </table>
+
 
                     <div class="my-4 px-4 sm:px-6">
                         {{ $hotels->links() }}
