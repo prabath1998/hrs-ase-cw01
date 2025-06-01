@@ -21,7 +21,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $this->checkAuthorization(auth()->user(), ['dashboard.view']);
+        $this->checkAuthorization(auth()->user(), []);
 
         return view(
             'backend.pages.dashboard.index',
