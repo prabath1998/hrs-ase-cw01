@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Backend\Auth\ForgotPasswordController;
 use App\Http\Controllers\Backend\Auth\LoginController;
 use App\Http\Controllers\Backend\Auth\ResetPasswordController;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
 
 // User authentication routes.
 Route::group(['as' => 'admin.', 'middleware' => 'guest'], function () {
