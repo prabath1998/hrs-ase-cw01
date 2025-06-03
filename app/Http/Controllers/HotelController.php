@@ -90,4 +90,11 @@ class HotelController extends Controller
 
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel deleted successfully.'));
     }
+
+    public function showAllHotels()
+    {
+        $hotels = $this->hotelService->getHotels();
+
+        return view('landing.hotels.index', compact('hotels'));
+    }
 }

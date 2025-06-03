@@ -80,6 +80,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::get('/action-log', [ActionLogController::class, 'index'])->name('actionlog.index');
 });
 
+Route::get('/hotels', [HotelController::class,'showAllHotels'])->name('hotels.index');
 /**
  * Profile routes.
  */
