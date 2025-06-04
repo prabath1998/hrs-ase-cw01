@@ -81,6 +81,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 });
 
 Route::get('/hotels', [HotelController::class,'showAllHotels'])->name('hotels.index');
+Route::get('/hotels/{hotel}', [HotelController::class,'show'])->name('hotels.show');
 /**
  * Profile routes.
  */

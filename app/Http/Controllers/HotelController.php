@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Enums\ActionType;
 use App\Models\Hotel;
 use App\Services\HotelService;
-use App\Services\RolesService;
-use App\Services\UserService;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 
@@ -96,5 +94,10 @@ class HotelController extends Controller
         $hotels = $this->hotelService->getHotels();
 
         return view('landing.hotels.index', compact('hotels'));
+    }
+
+    public function show($hotel)
+    {
+        return view('landing.hotels.detail', compact('hotel'));
     }
 }
