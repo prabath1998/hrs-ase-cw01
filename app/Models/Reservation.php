@@ -39,7 +39,7 @@ class Reservation extends Model
 
     public function optionalServices()
     {
-        return $this->belongsToMany(OptionalService::class, 'reservation_optional_services')
+        return $this->belongsToMany(OptionalService::class)
             ->withPivot('quantity', 'price_at_booking')
             ->using(ReservationOptionalService::class)
             ->withTimestamps();
@@ -49,4 +49,51 @@ class Reservation extends Model
     {
         return $this->hasOne(Bill::class);
     }
+
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class);
+    }
+
+    public function totalEstimatedCost()
+    {
+        $totalCost = $this->total_estimated_room_charge + $this->optionalServices->sum(function ($service) {
+            return $service->pivot->quantity * $service->pivot->price_at_booking;
+        });
+        $discount = $totalCost * ($this->applied_discount_percentage ?? 0 / 100);
+        $totalCost -= $discount;
+        return \Illuminate\Support\Number::currency($totalCost, 'LKR');
+    }
+
+    public function statusLabel()
+    {
+        return match ($this->status) {
+            'pending_payment' => __('Pending Payment'),
+            'confirmed' => __('Confirmed'),
+            'checked_in' => __('Checked In'),
+            'checked_out' => __('Checked Out'),
+            'cancelled_customer' => __('Cancelled by Customer'),
+            'cancelled_system' => __('Cancelled by System'),
+            'no_show' => __('No Show'),
+            'block_booking_pending_names' => __('Block Booking - Pending Names'),
+            default => __('Unknown Status'),
+        };
+    }
+
+    public function statusColor()
+    {
+        return match ($this->status) {
+            'pending_payment' => 'bg-yellow-100 text-yellow-800',
+            'confirmed' => 'bg-green-100 text-green-800',
+            'checked_in' => 'bg-blue-100 text-blue-800',
+            'checked_out' => 'bg-gray-100 text-gray-800',
+            'cancelled_customer' => 'bg-red-100 text-red-800',
+            'cancelled_system' => 'bg-red-200 text-red-900',
+            'no_show' => 'bg-orange-100 text-orange-800',
+            'block_booking_pending_names' => 'bg-purple-100 text-purple-800',
+            default => 'bg-gray-200 text-gray-900',
+        };
+    }
+
+
 }

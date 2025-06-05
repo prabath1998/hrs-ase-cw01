@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('room_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('hotel_id')->nullable()->constrained('hotels')->onDelete('set null');
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->integer('occupancy_limit'); // Maximum number of guests allowed
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_suite')->default(false);    // Indicates if the room type is more luxurious
             $table->decimal('suite_weekly_rate', 12, 2)->nullable();
             $table->decimal('suite_monthly_rate', 12, 2)->nullable();
+            $table->json('features')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

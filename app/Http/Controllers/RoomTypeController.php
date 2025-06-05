@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ActionType;
+use App\Models\Hotel;
 use App\Models\RoomType;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class RoomTypeController extends Controller
     public function index()
     {
         $this->checkAuthorization(auth()->user(), ['dashboard.view']);
-        $roomTypes = RoomType::paginate(10);
+        $roomTypes = RoomType::with('hotel')->paginate(10);
         return view('backend.pages.room-types.index', [
             'roomTypes' => $roomTypes,
         ]);
@@ -22,7 +23,9 @@ class RoomTypeController extends Controller
     {
         $this->checkAuthorization(auth()->user(), ['room_type.manage']);
 
-        return view('backend.pages.room-types.create');
+        $hotels = Hotel::get(['id', 'name']);
+
+        return view('backend.pages.room-types.create', compact('hotels'));
     }
 
     public function store(Request $request)
@@ -35,6 +38,7 @@ class RoomTypeController extends Controller
         ]);
 
         $validated = $request->validate([
+            'hotel_id' => 'exists:hotels,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'occupancy_limit' => 'required|integer|min:1',
@@ -47,14 +51,15 @@ class RoomTypeController extends Controller
 
         RoomType::create($validated);
 
-        $this->storeActionLog(ActionType::CREATED, ['room_type' => $validated['name']]);
+        $this->storeActionLog(ActionType::CREATED, ['room_type' => $validated]);
 
         return redirect()->route('admin.room-types.index')->with('success', __('Room type created successfully.'));
     }
 
     public function edit(RoomType $roomType)
     {
-        return view('backend.pages.room-types.edit', compact('roomType'));
+        $hotels = Hotel::get(['id', 'name']);
+        return view('backend.pages.room-types.edit', compact('roomType', 'hotels'));
     }
 
     public function update(Request $request, RoomType $roomType)
@@ -67,6 +72,7 @@ class RoomTypeController extends Controller
         ]);
 
         $validated = $request->validate([
+            'hotel_id' => 'exists:hotels,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'occupancy_limit' => 'required|integer|min:1',

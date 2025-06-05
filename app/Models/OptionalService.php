@@ -14,7 +14,7 @@ class OptionalService extends Model
 
     public function reservations()
     {
-        return $this->belongsToMany(Reservation::class, 'reservation_optional_services')
+        return $this->belongsToMany(Reservation::class, 'optional_service_reservation')
             ->withPivot('quantity', 'price_at_booking')
             ->using(ReservationOptionalService::class)
             ->withTimestamps();

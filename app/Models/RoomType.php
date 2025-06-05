@@ -12,6 +12,10 @@ class RoomType extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    protected $casts = [
+        'features' => 'array', // Or 'object'
+    ];
+
     public function rooms()
     {
         return $this->hasMany(Room::class);
@@ -20,5 +24,10 @@ class RoomType extends Model
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function hotel()
+    {
+        return $this->belongsTo(Hotel::class);
     }
 }

@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
                 'username' => 'customer',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
-                'hotel_id' => $hotel->id
+                // 'hotel_id' => $hotel->id // Customers are not associated with a specific hotel
             ]
         );
         $customerUser->assignRole('Customer');
@@ -112,7 +112,7 @@ class UserSeeder extends Seeder
                 'username' => 'travel_agent',
                 'password' => $defaultPassword,
                 'email_verified_at' => now(),
-                'hotel_id' => $hotel->id
+                // 'hotel_id' => $hotel->id // Travel companies are not associated with a specific hotel
             ]
         );
         $travelUser->assignRole('Travel Company');

@@ -80,6 +80,16 @@ class AdminMenuService
         ]);
 
         $this->addMenuItem([
+            'label' => __('Reservations'),
+            'icon' => 'hotel.svg',
+            'route' => route('admin.reservations.index'),
+            'active' => Route::is('admin.reservations.index'),
+            'id' => 'reservation',
+            'priority' => 1,
+            'permissions' => 'reservation.manage'
+        ]);
+
+        $this->addMenuItem([
             'label' => __('Room Types'),
             'icon' => 'dashboard.svg',
             'route' => route('admin.room-types.index'),

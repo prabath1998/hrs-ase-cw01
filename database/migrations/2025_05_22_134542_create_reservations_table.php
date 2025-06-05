@@ -20,7 +20,8 @@ return new class extends Migration
             $table->foreignId('room_type_id')->constrained('room_types')->onDelete('restrict');
             $table->datetime('check_in_date');
             $table->datetime('check_out_date');
-            $table->integer('number_of_guests')->default(1);
+            $table->integer('number_of_adults')->default(1);
+            $table->integer('number_of_children')->default(0);
             $table->string('status'); // Enum: pending_payment, confirmed, checked_in, checked_out, cancelled_customer, cancelled_system, no_show, block_booking_pending_names
             $table->boolean('has_credit_card_guarantee')->default(false);
             $table->text('special_requests')->nullable();

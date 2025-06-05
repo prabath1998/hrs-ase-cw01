@@ -13,8 +13,10 @@ use App\Http\Controllers\Backend\ProfilesController;
 use App\Http\Controllers\Backend\TranslationController;
 use App\Http\Controllers\Backend\UserLoginAsController;
 use App\Http\Controllers\Backend\LocaleController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\OptionalServiceController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTypeController;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +35,13 @@ use Illuminate\Support\Facades\Route;
 
 
 // Route::get('/', 'HomeController@redirectAdmin')->name('index');
-Route::get('/', 'HomeController@index')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/hotels/{hotel:id}/reservations/create/{roomType}', [ReservationController::class, 'create'])
+    ->name('hotel.reservations.create');
+
+Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 'store'])
+    ->name('hotel.reservations.store');
 
 /**
  * Admin routes.
@@ -44,6 +52,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Hotel Routes.
     Route::resource('hotels', HotelController::class);
+    // Route::resource('reservations', ReservationController::class);
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);
