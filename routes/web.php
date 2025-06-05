@@ -52,7 +52,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Hotel Routes.
     Route::resource('hotels', HotelController::class);
-    // Route::resource('reservations', ReservationController::class);
+    Route::resource('reservations', ReservationController::class);
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);
