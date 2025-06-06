@@ -25,9 +25,7 @@ class RoomTypeSeeder extends Seeder
                 'base_price_per_night' => 5000.00,
                 'is_suite' => false,
                 'features' => [
-                    'view' => 'garden',
-                    'air_conditioning' => true,
-                    'wifi' => true,
+                    'Air Conditioning', 'Flat Screen TV'
                 ]
             ]
         );
@@ -41,8 +39,8 @@ class RoomTypeSeeder extends Seeder
                 'base_price_per_night' => 10000.00,
                 'is_suite' => false,
                 'features' => [
-                    'view' => 'city',
-                    'balcony' => true,
+                    'Air Conditioning', 'Flat Screen TV', 'Free WIFI', 'Private Bathroom'
+
                 ]
             ]
         );
@@ -58,8 +56,8 @@ class RoomTypeSeeder extends Seeder
                 'suite_weekly_rate' => 100000.00,
                 'suite_monthly_rate' => 500000.00,
                 'features' => [
-                    'view' => 'pool',
-                    'separate_living_room' => true,
+                    'Air Conditioning', 'Flat Screen TV', 'Free WIFI', 'Minibar', 'Private Bathroom'
+
                 ],
             ]
         );
@@ -75,9 +73,8 @@ class RoomTypeSeeder extends Seeder
                 'suite_weekly_rate' => 200000.00,
                 'suite_monthly_rate' => 900000.00,
                 'features' => [
-                    'view' => 'ocean',
-                    'jacuzzi' => true,
-                    'separate_living_room' => true,
+                    'Air Conditioning', 'Flat Screen TV', 'Free WIFI', 'Balcony', 'Minibar', 'Private Bathroom'
+
                 ],
             ]
         );

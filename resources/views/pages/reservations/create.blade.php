@@ -144,7 +144,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                <p class="text-2xl font-bold text-primary-600">{{ $roomType->base_price_per_night }}</p>
+                                                <p class="text-2xl font-bold text-primary-600">$<span x-model="roomBasePrice" x-text="roomBasePrice"></span></p>
                                                 <p class="text-gray-500 text-sm">per night</p>
                                                 @if(isset($appliedRateType) && $appliedRateType !== 'Nightly')
                                                     <small class="text-muted fw-normal">({{ $appliedRateType }} Rate)</small>
@@ -155,33 +155,14 @@
                                             <h4 class="font-medium text-gray-900">Room Amenities:</h4>
                                             <ul class="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
 
-                                                @foreach ($roomType->features ?? [] as $key => $feature)
+                                                @foreach ($roomType->features ?? [] as $feature)
                                                     <li class="flex items-center">
                                                         <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                                                         </svg>
                                                         {{ $feature }}
                                                     </li>
-
                                                 @endforeach
-                                                {{-- <li class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                                    </svg>
-                                                    Air Conditioning
-                                                </li>
-                                                <li class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                                    </svg>
-                                                    Flat-screen TV
-                                                </li>
-                                                <li class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                                    </svg>
-                                                    Private Bathroom
-                                                </li> --}}
                                             </ul>
                                         </div>
                                     </div>
@@ -201,26 +182,12 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Adults</label>
-                                    <select class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" x-model="adults">
-                                        <option value="1">1 Adult</option>
-                                        <option value="2">2 Adults</option>
-                                        <option value="3">3 Adults</option>
-                                        <option value="4">4 Adults</option>
-                                        <option value="5">5 Adults</option>
-                                        <option value="6">6+ Adults</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Children</label>
-                                    <select class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" x-model="children">
-                                        <option value="0">No Children</option>
-                                        <option value="1">1 Child</option>
-                                        <option value="2">2 Children</option>
-                                        <option value="3">3 Children</option>
-                                        <option value="4">4 Children</option>
-                                        <option value="5">5 Children</option>
-                                        <option value="6">6+ Children</option>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Number of Rooms</label>
+                                    <select class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" x-model="amount" required>
+                                        <option selected value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
                                     </select>
                                 </div>
                             </div>
@@ -231,23 +198,10 @@
                                     <div class="space-y-3">
                                         @foreach ($optionalServices as $service)
                                             <div class="flex items-center">
-                                                <input id="breakfast" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" x-model="addBreakfast">
-                                                <label for="breakfast" class="ml-3 text-sm text-gray-700">{{ $service->name }}</label>
+                                                <input id="service{{ $service->id }}" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" x-model="service{{ $service->id }}">
+                                                <label for="service{{ $service->id }}" class="ml-3 text-sm text-gray-700">{{ $service->name }}</label>
                                             </div>
                                         @endforeach
-
-                                        {{-- <div class="flex items-center">
-                                            <input id="breakfast" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" x-model="addBreakfast">
-                                            <label for="breakfast" class="ml-3 text-sm text-gray-700">Add breakfast ($25 per person per day)</label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input id="early-checkin" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" x-model="earlyCheckin">
-                                            <label for="early-checkin" class="ml-3 text-sm text-gray-700">Early check-in (from 10:00 AM, $30 extra)</label>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <input id="late-checkout" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" x-model="lateCheckout">
-                                            <label for="late-checkout" class="ml-3 text-sm text-gray-700">Late check-out (until 4:00 PM, $30 extra)</label>
-                                        </div> --}}
                                     </div>
                                 @endif
                             </div>
@@ -286,15 +240,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div>
                                     <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                    <input type="text" id="city" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter city" x-model="city" required>
+                                    <input type="text" id="city" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter city" x-model="city">
                                 </div>
                                 <div>
                                     <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
-                                    <input type="text" id="state" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter state" x-model="state" required>
+                                    <input type="text" id="state" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter state" x-model="state">
                                 </div>
                                 <div>
                                     <label for="zip" class="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code</label>
-                                    <input type="text" id="zip" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter ZIP code" x-model="zipCode" required>
+                                    <input type="text" id="zip" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter ZIP code" x-model="zipCode">
                                 </div>
                             </div>
 
@@ -333,9 +287,10 @@
                                         <input id="credit-card" name="payment-method" type="radio" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300" value="credit-card" x-model="paymentMethod" checked>
                                         <label for="credit-card" class="ml-3 text-sm text-gray-700">Credit Card</label>
                                     </div>
+                                    {{-- Pay after check in --}}
                                     <div class="flex items-center">
-                                        <input id="paypal" name="payment-method" type="radio" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300" value="paypal" x-model="paymentMethod">
-                                        <label for="paypal" class="ml-3 text-sm text-gray-700">PayPal</label>
+                                        <input id="offline-payment" name="payment-method" type="radio" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300" value="offline-payment" x-model="paymentMethod">
+                                        <label for="offline-payment" class="ml-3 text-sm text-gray-700">Pay at check-in</label>
                                     </div>
                                 </div>
                             </div>
@@ -411,8 +366,8 @@
                                         <p class="font-medium">Deluxe King Room</p>
                                     </div>
                                     <div>
-                                        <p class="text-gray-500">Guests</p>
-                                        <p class="font-medium" x-text="`${adults} Adult${adults > 1 ? 's' : ''}, ${children} Child${children > 1 || children === '0' ? 'ren' : ''}`"></p>
+                                        <p class="text-gray-500">Room Amount</p>
+                                        <p class="font-medium" x-text="`${amount}`"></p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Check-in</p>
@@ -471,6 +426,16 @@
                                             <span>PayPal</span>
                                         </div>
                                     </template>
+                                    <template x-if="paymentMethod === 'offline-payment'">
+                                        <div class="flex items-center">
+                                            <svg class="h-5 w-8 mr-2" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="36" height="24" rx="4" fill="#F0F0F0"/>
+                                                <path d="M18 7.5C16.6193 7.5 15.8 8.47778 15.8 10C15.8 11.5222 16.6193 12.5 18 12.5C19.3807 12.5 20.2 11.5222 20.2 10C20.2 8.47778 19.3807 7.5 18 7.5Z" fill="#0070E0"/>
+                                                <path d="M24.5 16H21L20.5 18H17L18.5 10H21C23 10 24.5 11 24.5 13C24.5 14.5 23.5 16 22 16H21L20.5 18H24L24.5 16Z" fill="#003087"/>
+                                            </svg>
+                                            <span>Pay at check-in</span>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
@@ -521,8 +486,8 @@
                     <div class="p-6">
                         <div class="flex justify-between mb-4">
                             <div>
-                                <h3 class="font-semibold">Grand Plaza Hotel</h3>
-                                <p class="text-sm text-gray-600">Miami, Florida</p>
+                                <h3 class="font-semibold">{{ $hotel->name }}</h3>
+                                <p class="d-none text-sm text-gray-600">Miami, Florida</p>
                             </div>
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -545,25 +510,19 @@
 
                         <div class="mb-4">
                             <div class="flex justify-between mb-2">
-                                <span class="text-gray-600">Deluxe King Room</span>
-                                <span class="font-medium">$249 × <span x-text="calculateNights()"></span> nights</span>
-                            </div>
-                            <div class="flex justify-between mb-2" x-show="addBreakfast">
-                                <span class="text-gray-600">Breakfast</span>
-                                <span class="font-medium">$<span x-text="calculateBreakfastTotal()"></span></span>
-                            </div>
-                            <div class="flex justify-between mb-2" x-show="earlyCheckin">
-                                <span class="text-gray-600">Early check-in</span>
-                                <span class="font-medium">$30</span>
-                            </div>
-                            <div class="flex justify-between mb-2" x-show="lateCheckout">
-                                <span class="text-gray-600">Late check-out</span>
-                                <span class="font-medium">$30</span>
+                                <span class="text-gray-600">{{ $roomType->name }}</span>
+                                <span class="font-medium">$<span x-text="roomBasePrice"></span> × <span x-text="calculateNights()"></span> nights</span>
                             </div>
                             <div class="flex justify-between mb-2">
-                                <span class="text-gray-600">Taxes & fees</span>
-                                <span class="font-medium">$<span x-text="calculateTaxes()"></span></span>
+                                <span class="text-gray-600">Number of Rooms</span>
+                                <span class="font-medium" x-text="amount"></span>
                             </div>
+                            @foreach ($optionalServices as $service)
+                                <div class="flex justify-between mb-2" x-show="service{{ $service->id }}">
+                                    <span class="text-gray-600">{{ $service->name }}</span>
+                                    <span class="font-medium">$<span x-text="calculateServiceTotal({{ $service->id }})"></span></span>
+                                </div>
+                            @endforeach
                         </div>
 
                         <div class="border-t pt-4">
@@ -730,6 +689,8 @@
     <script>
         function reservationForm() {
             return {
+                optionalServices: {!! $optionalServices->toJson() !!},
+                roomBasePrice: {!! $roomType->base_price_per_night !!},
                 // Form steps
                 currentStep: 1,
                 totalSteps: 4,
@@ -739,11 +700,17 @@
                 roomTypeId: '{{ $roomType->id }}',
                 checkInDate: '',
                 checkOutDate: '',
-                adults: '2',
-                children: '0',
-                addBreakfast: false,
-                earlyCheckin: false,
-                lateCheckout: false,
+                amount: 1,
+                // children: '0',
+                selectedServices: [],
+
+                // Define optional services
+                service1: false,
+                service2: false,
+                service3: false,
+                service4: false,
+                service5: false,
+                service6: false,
 
                 // Step 2: Guest Information
                 firstName: '',
@@ -883,6 +850,15 @@
 
                     return true;
                 },
+                calculateServiceTotal(serviceId) {
+                    const service = this.optionalServices.find(s => s.id === serviceId);
+                    console.log(service);
+
+                    if (!service) return 0;
+
+                    const nights = this.calculateNights();
+                    return (nights * service.price) * this.amount;
+                },
 
                 // Calculation methods
                 calculateNights() {
@@ -896,26 +872,24 @@
                     return nights > 0 ? nights : 0;
                 },
 
-                calculateBreakfastTotal() {
-                    if (!this.addBreakfast) return 0;
-                    const nights = this.calculateNights();
-                    const totalGuests = parseInt(this.adults) + parseInt(this.children);
-                    return nights * totalGuests * 25;
-                },
-
                 calculateTaxes() {
                     const subtotal = this.calculateSubtotal();
-                    return Math.round(subtotal * 0.12); // 12% tax rate
+                    // return 0;
+                    return Math.round(subtotal * 0.4); // 4% tax rate
                 },
 
                 calculateSubtotal() {
                     const nights = this.calculateNights();
-                    const roomTotal = nights * 249; // $249 per night
-                    const breakfastTotal = this.calculateBreakfastTotal();
-                    const earlyCheckinFee = this.earlyCheckin ? 30 : 0;
-                    const lateCheckoutFee = this.lateCheckout ? 30 : 0;
+                    const roomTotal = nights * this.roomBasePrice;
 
-                    return roomTotal + breakfastTotal + earlyCheckinFee + lateCheckoutFee;
+                    let selectedServicesTotal = 0;
+                    this.optionalServices.forEach(service => {
+                        if (this[`service${service.id}`]) {
+                            selectedServicesTotal += this.calculateServiceTotal(service.id);
+                        }
+                    });
+
+                    return roomTotal * this.amount + selectedServicesTotal;
                 },
 
                 calculateTotal() {
@@ -956,8 +930,8 @@
                     formData.append('room_type_id', this.roomTypeId);
                     formData.append('checkInDate', this.checkInDate);
                     formData.append('checkOutDate', this.checkOutDate);
-                    formData.append('adults', this.adults);
-                    formData.append('children', this.children);
+                    formData.append('amount', this.amount);
+                    // formData.append('children', this.children);
                     formData.append('addBreakfast', this.addBreakfast);
                     formData.append('earlyCheckin', this.earlyCheckin);
                     formData.append('lateCheckout', this.lateCheckout);
