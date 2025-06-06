@@ -484,7 +484,7 @@
             </div>
 
             <div class="text-center mt-12">
-                <a href="hotels.html"
+                <a href="{{route('hotels.index')}}"
                     class="px-6 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 inline-flex items-center">
                     View All Hotels
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 20 20"
@@ -528,7 +528,7 @@
                         <li>Real-time inventory access</li>
                         <li>Flexible payment terms</li>
                     </ul>
-                    <a href="partners.html"
+                    <a href="{{route('travel-company.register')}}"
                         class="px-6 py-3 bg-blue-600 border border-transparent rounded-md text-base font-medium text-white hover:bg-blue-700">
                         Become a Partner
                     </a>
