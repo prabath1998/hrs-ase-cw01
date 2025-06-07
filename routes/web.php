@@ -57,6 +57,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);
+    Route::resource('travel-companies', TravelCompanyController::class);
 
     // Room-Type Routes.
     Route::resource('room-types', RoomTypeController::class)->except(['show']);

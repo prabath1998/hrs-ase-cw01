@@ -120,6 +120,16 @@ class AdminMenuService
         ]);
 
         $this->addMenuItem([
+            'label' => __('Travel Companies'),
+            'icon' => 'travel-company.svg',
+            'route' => route('admin.travel-companies.index'),
+            'active' => Route::is('admin.travel-companies.index'),
+            'id' => 'travel-companies',
+            'priority' => 1,
+            'permissions' => 'dashboard.view'
+        ]);
+
+        $this->addMenuItem([
             'label' => __('Roles & Permissions'),
             'icon' => 'key.svg',
             'id' => 'roles-submenu',
