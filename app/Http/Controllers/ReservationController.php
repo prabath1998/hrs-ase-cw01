@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ReservationController extends Controller
@@ -41,75 +43,97 @@ class ReservationController extends Controller
     {
         // dd($hotel, $roomType, $request->all());
         // Validate incoming search parameters (dates, guests) from the query string
-        $searchParams = $request->validate([
-            'check_in_date' => 'required|date|after_or_equal:today',
-            'check_out_date' => 'required|date|after:check_in_date',
-            'adults' => 'required|integer|min:1',
-            'children' => 'nullable|integer|min:0',
-        ]);
+        // $searchParams = $request->validate([
+        //     'check_in_date' => 'required|date|after_or_equal:today',
+        //     'check_out_date' => 'required|date|after:check_in_date',
+        //     'adults' => 'required|integer|min:1',
+        //     'children' => 'nullable|integer|min:0',
+        // ]);
 
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');
         }
 
-        $checkIn = Carbon::parse($searchParams['check_in_date']);
-        $checkOut = Carbon::parse($searchParams['check_out_date']);
-        $numberOfNights = $checkIn->diffInDays($checkOut);
+        // $checkIn = Carbon::parse($searchParams['check_in_date']);
+        // $checkOut = Carbon::parse($searchParams['check_out_date']);
+        // $numberOfNights = $checkIn->diffInDays($checkOut);
 
-        $estimatedRoomPrice = $roomType->base_price_per_night * $numberOfNights;
-        $appliedRateType = 'Nightly';
+        // $estimatedRoomPrice = $roomType->base_price_per_night * $numberOfNights;
+        // $appliedRateType = 'Nightly';
 
-        if ($roomType->is_suite) {
-            if ($numberOfNights >= 28 && $roomType->suite_monthly_rate > 0) {
-                $estimatedRoomPrice = $roomType->suite_monthly_rate * ceil($numberOfNights / 28);
-                $appliedRateType = 'Monthly';
-            } elseif ($numberOfNights >= 7 && $roomType->suite_weekly_rate > 0) {
-                $estimatedRoomPrice = $roomType->suite_weekly_rate * ceil($numberOfNights / 7);
-                $appliedRateType = 'Weekly';
-            }
-        }
+        // if ($roomType->is_suite) {
+        //     if ($numberOfNights >= 28 && $roomType->suite_monthly_rate > 0) {
+        //         $estimatedRoomPrice = $roomType->suite_monthly_rate * ceil($numberOfNights / 28);
+        //         $appliedRateType = 'Monthly';
+        //     } elseif ($numberOfNights >= 7 && $roomType->suite_weekly_rate > 0) {
+        //         $estimatedRoomPrice = $roomType->suite_weekly_rate * ceil($numberOfNights / 7);
+        //         $appliedRateType = 'Weekly';
+        //     }
+        // }
 
         $optionalServices = OptionalService::where('is_active', true)->get(); // Or filter by hotel if services are hotel-specific
 
         return view('pages.reservations.create', compact(
             'hotel',
             'roomType',
-            'searchParams',
-            'estimatedRoomPrice',
-            'numberOfNights',
+            // 'searchParams',
+            // 'estimatedRoomPrice',
+            // 'numberOfNights',
             'optionalServices',
-            'appliedRateType'
+            // 'appliedRateType'
         ));
     }
 
     public function store(Request $request, Hotel $hotel)
     {
-        dd($hotel, $request->all());
+        // dd($hotel, $request->all());
+        Log::debug(json_decode($request->input('optional_services', [])));
+        Log::debug($request->input('optional_services', []));
+        Log::debug(gettype($request->input('optional_services', [])));
 
-        $validated = $request->validate([
-            // 'hotel_id' => 'required|exists:hotels,id',
+        $request->merge([
+            'optional_services' => array_values(json_decode($request->input('optional_services', []))),
+            'has_credit_card_guarantee' => (bool)$request->input('has_credit_card_guarantee'),
+            // 'nic_or_passport_number' => $request->input('nic_or_passport_number', null),
+        ]);
+
+
+        Log::debug($request->all());
+        $validator = Validator::make($request->all(), [
+            'hotel_id' => 'required|exists:hotels,id',
             'room_type_id' => 'required|exists:room_types,id',
             'check_in_date' => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
-            'number_of_adults' => 'required|integer|min:1',
-            'number_of_children' => 'nullable|integer|min:0',
-            // Guest details (assuming these are collected on this form)
+            'amount' => 'numeric|min:1',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'contact_email' => 'required|email|max:255',
             'phone_number' => 'required|string|max:20',
             // 'nic_or_passport_number' => 'nullable|string|max:20',
-            // 'address' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
             'special_requests' => 'nullable|string',
             'has_credit_card_guarantee' => 'sometimes|boolean',
-            'optional_services' => 'nullable|array',
-            'optional_services.*' => 'integer|exists:optional_services,id', // Validate each selected service ID
+            'optional_services' => 'sometimes|array',
+            'optional_services.*' => 'exists:optional_services,id',
 
         ]);
 
+        if ($validator->fails()) {
+            Log::debug(100);
+            Log::debug($validator->errors()->all());
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        Log::debug(110);
+        Log::debug($validated);
+
         $user = Auth::user();
 
-        if(!$user) {
+        if (!$user) {
             $user = User::create([
                 'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                 'username' => strtolower($validated['first_name']) . '_' . strtolower($validated['last_name']),
@@ -127,9 +151,9 @@ class ReservationController extends Controller
                 'contact_email' => $validated['contact_email'],
                 'phone_number' => $validated['phone_number'],
                 // 'nic_or_passport_number' => $validated['nic_or_passport_number'],
-                // 'address' => $validated['address'],
-                'payment_info_token' => null,
-                'credit_card_last_four' => null,
+                'address' => $validated['address'],
+                'payment_info_token' => $validated['has_credit_card_guarantee'] ? Hash::make(Str::random(12)) : null,
+                'credit_card_last_four' => $validated['has_credit_card_guarantee'] ? Str::random(4) : null,
             ]
         );
 
@@ -157,18 +181,17 @@ class ReservationController extends Controller
                 $suiteRateApplied = $roomType->suite_weekly_rate;
             }
         }
+        Log::debug(160);
 
         try {
             $reservation = Reservation::create([
                 'customer_id' => $customer->id,
-                'hotel_id' => $hotel->id, // Link reservation to the hotel
+                'hotel_id' => $hotel->id,
                 'room_type_id' => $validated['room_type_id'],
                 // 'room_id' is NULL until check-in
                 'check_in_date' => $validated['check_in_date'],
                 'check_out_date' => $validated['check_out_date'],
-                'number_of_adults' => $validated['number_of_adults'],
-                'number_of_children' => $validated['number_of_children'] ?? 0,
-                'status' => $request->input('has_credit_card_guarantee', false) ? 'confirmed_guaranteed' : 'confirmed_no_cc_hold',
+                'status' => $validated['has_credit_card_guarantee'] ? 'confirmed_guaranteed' : 'confirmed_no_cc_hold',
                 'has_credit_card_guarantee' => $request->input('has_credit_card_guarantee', false),
                 'special_requests' => $validated['special_requests'],
                 'booked_by_user_id' => $user->id,
@@ -191,17 +214,17 @@ class ReservationController extends Controller
             }
 
             // Send confirmation email to customer
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return back()->withErrors(['reservation' => 'Failed to create reservation: ' . $e->getMessage()])->withInput();
         }
 
         $this->storeActionLog(ActionType::CREATED, ['reservation' => $validated]);
+        // dd('Reservation created successfully', $reservation);
 
-        if($user->hasRole('customer')) {
-            // return redirect()->route('customer.dashboard')->with('success', __('Reservation created successfully.'));
+        if ($user->hasRole('customer')) {
+            return redirect()->route('customer.dashboard')->with('success', __('Reservation created successfully.'));
         } else {
-            // return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
+            return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
         }
     }
 

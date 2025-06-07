@@ -172,11 +172,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
-                                    <input type="text" id="check-in-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Select date" x-model="checkInDate" required>
+                                    <input type="text" id="check-in-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Select date" x-model="check_in_date" required>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
-                                    <input type="text" id="check-out-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Select date" x-model="checkOutDate" required>
+                                    <input type="text" id="check-out-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Select date" x-model="check_out_date" required>
                                 </div>
                             </div>
 
@@ -213,22 +213,22 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                                    <input type="text" id="first-name" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter first name" x-model="firstName" required>
+                                    <input type="text" id="first-name" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter first name" x-model="first_name" required>
                                 </div>
                                 <div>
                                     <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                                    <input type="text" id="last-name" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter last name" x-model="lastName" required>
+                                    <input type="text" id="last-name" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter last name" x-model="last_name" required>
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                    <input type="email" id="email" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter email address" x-model="email" required>
+                                    <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <input type="contact_email" id="contact_email" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter email address" x-model="contact_email" required>
                                 </div>
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                                    <input type="tel" id="phone" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter phone number" x-model="phone" required>
+                                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" id="phone_number" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter phone number" x-model="phone_number" required>
                                 </div>
                             </div>
 
@@ -272,7 +272,7 @@
 
                             <div class="mb-6">
                                 <label for="special-requests" class="block text-sm font-medium text-gray-700 mb-1">Special Requests (Optional)</label>
-                                <textarea id="special-requests" rows="3" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter any special requests or requirements" x-model="specialRequests"></textarea>
+                                <textarea id="special-requests" rows="3" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Enter any special requests or requirements" x-model="special_requests"></textarea>
                                 <p class="text-xs text-gray-500 mt-1">Special requests cannot be guaranteed but we will do our best to accommodate your needs.</p>
                             </div>
                         </div>
@@ -296,16 +296,16 @@
                             </div>
 
                             <!-- Credit Card Form -->
-                            <div x-show="paymentMethod === 'credit-card'" class="space-y-6">
+                            <div x-data="{ isChecked: paymentMethod === 'credit-card' }" x-show="paymentMethod === 'credit-card'" class="space-y-6">
                                 <div>
                                     <label for="card-holder" class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
-                                    <input type="text" id="card-holder" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Name on card" x-model="cardholderName" required>
+                                    <input type="text" id="card-holder" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Name on card" x-model="cardholderName" :required="paymentMethod === 'credit-card'">
                                 </div>
 
                                 <div>
                                     <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
                                     <div class="relative">
-                                        <input type="text" id="card-number" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="1234 5678 9012 3456" x-model="cardNumber" maxlength="19" x-on:input="formatCardNumber" required>
+                                        <input type="text" id="card-number" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="1234 5678 9012 3456" x-model="cardNumber" maxlength="19" x-on:input="formatCardNumber" :required="paymentMethod === 'credit-card'">
                                         <div class="absolute right-3 top-2.5 flex space-x-2">
                                             <svg class="h-5 w-8" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <rect width="36" height="24" rx="4" fill="#1434CB"/>
@@ -326,11 +326,11 @@
                                 <div class="grid grid-cols-2 gap-6">
                                     <div>
                                         <label for="expiry-date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                                        <input type="text" id="expiry-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="MM/YY" x-model="expiryDate" maxlength="5" x-on:input="formatExpiryDate" required>
+                                        <input type="text" id="expiry-date" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="MM/YY" x-model="expiryDate" maxlength="5" x-on:input="formatExpiryDate" :required="paymentMethod === 'credit-card'">
                                     </div>
                                     <div>
                                         <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                        <input type="text" id="cvv" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="123" x-model="cvv" maxlength="4" required>
+                                        <input type="text" id="cvv" class="w-full px-4 py-2 border rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="123" x-model="cvv" maxlength="4" :required="paymentMethod === 'credit-card'">
                                     </div>
                                 </div>
                             </div>
@@ -371,11 +371,11 @@
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Check-in</p>
-                                        <p class="font-medium" x-text="checkInDate"></p>
+                                        <p class="font-medium" x-text="check_in_date"></p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Check-out</p>
-                                        <p class="font-medium" x-text="checkOutDate"></p>
+                                        <p class="font-medium" x-text="check_out_date"></p>
                                     </div>
                                 </div>
                             </div>
@@ -385,15 +385,15 @@
                                 <div class="grid grid-cols-2 gap-4 text-sm">
                                     <div>
                                         <p class="text-gray-500">Name</p>
-                                        <p class="font-medium" x-text="`${firstName} ${lastName}`"></p>
+                                        <p class="font-medium" x-text="`${first_name} ${last_name}`"></p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Email</p>
-                                        <p class="font-medium" x-text="email"></p>
+                                        <p class="font-medium" x-text="contact_email"></p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Phone</p>
-                                        <p class="font-medium" x-text="phone"></p>
+                                        <p class="font-medium" x-text="phone_number"></p>
                                     </div>
                                     <div>
                                         <p class="text-gray-500">Address</p>
@@ -441,7 +441,7 @@
 
                             <div class="bg-gray-50 p-4 rounded-md mb-6">
                                 <h3 class="font-medium text-gray-900 mb-2">Special Requests</h3>
-                                <p class="text-sm" x-text="specialRequests || 'None'"></p>
+                                <p class="text-sm" x-text="special_requests || 'None'"></p>
                             </div>
                         </div>
 
@@ -500,11 +500,11 @@
                         <div class="border-t border-b py-4 mb-4">
                             <div class="flex justify-between mb-2">
                                 <span class="text-gray-600">Check-in</span>
-                                <span class="font-medium" x-text="checkInDate || 'Select date'"></span>
+                                <span class="font-medium" x-text="check_in_date || 'Select date'"></span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Check-out</span>
-                                <span class="font-medium" x-text="checkOutDate || 'Select date'"></span>
+                                <span class="font-medium" x-text="check_out_date || 'Select date'"></span>
                             </div>
                         </div>
 
@@ -584,7 +584,7 @@
                     <h3 class="text-lg font-semibold mb-4">Subscribe to our newsletter</h3>
                     <p class="text-gray-300 mb-4">Get the latest offers and updates</p>
                     <form class="flex">
-                        <input type="email" placeholder="Your email" class="px-4 py-2 w-full rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900">
+                        <input type="contact_email" placeholder="Your email" class="px-4 py-2 w-full rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900">
                         <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-r-md hover:bg-primary-700">Subscribe</button>
                     </form>
                 </div>
@@ -698,8 +698,8 @@
                 // Step 1: Room Selection
                 hotelId: '{{ $hotel->id }}',
                 roomTypeId: '{{ $roomType->id }}',
-                checkInDate: '',
-                checkOutDate: '',
+                check_in_date: '',
+                check_out_date: '',
                 amount: 1,
                 // children: '0',
                 selectedServices: [],
@@ -713,16 +713,16 @@
                 service6: false,
 
                 // Step 2: Guest Information
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
+                first_name: '',
+                last_name: '',
+                contact_email: '',
+                phone_number: '',
                 address: '',
                 city: '',
                 state: '',
                 zipCode: '',
                 country: '',
-                specialRequests: '',
+                special_requests: '',
 
                 // Step 3: Payment Information
                 paymentMethod: 'credit-card',
@@ -731,6 +731,7 @@
                 expiryDate: '',
                 cvv: '',
                 agreeToTerms: false,
+                has_credit_card_guarantee: this.paymentMethod === 'credit-card',
 
                 init() {
                     this.initializeDatePickers();
@@ -746,7 +747,7 @@
                         minDate: "today",
                         dateFormat: "Y-m-d",
                         onChange: (selectedDates, dateStr) => {
-                            this.checkInDate = dateStr;
+                            this.check_in_date = dateStr;
                             const checkOutPicker = document.querySelector("#check-out-date")._flatpickr;
                             if (checkOutPicker) {
                                 const minCheckOut = new Date(selectedDates[0]);
@@ -761,7 +762,7 @@
                         minDate: tomorrow,
                         dateFormat: "Y-m-d",
                         onChange: (selectedDates, dateStr) => {
-                            this.checkOutDate = dateStr;
+                            this.check_out_date = dateStr;
                         }
                     });
                 },
@@ -796,7 +797,7 @@
                 },
 
                 validateStep1() {
-                    if (!this.checkInDate || !this.checkOutDate) {
+                    if (!this.check_in_date || !this.check_out_date) {
                         alert('Please select check-in and check-out dates.');
                         return false;
                     }
@@ -804,7 +805,7 @@
                 },
 
                 validateStep2() {
-                    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode', 'country'];
+                    const requiredFields = ['first_name', 'last_name', 'contact_email', 'phone_number', 'address', 'city', 'state', 'zipCode', 'country'];
                     for (let field of requiredFields) {
                         if (!this[field]) {
                             alert('Please fill in all required fields.');
@@ -813,7 +814,7 @@
                     }
 
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(this.email)) {
+                    if (!emailRegex.test(this.contact_email)) {
                         alert('Please enter a valid email address.');
                         return false;
                     }
@@ -862,10 +863,10 @@
 
                 // Calculation methods
                 calculateNights() {
-                    if (!this.checkInDate || !this.checkOutDate) return 0;
+                    if (!this.check_in_date || !this.check_out_date) return 0;
 
-                    const checkIn = new Date(this.checkInDate);
-                    const checkOut = new Date(this.checkOutDate);
+                    const checkIn = new Date(this.check_in_date);
+                    const checkOut = new Date(this.check_out_date);
                     const timeDiff = checkOut.getTime() - checkIn.getTime();
                     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
@@ -883,8 +884,10 @@
                     const roomTotal = nights * this.roomBasePrice;
 
                     let selectedServicesTotal = 0;
+                    this.selectedServices = [];
                     this.optionalServices.forEach(service => {
                         if (this[`service${service.id}`]) {
+                            this.selectedServices.push(service.id);
                             selectedServicesTotal += this.calculateServiceTotal(service.id);
                         }
                     });
@@ -928,24 +931,23 @@
                     formData.append('csrf_token', '{{ csrf_token() }}');
                     formData.append('hotel_id', this.hotelId);
                     formData.append('room_type_id', this.roomTypeId);
-                    formData.append('checkInDate', this.checkInDate);
-                    formData.append('checkOutDate', this.checkOutDate);
+                    formData.append('check_in_date', this.check_in_date);
+                    formData.append('check_out_date', this.check_out_date);
                     formData.append('amount', this.amount);
                     // formData.append('children', this.children);
-                    formData.append('addBreakfast', this.addBreakfast);
-                    formData.append('earlyCheckin', this.earlyCheckin);
-                    formData.append('lateCheckout', this.lateCheckout);
-                    formData.append('firstName', this.firstName);
-                    formData.append('lastName', this.lastName);
-                    formData.append('email', this.email);
-                    formData.append('phone', this.phone);
+                    formData.append('optional_services', JSON.stringify(this.selectedServices));
+                    formData.append('first_name', this.first_name);
+                    formData.append('last_name', this.last_name);
+                    formData.append('contact_email', this.contact_email);
+                    formData.append('phone_number', this.phone_number);
                     formData.append('address', this.address);
                     formData.append('city', this.city);
                     formData.append('state', this.state);
                     formData.append('zipCode', this.zipCode);
                     formData.append('country', this.country);
-                    formData.append('specialRequests', this.specialRequests);
+                    formData.append('special_requests', this.special_requests);
                     formData.append('paymentMethod', this.paymentMethod);
+                    formData.append('has_credit_card_guarantee', this.has_credit_card_guarantee);
                     formData.append('total', this.calculateTotal());
 
                     console.log('Reservation submitted:');
