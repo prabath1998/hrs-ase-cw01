@@ -42,12 +42,19 @@ class HotelController extends Controller
             'phone_number' => 'nullable|string|max:20',
             'default_check_in_time' => 'required|date',
             'default_check_out_time' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'description' => 'nullable|string',
+            'rating' => 'nullable|numeric|min:0|max:5',
             'is_active' => 'nullable|boolean',
         ]);
 
+        if($validated['image']) {
+            $validated['image'] = $request->file('image')->store('hotels', 'public');
+        }
+
         Hotel::create($validated);
 
-        $this->storeActionLog(ActionType::CREATED, ['hotel' => $validated['name']]);
+        $this->storeActionLog(ActionType::CREATED, ['hotel' => $validated]);
 
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel created successfully.'));
     }
@@ -70,11 +77,18 @@ class HotelController extends Controller
             'phone_number' => 'nullable|string|max:20',
             'default_check_in_time' => 'required|date',
             'default_check_out_time' => 'required|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'description' => 'nullable|string',
+            'rating' => 'nullable|numeric|min:0|max:5',
             'is_active' => 'boolean',
         ]);
 
+        if($validated['image']) {
+            $validated['image'] = $request->file('image')->store('hotels', 'public');
+        }
+
         $hotel->update($validated);
-        $this->storeActionLog(ActionType::UPDATED, ['hotel' => $validated['name']]);
+        $this->storeActionLog(ActionType::UPDATED, ['hotel' => $validated]);
 
 
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel updated successfully.'));

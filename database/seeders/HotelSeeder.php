@@ -13,6 +13,9 @@ class HotelSeeder extends Seeder
      */
     public function run(): void
     {
+
+        
+
         Hotel::firstOrCreate(
             ['name' => 'Hotel A'],
             [
