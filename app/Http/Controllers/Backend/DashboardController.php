@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Hotel;
+use App\Models\TravelCompany;
 use App\Models\User;
 use App\Services\Charts\UserChartService;
 use App\Services\LanguageService;
@@ -27,8 +29,8 @@ class DashboardController extends Controller
             'backend.pages.dashboard.index',
             [
                 'total_users' => number_format(User::count()),
-                'total_roles' => number_format(Role::count()),
-                'total_permissions' => number_format(Permission::count()),
+                'total_hotels' => number_format(Hotel::count()),
+                'total_travel_companies' => number_format(TravelCompany::count()),
                 'languages' => [
                         'total' => number_format(count($this->languageService->getLanguages())),
                         'active' => number_format(count($this->languageService->getActiveLanguages())),
