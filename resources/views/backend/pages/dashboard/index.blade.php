@@ -32,16 +32,16 @@
                     ])
                     @include('backend.pages.dashboard.partials.card', [
                         'icon_svg' => asset('images/icons/key.svg'),
-                        'label' => __('Roles'),
-                        'value' => $total_roles,
+                        'label' => __('Hotels'),
+                        'value' => $total_hotels,
                         'bg' => '#00D7FF',
                         'class' => 'bg-white',
                         'url' => route('admin.roles.index'),
                     ])
                     @include('backend.pages.dashboard.partials.card', [
                         'icon' => 'bi bi-shield-check',
-                        'label' => __('Permissions'),
-                        'value' => $total_permissions,
+                        'label' => __('Travel Companies'),
+                        'value' => $total_travel_companies,
                         'bg' => '#FF4D96',
                         'class' => 'bg-white',
                         'url' => route('admin.permissions.index'),
