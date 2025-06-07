@@ -19,6 +19,7 @@ use App\Http\Controllers\OptionalServiceController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTypeController;
+use App\Http\Controllers\TravelCompanyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -56,8 +57,9 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);
+    Route::resource('travel-companies', TravelCompanyController::class);
 
-     // Room-Type Routes.
+    // Room-Type Routes.
     Route::resource('room-types', RoomTypeController::class)->except(['show']);
     Route::resource('rooms', RoomController::class)->except(['show']);
 
@@ -87,10 +89,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Action Log Routes.
     Route::get('/action-log', [ActionLogController::class, 'index'])->name('actionlog.index');
+
+
 });
 
-Route::get('/hotels', [HotelController::class,'showAllHotels'])->name('hotels.index');
-Route::get('/hotels/{hotel}', [HotelController::class,'show'])->name('hotels.show');
+Route::get('/hotels', [HotelController::class, 'showAllHotels'])->name('hotels.index');
+Route::get('/hotels/{hotel}', [HotelController::class, 'show'])->name('hotels.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/travel-company/register', [TravelCompanyController::class, 'showRegistrationForm'])->name('travel-company.register');
+    Route::post('/travel-company/register', [TravelCompanyController::class, 'register'])->name('travel-company.register.submit');
+});
+
+
+
 /**
  * Profile routes.
  */

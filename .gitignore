@@ -24,3 +24,4 @@ public/images/.DS_Store
 
 # Exclude release builds
 /releases
+.fuse_*
