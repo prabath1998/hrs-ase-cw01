@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HotelHub - Find Your Perfect Stay</title>
+    <title>TravelEase - Find Your Perfect Stay</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js CDN -->
@@ -504,7 +504,7 @@
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Partner With Us</h2>
                 <p class="text-xl text-gray-600">
-                    Grow your business by joining the HotelHub network and offering our extensive inventory to your
+                    Grow your business by joining the TravelEase network and offering our extensive inventory to your
                     clients.
                 </p>
             </div>
@@ -595,7 +595,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-5 gap-8">
                 <div class="md:col-span-2">
-                    <h3 class="text-2xl font-bold mb-4 text-blue-400">HotelHub</h3>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-400">TravelEase</h3>
                     <p class="text-gray-300 mb-6 max-w-md">
                         Your trusted partner for finding and booking the perfect accommodations worldwide. Experience
                         luxury,
@@ -662,7 +662,7 @@
                                 stroke-linejoin="round" class="lucide lucide-mail w-5 h-5 text-gray-400">
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                            </svg><span>support@hotelhub.com</span></div>
+                            </svg><span>support@TravelEase.com</span></div>
                         <div class="flex items-center space-x-3"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -675,7 +675,7 @@
             </div>
             <div class="border-t border-gray-800 mt-12 pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center">
-                    <p class="text-gray-400">© 2024 HotelHub. All rights reserved.</p>
+                    <p class="text-gray-400">© 2024 TravelEase. All rights reserved.</p>
                     <div class="flex space-x-6 mt-4 md:mt-0"><a href="/privacy"
                             class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a><a
                             href="/cookies" class="text-gray-400 hover:text-white transition-colors">Cookie
