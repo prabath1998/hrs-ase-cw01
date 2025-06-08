@@ -12,6 +12,10 @@ class Hotel extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    protected $casts = [
+        'images' => 'array',
+    ];
+
     public function rooms()
     {
         return $this->hasMany(Room::class);

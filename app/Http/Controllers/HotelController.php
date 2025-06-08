@@ -115,7 +115,9 @@ class HotelController extends Controller
         $hotel = Hotel::with(['roomTypes'])
             ->where('id', $hotel->id)
             ->firstOrFail();
-        return view('landing.hotels.detail', compact('hotel'));
+
+        $priceFrom = $hotel->roomTypes->min('price_per_night');
+        return view('landing.hotels.detail', compact('hotel', 'priceFrom'));
     }
 
     public function checkRoomAvailability(Request $request, Hotel $hotel)
