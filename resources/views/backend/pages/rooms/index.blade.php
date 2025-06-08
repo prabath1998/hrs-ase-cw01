@@ -80,7 +80,7 @@
                                             @endif
                                             <span
                                                 class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-800 dark:text-white">
-                                                {{ $value ? ucwords(preg_replace('/_/', ' ', $key)) : '' }}
+                                                {{ $value ? ucwords(preg_replace('/_/', ' ', $value)) : '' }}
                                             </span>
                                         @endforeach
                                     </td>

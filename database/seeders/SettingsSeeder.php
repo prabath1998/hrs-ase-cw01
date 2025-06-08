@@ -18,7 +18,7 @@ class SettingsSeeder extends Seeder
     {
         DB::table('settings')->insert([
             // Site title.
-            ['option_name' => 'app_name', 'option_value' => 'Lara Dashboard'],
+            ['option_name' => 'app_name', 'option_value' => 'TravelEase Dashboard'],
 
             // theme colors.
             ['option_name' => 'theme_primary_color', 'option_value' => '#635bff'],
