@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('contact_email')->nullable()->unique();
             $table->string('phone_number')->nullable();
-            $table->text('image');
+            $table->json('images')->nullable();
             $table->text('description')->nullable();
             $table->string('website')->nullable();
             $table->decimal('rating', 3, 2)->default(0.00);
