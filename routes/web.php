@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Backend\ActionLogController;
 use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Backend\ModulesController;
 use App\Http\Controllers\Backend\PermissionsController;
 use App\Http\Controllers\Backend\RolesController;
@@ -43,6 +44,18 @@ Route::get('/hotels/{hotel:id}/reservations/create/{roomType}', [ReservationCont
 
 Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 'store'])
     ->name('hotel.reservations.store');
+
+/**
+ * Customer Dashboard
+ */
+
+Route::group([], function () {
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
+    Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+});
 
 /**
  * Admin routes.
@@ -89,8 +102,6 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Action Log Routes.
     Route::get('/action-log', [ActionLogController::class, 'index'])->name('actionlog.index');
-
-
 });
 
 Route::get('/hotels', [HotelController::class, 'showAllHotels'])->name('hotels.index');
