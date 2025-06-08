@@ -7,21 +7,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', config('app.name'))</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    
+
     @include('backend.layouts.partials.theme-colors')
     @yield('before_vite_build')
 
     @viteReactRefresh
     @vite(['resources/js/app.js', 'resources/css/app.css'])
-    
+
     @if (!empty(config('settings.global_custom_css')))
-    <style>
-        /* {!! config('settings.global_custom_css') !!} */
-    </style>
+        <style>
+            /* {!! config('settings.global_custom_css') !!} */
+        </style>
     @endif
 
     @include('backend.layouts.partials.integration-scripts')
-    
+
     @yield('styles')
 </head>
 
@@ -71,11 +71,22 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
                             </div>
 
                             <div class="flex flex-col items-center max-w-xs">
-                                <a href="#" class="block mb-4">
-                                    <img src="/images/logo/lara-dashboard-dark.png" alt="Logo">
+                                <a href="{{ route('home') }}" class="group flex items-center space-x-3">
+                                    <div class="relative">
+                                        <div
+                                            class="w-10 h-10 dark:via-purple-600 dark:to-indigo-600  bg-gradient-to-tr from-blue-600 via-purple-600 to-indigo-600 rounded-xl shadow-lg rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                                        </div>
+                                        <div
+                                            class="absolute inset-0 w-10 h-10 bg-gradient-to-tr from-blue-400 via-purple-400 to-indigo-400 rounded-xl blur-md opacity-70 -z-10">
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="text-2xl font-bold bg-gradient-to-r  bg-clip-text text-transparent from-gray-100 via-blue-300 to-indigo-300 transition-colors duration-300">
+                                        TravelEase
+                                    </span>
                                 </a>
                                 <p class="text-center text-gray-400 dark:text-white/60">
-                                    {{ __('Free and Open-Source Laravel Admin Dashboard Template') }}
+                                    {{ __('Sign in to your account') }}
                                 </p>
                             </div>
                         </div>
@@ -106,11 +117,11 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
     </div>
 
     @stack('scripts')
-    
+
     @if (!empty(config('settings.global_custom_js')))
-    <script>
-        {!! config('settings.global_custom_js') !!}
-    </script>
+        <script>
+            {!! config('settings.global_custom_js') !!}
+        </script>
     @endif
 </body>
 
