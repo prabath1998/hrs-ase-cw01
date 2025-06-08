@@ -82,23 +82,6 @@
 
                     </div>
 
-                    <div>
-                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            {{ __('Register As') }} <span class="text-error-500">*</span>
-                        </label>
-                        <select name="role" id="role" required
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 @error('role') border-red-500 @enderror">
-                            <option value="Customer" {{ old('role') == 'Customer' ? 'selected' : '' }}>
-                                {{ __('Customer') }}</option>
-                            <option value="Travel Company" {{ old('role') == 'Travel Company' ? 'selected' : '' }}>
-                                {{ __('Travel Company') }}</option>
-                        </select>
-
-                        @error('role')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
 
                     <div>
                         <button type="submit"

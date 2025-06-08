@@ -48,7 +48,7 @@ class HotelController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        if($validated['image']) {
+        if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('hotels', 'public');
         }
 
@@ -58,6 +58,7 @@ class HotelController extends Controller
 
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel created successfully.'));
     }
+
 
     public function edit(Hotel $hotel)
     {
@@ -83,16 +84,19 @@ class HotelController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        if($validated['image']) {
+        if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('hotels', 'public');
+        } else {
+            unset($validated['image']);
         }
 
         $hotel->update($validated);
-        $this->storeActionLog(ActionType::UPDATED, ['hotel' => $validated]);
 
+        $this->storeActionLog(ActionType::UPDATED, ['hotel' => $validated]);
 
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel updated successfully.'));
     }
+
 
     public function destroy(Hotel $hotel)
     {
