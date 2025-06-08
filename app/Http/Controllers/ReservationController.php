@@ -43,12 +43,12 @@ class ReservationController extends Controller
     {
         // dd($hotel, $roomType, $request->all());
         // Validate incoming search parameters (dates, guests) from the query string
-        // $searchParams = $request->validate([
-        //     'check_in_date' => 'required|date|after_or_equal:today',
-        //     'check_out_date' => 'required|date|after:check_in_date',
-        //     'adults' => 'required|integer|min:1',
-        //     'children' => 'nullable|integer|min:0',
-        // ]);
+        $searchParams = $request->validate([
+            'check_in_date' => 'required|date|after_or_equal:today',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'adults' => 'required|integer|min:1',
+            'children' => 'nullable|integer|min:0',
+        ]);
 
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');

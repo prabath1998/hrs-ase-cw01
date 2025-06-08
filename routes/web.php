@@ -95,6 +95,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
 Route::get('/hotels', [HotelController::class, 'showAllHotels'])->name('hotels.index');
 Route::get('/hotels/{hotel}', [HotelController::class, 'show'])->name('hotels.show');
+Route::post('/hotels/{hotel}/check-availability', [HotelController::class, 'checkRoomAvailability'])
+    ->name('hotels.check-availability');
 
 Route::middleware('auth')->group(function () {
     Route::get('/travel-company/register', [TravelCompanyController::class, 'showRegistrationForm'])->name('travel-company.register');

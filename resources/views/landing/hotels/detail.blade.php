@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Plaza Hotel - Luxury Stay in Miami</title>
+    <title>{{  }}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -895,7 +895,7 @@
             </div>
 
             <!-- Right Column: Booking Form -->
-            <div class="lg:col-span-1">
+            <div class="lg:col-span-1" x-data="{ checkAvailabilityForm() }">
                 <div class="bg-white border rounded-lg shadow-sm p-6 sticky top-6">
                     <h2 class="text-xl font-semibold mb-4">Book Your Stay</h2>
                     <form>
@@ -917,16 +917,16 @@
                                 <option value="5">5+ Guests</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        {{-- <div class="mb-4">
                             <label for="room-type" class="block text-sm font-medium text-gray-700 mb-1">Room Type</label>
                             <select id="room-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="deluxe">Deluxe Room - $299/night</option>
                                 <option value="executive">Executive Suite - $499/night</option>
                                 <option value="presidential">Presidential Suite - $999/night</option>
                             </select>
-                        </div>
+                        </div> --}}
 
-                        <div class="border-t border-gray-200 pt-4 mt-4">
+                        {{-- <div class="border-t border-gray-200 pt-4 mt-4">
                             <div class="flex justify-between mb-2">
                                 <span class="text-gray-600">$299 x 3 nights</span>
                                 <span class="text-gray-800">$897</span>
@@ -939,9 +939,13 @@
                                 <span>Total</span>
                                 <span>$1,005</span>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 mt-6">
+                            Check Availability
+                        </button>
+
+                        <button :disabled="!availability" type="button" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition duration-300 mt-2">
                             Book Now
                         </button>
 
@@ -1059,6 +1063,43 @@
             }
         });
     });
+
+    function checkAvailabilityForm() {
+        return {
+            availability: false, // This would be dynamically set based on form input
+            roomTypeId: '',
+            checkAvailability() {
+                const formData = new FormData();
+                formData.append('checkIn', document.getElementById('check-in').value);
+                formData.append('checkOut', document.getElementById('check-out').value);
+                formData.append('room_type_id', document.getElementById('room-type').value);
+
+                fetch('/hotels/{{ $hotel->id }}/check-availability', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        checkIn: document.getElementById('check-in').value,
+                        checkOut: document.getElementById('check-out').value,
+                        guests: document.getElementById('guests').value,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.availability = data.available; // Set availability based on API response
+                    if (this.availability) {
+                        alert('Rooms are available for your selected dates!');
+                    } else {
+                        alert('Sorry, no rooms available for your selected dates.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking availability:', error);
+                });
+            }
+        }
+    }
 </script>
 </body>
 </html>

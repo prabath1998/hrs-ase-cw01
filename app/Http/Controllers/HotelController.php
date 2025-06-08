@@ -110,8 +110,29 @@ class HotelController extends Controller
         return view('landing.hotels.index', compact('hotels'));
     }
 
-    public function show($hotel)
+    public function show(Hotel $hotel)
     {
+        $hotel = Hotel::with(['roomTypes'])
+            ->where('id', $hotel->id)
+            ->firstOrFail();
         return view('landing.hotels.detail', compact('hotel'));
+    }
+
+    public function checkRoomAvailability(Request $request, Hotel $hotel)
+    {
+        $request->validate([
+            'check_in' => 'required|date',
+            'check_out' => 'required|date|after:check_in',
+            'room_type_id' => 'required|exists:room_types,id',
+        ]);
+
+        $availability = $this->hotelService->checkRoomAvailability(
+            $hotel,
+            $request->input('check_in'),
+            $request->input('check_out'),
+            $request->input('room_type_id')
+        );
+
+        return response()->json(['available' => $availability]);
     }
 }
