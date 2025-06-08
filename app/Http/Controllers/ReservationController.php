@@ -39,16 +39,20 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function create(Hotel $hotel, RoomType $roomType, Request $request): Renderable
+    public function create(Request $request): Renderable
     {
-        // dd($hotel, $roomType, $request->all());
+        // dd($request->all());
         // Validate incoming search parameters (dates, guests) from the query string
         $searchParams = $request->validate([
-            'check_in_date' => 'required|date|after_or_equal:today',
-            'check_out_date' => 'required|date|after:check_in_date',
-            'adults' => 'required|integer|min:1',
-            'children' => 'nullable|integer|min:0',
+            'hotelId' => 'required|exists:hotels,id',
+            'roomTypeId' => 'required|exists:room_types,id',
+            'checkIn' => 'required|date|after_or_equal:today',
+            'checkOut' => 'required|date|after:check_in_date',
+            'guests' => 'required|integer|min:1',
         ]);
+
+        $hotel = Hotel::findOrFail($searchParams['hotelId']);
+        $roomType = RoomType::findOrFail($searchParams['roomTypeId']);
 
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Your Reservation | Luxury Hotels</title>
+    <title>{{ $hotel->name }}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
@@ -41,23 +41,45 @@
         }
     </script>
 </head>
-<body class="bg-gray-50">
+<body class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center">
-                    <a href="index.html" class="text-2xl font-bold text-primary-600">LuxStay</a>
-                </div>
-                <nav class="hidden md:flex space-x-8">
-                    <a href="index.html" class="text-gray-500 hover:text-gray-900">Home</a>
-                    <a href="hotels.html" class="text-gray-500 hover:text-gray-900">Hotels</a>
-                    <a href="become-a-partner.html" class="text-gray-500 hover:text-gray-900">Become a Partner</a>
-                    <a href="#" class="text-gray-500 hover:text-gray-900">Contact</a>
-                </nav>
+    <header
+        class="relative backdrop-blur-lg bg-white/70 border-b border-white/20 sticky top-0 z-50 shadow-lg shadow-black/5">
+        <!-- Background gradient mesh -->
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/30 via-purple-50/20 to-indigo-50/30"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
                 <div class="flex items-center space-x-4">
-                    <a href="login.html" class="text-gray-500 hover:text-gray-900">Login</a>
-                    <a href="register.html" class="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700">Sign Up</a>
+                    <a href="{{ url('/') }}" class="group flex items-center space-x-3">
+                        <div class="relative">
+                            <div
+                                class="w-10 h-10 bg-gradient-to-tr from-blue-600 via-purple-600 to-indigo-600 rounded-xl shadow-lg rotate-12 group-hover:rotate-0 transition-transform duration-300">
+                            </div>
+                            <div
+                                class="absolute inset-0 w-10 h-10 bg-gradient-to-tr from-blue-400 via-purple-400 to-indigo-400 rounded-xl blur-md opacity-70 -z-10">
+                            </div>
+                        </div>
+                        <span
+                            class="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent">
+                            TravelEase
+                        </span>
+                    </a>
+
+                    <span class="text-gray-400">|</span>
+                    <span class="text-gray-600">Reservation</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="relative bg-transparent hover:bg-gray-100 rounded p-2">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    </button>
+                    <a href="{{ route('hotels.index') }}" class="border px-4 py-2 rounded hover:bg-gray-100">New
+                        Booking</a>
+                    <a href="/" class="flex items-center px-2 py-2 hover:bg-gray-100 rounded">
+                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>
+                        Logout
+                    </a>
                 </div>
             </div>
         </div>
@@ -66,7 +88,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="reservationForm()">
         <!-- Breadcrumbs -->
-        <nav class="flex mb-6" aria-label="Breadcrumb">
+        {{-- <nav class="flex mb-6" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
                     <a href="index.html" class="text-gray-500 hover:text-gray-900 inline-flex items-center">
@@ -101,7 +123,7 @@
                     </div>
                 </li>
             </ol>
-        </nav>
+        </nav> --}}
 
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Reservation Form -->
@@ -114,7 +136,7 @@
 
                     <!-- Progress Bar -->
                     <div class="relative h-1 bg-gray-200">
-                        <div class="form-progress-bar bg-primary-500 absolute top-0 left-0" :style="`width: ${(currentStep / totalSteps) * 100}%`"></div>
+                        <div class="form-progress-bar absolute top-0 left-0 bg-gradient-to-tr from-blue-600 via-purple-600 to-indigo-600" :style="`width: ${(currentStep / totalSteps) * 100}%`"></div>
                     </div>
 
                     <!-- Form Steps -->
@@ -129,7 +151,7 @@
                             <div class="border rounded-lg overflow-hidden mb-6">
                                 <div class="flex flex-col md:flex-row">
                                     <div class="md:w-1/3">
-                                        <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" alt="Deluxe Room" class="w-full h-full object-cover">
+                                        <img src="{{ asset('images/hotel/ocean-resort-california.jpg') }}" alt="Deluxe Room" class="w-full h-full object-cover">
                                     </div>
                                     <div class="p-4 md:w-2/3">
                                         <div class="flex justify-between items-start">
@@ -144,7 +166,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                <p class="text-2xl font-bold text-primary-600">$<span x-model="roomBasePrice" x-text="roomBasePrice"></span></p>
+                                                <p class="text-2xl font-bold text-blue-600">$<span x-model="roomBasePrice" x-text="roomBasePrice"></span></p>
                                                 <p class="text-gray-500 text-sm">per night</p>
                                                 @if(isset($appliedRateType) && $appliedRateType !== 'Nightly')
                                                     <small class="text-muted fw-normal">({{ $appliedRateType }} Rate)</small>
@@ -690,7 +712,7 @@
         function reservationForm() {
             return {
                 optionalServices: {!! $optionalServices->toJson() !!},
-                roomBasePrice: {!! $roomType->base_price_per_night !!},
+                roomBasePrice: 180,
                 // Form steps
                 currentStep: 1,
                 totalSteps: 4,

@@ -39,8 +39,8 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', 'HomeController@redirectAdmin')->name('index');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/hotels/{hotel:id}/reservations/create/{roomType}', [ReservationController::class, 'create'])
-    ->name('hotel.reservations.create');
+// Route::get('/reservations', [ReservationController::class, 'create'])
+//     ->name('hotel.reservations.create');
 
 Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 'store'])
     ->name('hotel.reservations.store');
@@ -52,6 +52,7 @@ Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 's
 Route::group([], function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
     Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');

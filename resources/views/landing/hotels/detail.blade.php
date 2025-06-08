@@ -45,46 +45,8 @@
 <body class="bg-gray-50 min-h-screen" x-data="hotelPage()">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <a href="/hotels" class="flex items-center px-2 py-1 rounded hover:bg-gray-100 text-blue-600">
-                        <!-- ArrowLeft SVG -->
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Back to Hotels
-                    </a>
-                    <h1 class="text-2xl font-bold text-blue-600">HotelHub</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button class="border px-3 py-1 rounded flex items-center text-gray-700 hover:bg-gray-100">
-                        <!-- Share2 SVG -->
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <circle cx="18" cy="5" r="3" />
-                            <circle cx="6" cy="12" r="3" />
-                            <circle cx="18" cy="19" r="3" />
-                            <path d="M8.59 13.51l6.83 3.98" />
-                            <path d="M15.41 6.51l-6.82 3.98" />
-                        </svg>
-                        Share
-                    </button>
-                    <button class="border px-3 py-1 rounded flex items-center text-gray-700 hover:bg-gray-100">
-                        <!-- Heart SVG -->
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path
-                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                        Save
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+    <x-header />
+
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-show="hotel">
         <!-- Hotel Header -->
@@ -610,7 +572,7 @@
                     website: "https://sunsetgallefort.com"
                 },
                 rooms: [{
-                        id: 101,
+                        id: 1,
                         name: "Standard Twin Room",
                         description: "Spacious room with 2 twin beds.",
                         images: [
@@ -627,7 +589,7 @@
                         lastBooked: "3 hours ago"
                     },
                     {
-                        id: 102,
+                        id: 2,
                         name: "Suite",
                         description: "Luxury suite with living area.",
                         images: [
@@ -674,12 +636,12 @@
                     if (this.selectedRoom && this.checkIn && this.checkOut) {
                         const params = new URLSearchParams({
                             hotelId: this.hotel.id,
-                            roomId: this.selectedRoom,
+                            roomTypeId: this.selectedRoom,
                             checkIn: this.checkIn,
                             checkOut: this.checkOut,
                             guests: this.guests
                         });
-                        window.location.href = `/reservation?${params.toString()}`;
+                        window.location.href = `/reservations/create?${params.toString()}`;
                     }
                 }
             }
