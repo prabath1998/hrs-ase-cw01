@@ -547,6 +547,12 @@
                             </template>
                         </div>
                     </template>
+                    {{-- Check Availability button --}}
+                    <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+                        :disabled="!checkIn || !checkOut" @click="selectedRoom = null">
+                        <span x-text="selectedRoom ? 'Change Dates' : 'Check Availability'"></span>
+                    </button>
+
                     <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
                         :disabled="!checkIn || !checkOut || !selectedRoom" @click="bookNow">
                         <span x-text="selectedRoom ? 'Book Now' : 'Select a Room First'"></span>
@@ -581,10 +587,10 @@
                 description: "A beautiful hotel located in the heart of Galle Fort, offering stunning views and luxurious amenities.",
                 address: "Galle City, Galle (Old Town)",
                 images: [
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/83871748.jpg?k=1a0a78d60f129c5a6e29d1189ab6d9a174288ba270a4f9ff977b4d0a6977d58b&o=',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/84220869.jpg?k=d61f93267dc7680385f9898e3cf8e8eff91a99449192f7c63fa45e6364421277&o=&hp=1',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/86161620.jpg?k=08dc11fbb4e510d74712530d0b9f1b6b0b7c13923607279514ab27b2dabded97&o=&hp=1',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/86161663.jpg?k=ee5bd60f7ffdf9ff7b368dbd0e350dd61ab61baa7b503f531c8029febc64ff2b&o=&hp=1',
+                    '{{ asset('images/hotel/1/83871748.jpg') }}',
+                    '{{ asset('images/hotel/1/84220869.jpg') }}',
+                    '{{ asset('images/hotel/1/86161620.jpg') }}',
+                    '{{ asset('images/hotel/1/86161663.jpg') }}',
                 ],
                 features: ["Free WiFi", "Swimming Pool", "Spa & Wellness", "24/7 Reception"],
                 awards: ["Best Luxury Hotel 2023"],
@@ -608,7 +614,7 @@
                         name: "Standard Twin Room",
                         description: "Spacious room with 2 twin beds.",
                         images: [
-                            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80"
+                            '{{ asset('images/room/deluxe-room.jpg') }}'
                         ],
                         price: 120,
                         originalPrice: 150,
@@ -625,7 +631,7 @@
                         name: "Suite",
                         description: "Luxury suite with living area.",
                         images: [
-                            "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80"
+                            '{{ asset('images/room/executive-suite.jpg') }}',
                         ],
                         price: 200,
                         size: "50m²",
