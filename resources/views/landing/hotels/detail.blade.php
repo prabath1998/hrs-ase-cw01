@@ -1,541 +1,526 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $hotel->name }}</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Flatpickr for date picker -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+@extends('layouts.guest')
+
+@push('styles')
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
+
         .form-progress-bar {
             height: 4px;
             transition: width 0.3s ease;
         }
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
+@endpush
 
-<body class="bg-gray-50 min-h-screen" x-data="hotelPage()">
-
-    <!-- Header -->
-    <x-header />
-
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-show="hotel">
-        <!-- Hotel Header -->
-        <div class="mb-8">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                <div>
-                    <h1 class="text-4xl font-bold mb-2" x-text="hotel.name"></h1>
-                    <div class="flex items-center space-x-4 mb-2">
-                        <div class="flex items-center">
-                            <!-- Star SVG -->
-                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                <polygon
-                                    points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
-                            </svg>
-                            <span class="ml-1 font-semibold" x-text="hotel.rating"></span>
-                            <span class="ml-1 text-gray-600" x-text="'(' + hotel.reviewCount + ' reviews)'"></span>
-                        </div>
-                        <template x-if="hotel.awards.length">
-                            <span class="bg-yellow-600 text-white px-2 py-1 rounded text-xs flex items-center">
-                                <!-- Award SVG -->
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <circle cx="12" cy="8" r="7" />
-                                    <path
-                                        d="M8.21 13.89l-1.42 4.24a1 1 0 0 0 1.45 1.12L12 17.77l3.76 1.48a1 1 0 0 0 1.45-1.12l-1.42-4.24" />
+@section('content')
+    <div x-data="hotelPage()" class="min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-show="hotel">
+            <!-- Hotel Header -->
+            <div class="mb-8">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2" x-text="hotel.name"></h1>
+                        <div class="flex items-center space-x-4 mb-2">
+                            <div class="flex items-center">
+                                <!-- Star SVG -->
+                                <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                    <polygon
+                                        points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
                                 </svg>
-                                Award Winner
-                            </span>
-                        </template>
-                        <template x-if="hotel.sustainability.length">
-                            <span class="bg-green-600 text-white px-2 py-1 rounded text-xs flex items-center">
-                                <!-- Leaf SVG -->
-                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
-                                </svg>
-                                Eco-Friendly
-                            </span>
-                        </template>
-                    </div>
-                    <div class="flex items-center text-gray-600">
-                        <!-- MapPin SVG -->
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
-                        <span x-text="hotel.address"></span>
-                    </div>
-                </div>
-                <div class="text-right mt-4 lg:mt-0">
-                    <p class="text-sm text-gray-600">Starting from</p>
-                    <p class="text-3xl font-bold text-blue-600" x-text="'$' + hotel.priceFrom + '/night'"></p>
-                </div>
-            </div>
-            <p class="text-gray-700 text-lg" x-text="hotel.description"></p>
-        </div>
-
-        <!-- Image Gallery -->
-        <div class="mb-8">
-            <div class="grid grid-cols-4 gap-4 h-96">
-                <div class="col-span-2 relative rounded-lg overflow-hidden">
-                    <img :src="hotel.images[selectedImageIndex] || '/placeholder.svg'" :alt="hotel.name"
-                        class="object-cover w-full h-full absolute inset-0" />
-                    <div
-                        class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all cursor-pointer">
-                    </div>
-                </div>
-                <div class="col-span-2 grid grid-cols-2 gap-4">
-                    <template x-for="(image, index) in hotel.images.slice(1, 5)" :key="index">
-                        <div class="relative rounded-lg overflow-hidden cursor-pointer"
-                            @click="selectedImageIndex = index + 1">
-                            <img :src="image || '/placeholder.svg'" :alt="hotel.name + ' ' + (index + 2)"
-                                class="object-cover w-full h-full absolute inset-0" />
-                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
+                                <span class="ml-1 font-semibold" x-text="hotel.rating"></span>
+                                <span class="ml-1 text-gray-600" x-text="'(' + hotel.reviewCount + ' reviews)'"></span>
                             </div>
+                            <template x-if="hotel.awards.length">
+                                <span class="bg-yellow-600 text-white px-2 py-1 rounded text-xs flex items-center">
+                                    <!-- Award SVG -->
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <circle cx="12" cy="8" r="7" />
+                                        <path
+                                            d="M8.21 13.89l-1.42 4.24a1 1 0 0 0 1.45 1.12L12 17.77l3.76 1.48a1 1 0 0 0 1.45-1.12l-1.42-4.24" />
+                                    </svg>
+                                    Award Winner
+                                </span>
+                            </template>
+                            <template x-if="hotel.sustainability.length">
+                                <span class="bg-green-600 text-white px-2 py-1 rounded text-xs flex items-center">
+                                    <!-- Leaf SVG -->
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
+                                    </svg>
+                                    Eco-Friendly
+                                </span>
+                            </template>
                         </div>
+                        <div class="flex items-center text-gray-600">
+                            <!-- MapPin SVG -->
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+                            <span x-text="hotel.address"></span>
+                        </div>
+                    </div>
+                    <div class="text-right mt-4 lg:mt-0">
+                        <p class="text-sm text-gray-600">Starting from</p>
+                        <p class="text-3xl font-bold text-blue-600" x-text="'$' + hotel.priceFrom + '/night'"></p>
+                    </div>
+                </div>
+                <p class="text-gray-700 text-lg" x-text="hotel.description"></p>
+            </div>
+
+            <!-- Image Gallery -->
+            <div class="mb-8">
+                <div class="grid grid-cols-4 gap-4 h-96">
+                    <div class="col-span-2 relative rounded-lg overflow-hidden">
+                        <img :src="hotel.images[selectedImageIndex] || '/placeholder.svg'" :alt="hotel.name"
+                            class="object-cover w-full h-full absolute inset-0" />
+                        <div
+                            class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all cursor-pointer">
+                        </div>
+                    </div>
+                    <div class="col-span-2 grid grid-cols-2 gap-4">
+                        <template x-for="(image, index) in hotel.images.slice(1, 5)" :key="index">
+                            <div class="relative rounded-lg overflow-hidden cursor-pointer"
+                                @click="selectedImageIndex = index + 1">
+                                <img :src="image || '/placeholder.svg'" :alt="hotel.name + ' ' + (index + 2)"
+                                    class="object-cover w-full h-full absolute inset-0" />
+                                <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-4 space-x-2">
+                    <template x-for="(img, index) in hotel.images" :key="index">
+                        <button @click="selectedImageIndex = index"
+                            :class="selectedImageIndex === index ? 'bg-blue-600' : 'bg-gray-300'"
+                            class="w-3 h-3 rounded-full"></button>
                     </template>
                 </div>
             </div>
-            <div class="flex justify-center mt-4 space-x-2">
-                <template x-for="(img, index) in hotel.images" :key="index">
-                    <button @click="selectedImageIndex = index"
-                        :class="selectedImageIndex === index ? 'bg-blue-600' : 'bg-gray-300'"
-                        class="w-3 h-3 rounded-full"></button>
-                </template>
-            </div>
-        </div>
 
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2">
-                <!-- Tabs -->
-                <div x-data="{ tab: 'overview' }" class="space-y-6">
-                    <div class="grid w-full grid-cols-5 mb-4">
-                        <button :class="tab === 'overview' ? 'border-b-2 border-blue-600 font-bold' : ''"
-                            class="py-2" @click="tab='overview'">Overview</button>
-                        <button :class="tab === 'rooms' ? 'border-b-2 border-blue-600 font-bold' : ''"
-                            class="py-2" @click="tab='rooms'">Rooms</button>
-                        <button :class="tab === 'amenities' ? 'border-b-2 border-blue-600 font-bold' : ''"
-                            class="py-2" @click="tab='amenities'">Amenities</button>
-                        <button :class="tab === 'location' ? 'border-b-2 border-blue-600 font-bold' : ''"
-                            class="py-2" @click="tab='location'">Location</button>
-                        <button :class="tab === 'reviews' ? 'border-b-2 border-blue-600 font-bold' : ''"
-                            class="py-2 hidden" @click="tab='reviews'">Reviews</button>
-                    </div>
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2">
+                    <!-- Tabs -->
+                    <div x-data="{ tab: 'overview' }" class="space-y-6">
+                        <div class="grid w-full grid-cols-5 mb-4">
+                            <button :class="tab === 'overview' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
+                                @click="tab='overview'">Overview</button>
+                            <button :class="tab === 'rooms' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
+                                @click="tab='rooms'">Rooms</button>
+                            <button :class="tab === 'amenities' ? 'border-b-2 border-blue-600 font-bold' : ''"
+                                class="py-2" @click="tab='amenities'">Amenities</button>
+                            <button :class="tab === 'location' ? 'border-b-2 border-blue-600 font-bold' : ''"
+                                class="py-2" @click="tab='location'">Location</button>
+                            <button :class="tab === 'reviews' ? 'border-b-2 border-blue-600 font-bold' : ''"
+                                class="py-2 hidden" @click="tab='reviews'">Reviews</button>
+                        </div>
 
-                    <!-- Overview Tab -->
-                    <div x-show="tab==='overview'" class="space-y-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h2 class="font-bold text-xl mb-2">About This Hotel</h2>
-                            <p class="text-gray-700 mb-4" x-text="hotel.description"></p>
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <h4 class="font-semibold mb-2">Key Features</h4>
-                                    <ul class="space-y-1">
-                                        <template x-for="feature in hotel.features" :key="feature">
-                                            <li class="flex items-center">
-                                                <!-- CheckCircle SVG -->
-                                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none"
-                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path d="M9 12l2 2l4-4" />
-                                                    <circle cx="12" cy="12" r="10" />
-                                                </svg>
-                                                <span class="text-sm" x-text="feature"></span>
-                                            </li>
-                                        </template>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 class="font-semibold mb-2">Awards & Recognition</h4>
-                                    <ul class="space-y-1">
-                                        <template x-for="award in hotel.awards" :key="award">
-                                            <li class="flex items-center">
-                                                <!-- Award SVG -->
-                                                <svg class="w-4 h-4 text-yellow-600 mr-2" fill="none"
-                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="8" r="7" />
-                                                    <path
-                                                        d="M8.21 13.89l-1.42 4.24a1 1 0 0 0 1.45 1.12L12 17.77l3.76 1.48a1 1 0 0 0 1.45-1.12l-1.42-4.24" />
-                                                </svg>
-                                                <span class="text-sm" x-text="award"></span>
-                                            </li>
-                                        </template>
-                                    </ul>
+                        <!-- Overview Tab -->
+                        <div x-show="tab==='overview'" class="space-y-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="font-bold text-xl mb-2">About This Hotel</h2>
+                                <p class="text-gray-700 mb-4" x-text="hotel.description"></p>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 class="font-semibold mb-2">Key Features</h4>
+                                        <ul class="space-y-1">
+                                            <template x-for="feature in hotel.features" :key="feature">
+                                                <li class="flex items-center">
+                                                    <!-- CheckCircle SVG -->
+                                                    <svg class="w-4 h-4 text-green-600 mr-2" fill="none"
+                                                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path d="M9 12l2 2l4-4" />
+                                                        <circle cx="12" cy="12" r="10" />
+                                                    </svg>
+                                                    <span class="text-sm" x-text="feature"></span>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold mb-2">Awards & Recognition</h4>
+                                        <ul class="space-y-1">
+                                            <template x-for="award in hotel.awards" :key="award">
+                                                <li class="flex items-center">
+                                                    <!-- Award SVG -->
+                                                    <svg class="w-4 h-4 text-yellow-600 mr-2" fill="none"
+                                                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <circle cx="12" cy="8" r="7" />
+                                                        <path
+                                                            d="M8.21 13.89l-1.42 4.24a1 1 0 0 0 1.45 1.12L12 17.77l3.76 1.48a1 1 0 0 0 1.45-1.12l-1.42-4.24" />
+                                                    </svg>
+                                                    <span class="text-sm" x-text="award"></span>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h2 class="font-bold text-xl mb-2">Hotel Policies</h2>
-                            <div class="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <div class="flex items-center mb-2">
-                                        <!-- Clock SVG -->
-                                        <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M12 6v6l4 2" />
-                                        </svg>
-                                        <span class="font-medium"
-                                            x-text="'Check-in: ' + hotel.policies.checkIn"></span>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="font-bold text-xl mb-2">Hotel Policies</h2>
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <!-- Clock SVG -->
+                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M12 6v6l4 2" />
+                                            </svg>
+                                            <span class="font-medium"
+                                                x-text="'Check-in: ' + hotel.policies.checkIn"></span>
+                                        </div>
+                                        <div class="flex items-center mb-2">
+                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M12 6v6l4 2" />
+                                            </svg>
+                                            <span class="font-medium"
+                                                x-text="'Check-out: ' + hotel.policies.checkOut"></span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M9 12l2 2l4-4" />
+                                                <circle cx="12" cy="12" r="10" />
+                                            </svg>
+                                            <span class="text-sm" x-text="hotel.policies.cancellation"></span>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center mb-2">
-                                        <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M12 6v6l4 2" />
-                                        </svg>
-                                        <span class="font-medium"
-                                            x-text="'Check-out: ' + hotel.policies.checkOut"></span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <path d="M9 12l2 2l4-4" />
-                                            <circle cx="12" cy="12" r="10" />
-                                        </svg>
-                                        <span class="text-sm" x-text="hotel.policies.cancellation"></span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex items-center mb-2">
-                                        <span class="font-medium">Pets: </span>
-                                        <span class="ml-2"
-                                            :class="hotel.policies.pets ? 'text-green-600' : 'text-red-600'"
-                                            x-text="hotel.policies.pets ? 'Allowed' : 'Not Allowed'"></span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <span class="font-medium">Smoking: </span>
-                                        <span class="ml-2"
-                                            :class="hotel.policies.smoking ? 'text-green-600' : 'text-red-600'"
-                                            x-text="hotel.policies.smoking ? 'Allowed' : 'Not Allowed'"></span>
+                                    <div>
+                                        <div class="flex items-center mb-2">
+                                            <span class="font-medium">Pets: </span>
+                                            <span class="ml-2"
+                                                :class="hotel.policies.pets ? 'text-green-600' : 'text-red-600'"
+                                                x-text="hotel.policies.pets ? 'Allowed' : 'Not Allowed'"></span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span class="font-medium">Smoking: </span>
+                                            <span class="ml-2"
+                                                :class="hotel.policies.smoking ? 'text-green-600' : 'text-red-600'"
+                                                x-text="hotel.policies.smoking ? 'Allowed' : 'Not Allowed'"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Rooms Tab -->
-                    <div x-show="tab==='rooms'" class="space-y-6">
-                        <template x-for="room in hotel.rooms" :key="room.id">
-                            <div @click="selectedRoom = room.id"
-                                :class="selectedRoom === room.id ? 'ring-2 ring-blue-500' : ''"
-                                class="bg-white rounded-lg shadow p-6 cursor-pointer transition-all">
-                                <div class="grid md:grid-cols-3 gap-6">
-                                    <div class="relative h-48 rounded-lg overflow-hidden">
-                                        <img :src="room.images[0] || '/placeholder.svg'" :alt="room.name"
-                                            class="object-cover w-full h-full absolute inset-0" />
-                                        <template x-if="room.popularChoice">
-                                            <span
-                                                class="absolute top-2 left-2 bg-yellow-600 text-white px-2 py-1 rounded text-xs">Popular
-                                                Choice</span>
-                                        </template>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <div class="flex justify-between items-start mb-3">
-                                            <div>
-                                                <h3 class="text-xl font-bold" x-text="room.name"></h3>
-                                                <p class="text-gray-600" x-text="room.description"></p>
-                                            </div>
-                                            <div class="text-right">
-                                                <template x-if="room.originalPrice">
-                                                    <span class="text-sm text-gray-500 line-through"
-                                                        x-text="'$' + room.originalPrice"></span>
-                                                </template>
-                                                <p class="text-2xl font-bold text-blue-600"
-                                                    x-text="'$' + room.price + '/night'"></p>
-                                            </div>
-                                        </div>
-                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 text-sm text-gray-600">
-                                            <div x-text="'Size: ' + room.size"></div>
-                                            <div x-text="'Max: ' + room.maxGuests + ' guests'"></div>
-                                            <div x-text="'Bed: ' + room.bedType"></div>
-                                            <div x-text="'Views: ' + room.views.join(', ')"></div>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2 mb-4">
-                                            <template x-for="amenity in room.amenities" :key="amenity">
-                                                <span class="bg-gray-200 px-2 py-1 rounded text-xs"
-                                                    x-text="amenity"></span>
+                        <!-- Rooms Tab -->
+                        <div x-show="tab==='rooms'" class="space-y-6">
+                            <template x-for="room in hotel.rooms" :key="room.id">
+                                <div @click="selectedRoom = room.id"
+                                    :class="selectedRoom === room.id ? 'ring-2 ring-blue-500' : ''"
+                                    class="bg-white rounded-lg shadow p-6 cursor-pointer transition-all">
+                                    <div class="grid md:grid-cols-3 gap-6">
+                                        <div class="relative h-48 rounded-lg overflow-hidden">
+                                            <img :src="room.images[0] || '/placeholder.svg'" :alt="room.name"
+                                                class="object-cover w-full h-full absolute inset-0" />
+                                            <template x-if="room.popularChoice">
+                                                <span
+                                                    class="absolute top-2 left-2 bg-yellow-600 text-white px-2 py-1 rounded text-xs">Popular
+                                                    Choice</span>
                                             </template>
                                         </div>
-                                        <template x-if="room.lastBooked">
-                                            <p class="text-sm text-orange-600 mb-2"
-                                                x-text="'🔥 Last booked ' + room.lastBooked"></p>
-                                        </template>
-                                        <template x-if="selectedRoom === room.id">
-                                            <div class="bg-blue-50 p-3 rounded-lg">
-                                                <p class="text-blue-800 font-medium">✓ Selected for booking</p>
+                                        <div class="md:col-span-2">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <div>
+                                                    <h3 class="text-xl font-bold" x-text="room.name"></h3>
+                                                    <p class="text-gray-600" x-text="room.description"></p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <template x-if="room.originalPrice">
+                                                        <span class="text-sm text-gray-500 line-through"
+                                                            x-text="'$' + room.originalPrice"></span>
+                                                    </template>
+                                                    <p class="text-2xl font-bold text-blue-600"
+                                                        x-text="'$' + room.price + '/night'"></p>
+                                                </div>
                                             </div>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <!-- Amenities Tab -->
-                    <div x-show="tab==='amenities'" class="space-y-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h2 class="font-bold text-xl mb-2">Hotel Amenities</h2>
-                            <div class="grid md:grid-cols-3 gap-6">
-                                <template x-for="amenity in hotel.amenities" :key="amenity">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <path d="M9 12l2 2l4-4" />
-                                            <circle cx="12" cy="12" r="10" />
-                                        </svg>
-                                        <span x-text="amenity"></span>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                        <template x-if="hotel.sustainability.length">
-                            <div class="bg-white rounded-lg shadow p-6">
-                                <h2 class="font-bold text-xl mb-2 flex items-center">
-                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
-                                    </svg>
-                                    Sustainability Initiatives
-                                </h2>
-                                <div class="grid md:grid-cols-2 gap-4">
-                                    <template x-for="initiative in hotel.sustainability" :key="initiative">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 text-green-600 mr-2" fill="none"
-                                                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
-                                            </svg>
-                                            <span x-text="initiative"></span>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <!-- Location Tab -->
-                    <div x-show="tab==='location'" class="space-y-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h2 class="font-bold text-xl mb-2">Location & Nearby Attractions</h2>
-                            <div class="mb-6">
-                                <h4 class="font-semibold mb-2">Address</h4>
-                                <p class="text-gray-700" x-text="hotel.address"></p>
-                            </div>
-                            <div class="mb-6">
-                                <h4 class="font-semibold mb-2">Nearby Attractions</h4>
-                                <div class="space-y-2">
-                                    <template x-for="attraction in hotel.nearbyAttractions" :key="attraction">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none"
-                                                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" />
-                                                <circle cx="12" cy="10" r="3" />
-                                            </svg>
-                                            <span x-text="attraction"></span>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold mb-2">Contact Information</h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <path
-                                                d="M22 16.92V19a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3 5.18 2 2 0 0 1 5 3h2.09a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.06a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.99.35 2.01.59 3.06.72A2 2 0 0 1 22 16.92z" />
-                                        </svg>
-                                        <span x-text="hotel.contact.phone"></span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <path d="M4 4h16v16H4z" />
-                                            <path d="M22 6l-10 7L2 6" />
-                                        </svg>
-                                        <span x-text="hotel.contact.email"></span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
-                                            stroke-width="2" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10" />
-                                            <path d="M2 12h20" />
-                                            <path
-                                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                                        </svg>
-                                        <span x-text="hotel.contact.website"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reviews Tab -->
-                    <div x-show="tab==='reviews'" class="space-y-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h2 class="font-bold text-xl mb-2">Guest Reviews</h2>
-                            <div class="text-center mb-6">
-                                <div class="text-4xl font-bold text-blue-600 mb-2" x-text="hotel.rating"></div>
-                                <div class="flex justify-center mb-2">
-                                    <template x-for="i in 5">
-                                        <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                                            <polygon
-                                                points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
-                                        </svg>
-                                    </template>
-                                </div>
-                                <p class="text-gray-600" x-text="'Based on ' + hotel.reviewCount + ' reviews'"></p>
-                            </div>
-                            <div class="space-y-4">
-                                <!-- Example reviews, replace with your data -->
-                                <div class="border-b pb-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center">
-                                            <div class="flex text-yellow-400">
-                                                <template x-for="i in 5">
-                                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                                        <polygon
-                                                            points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
-                                                    </svg>
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 text-sm text-gray-600">
+                                                <div x-text="'Size: ' + room.size"></div>
+                                                <div x-text="'Max: ' + room.maxGuests + ' guests'"></div>
+                                                <div x-text="'Bed: ' + room.bedType"></div>
+                                                <div x-text="'Views: ' + room.views.join(', ')"></div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2 mb-4">
+                                                <template x-for="amenity in room.amenities" :key="amenity">
+                                                    <span class="bg-gray-200 px-2 py-1 rounded text-xs"
+                                                        x-text="amenity"></span>
                                                 </template>
                                             </div>
-                                            <span class="ml-2 font-semibold">John D.</span>
+                                            <template x-if="room.lastBooked">
+                                                <p class="text-sm text-orange-600 mb-2"
+                                                    x-text="'🔥 Last booked ' + room.lastBooked"></p>
+                                            </template>
+                                            <template x-if="selectedRoom === room.id">
+                                                <div class="bg-blue-50 p-3 rounded-lg">
+                                                    <p class="text-blue-800 font-medium">✓ Selected for booking</p>
+                                                </div>
+                                            </template>
                                         </div>
-                                        <span class="text-sm text-gray-600">2 days ago</span>
                                     </div>
-                                    <p class="text-gray-700">
-                                        "Exceptional service and beautiful accommodations. The staff went above and
-                                        beyond to make our stay memorable."
-                                    </p>
-                                </div>
-                                <div class="border-b pb-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center">
-                                            <div class="flex text-yellow-400">
-                                                <template x-for="i in 4">
-                                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                                        <polygon
-                                                            points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
-                                                    </svg>
-                                                </template>
-                                                <svg class="w-4 h-4 text-gray-300" viewBox="0 0 24 24">
-                                                    <polygon
-                                                        points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
-                                                </svg>
-                                            </div>
-                                            <span class="ml-2 font-semibold">Sarah M.</span>
-                                        </div>
-                                        <span class="text-sm text-gray-600">1 week ago</span>
-                                    </div>
-                                    <p class="text-gray-700">
-                                        "Great location and amenities. The room was spacious and clean. Would definitely
-                                        stay here again."
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Booking Sidebar -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow p-6 sticky top-24 space-y-4">
-                    <h2 class="font-bold text-xl mb-2">Book Your Stay</h2>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Check-in Date</label>
-                        <input type="date" class="w-full border rounded px-3 py-2" x-model="checkIn"
-                            :min="today" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Check-out Date</label>
-                        <input type="date" class="w-full border rounded px-3 py-2" x-model="checkOut"
-                            :min="checkIn || today" />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Guests</label>
-                        <select class="w-full border rounded px-3 py-2" x-model="guests">
-                            <option value="1">1 Guest</option>
-                            <option value="2">2 Guests</option>
-                            <option value="3">3 Guests</option>
-                            <option value="4">4 Guests</option>
-                            <option value="5">5 Guests</option>
-                            <option value="6">6+ Guests</option>
-                        </select>
-                    </div>
-                    <template x-if="checkIn && checkOut">
-                        <div class="bg-gray-50 p-3 rounded-lg">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>Duration:</span>
-                                <span x-text="nights + ' nights'"></span>
-                            </div>
-                            <template x-if="selectedRoom">
-                                <div class="flex justify-between text-sm">
-                                    <span>Room rate:</span>
-                                    <span
-                                        x-text="'$' + (hotel.rooms.find(r => r.id === selectedRoom)?.price) + '/night'"></span>
                                 </div>
                             </template>
                         </div>
-                    </template>
-                    {{-- Check Availability button --}}
-                    <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
-                        :disabled="!checkIn || !checkOut" @click="selectedRoom = null">
-                        <span x-text="selectedRoom ? 'Change Dates' : 'Check Availability'"></span>
-                    </button>
 
-                    <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
-                        :disabled="!checkIn || !checkOut || !selectedRoom" @click="bookNow">
-                        <span x-text="selectedRoom ? 'Book Now' : 'Select a Room First'"></span>
-                    </button>
-                    <div class="text-center text-sm text-gray-600">
-                        <p>✓ Free cancellation until 6 PM</p>
-                        <p>✓ Best price guarantee</p>
-                        <p>✓ Instant confirmation</p>
+                        <!-- Amenities Tab -->
+                        <div x-show="tab==='amenities'" class="space-y-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="font-bold text-xl mb-2">Hotel Amenities</h2>
+                                <div class="grid md:grid-cols-3 gap-6">
+                                    <template x-for="amenity in hotel.amenities" :key="amenity">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M9 12l2 2l4-4" />
+                                                <circle cx="12" cy="12" r="10" />
+                                            </svg>
+                                            <span x-text="amenity"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <template x-if="hotel.sustainability.length">
+                                <div class="bg-white rounded-lg shadow p-6">
+                                    <h2 class="font-bold text-xl mb-2 flex items-center">
+                                        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor"
+                                            stroke-width="2" viewBox="0 0 24 24">
+                                            <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
+                                        </svg>
+                                        Sustainability Initiatives
+                                    </h2>
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        <template x-for="initiative in hotel.sustainability" :key="initiative">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path d="M2 22s16-4 20-16c0 0-7 2-10 9-2 4-8 7-8 7z" />
+                                                </svg>
+                                                <span x-text="initiative"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Location Tab -->
+                        <div x-show="tab==='location'" class="space-y-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="font-bold text-xl mb-2">Location & Nearby Attractions</h2>
+                                <div class="mb-6">
+                                    <h4 class="font-semibold mb-2">Address</h4>
+                                    <p class="text-gray-700" x-text="hotel.address"></p>
+                                </div>
+                                <div class="mb-6">
+                                    <h4 class="font-semibold mb-2">Nearby Attractions</h4>
+                                    <div class="space-y-2">
+                                        <template x-for="attraction in hotel.nearbyAttractions" :key="attraction">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 text-gray-600 mr-2" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z" />
+                                                    <circle cx="12" cy="10" r="3" />
+                                                </svg>
+                                                <span x-text="attraction"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold mb-2">Contact Information</h4>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M22 16.92V19a2 2 0 0 1-2.18 2A19.72 19.72 0 0 1 3 5.18 2 2 0 0 1 5 3h2.09a2 2 0 0 1 2 1.72c.13 1.05.37 2.07.72 3.06a2 2 0 0 1-.45 2.11l-1.27 1.27a16 16 0 0 0 6.29 6.29l1.27-1.27a2 2 0 0 1 2.11-.45c.99.35 2.01.59 3.06.72A2 2 0 0 1 22 16.92z" />
+                                            </svg>
+                                            <span x-text="hotel.contact.phone"></span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M4 4h16v16H4z" />
+                                                <path d="M22 6l-10 7L2 6" />
+                                            </svg>
+                                            <span x-text="hotel.contact.email"></span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 text-gray-600 mr-2" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="10" />
+                                                <path d="M2 12h20" />
+                                                <path
+                                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                            </svg>
+                                            <span x-text="hotel.contact.website"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reviews Tab -->
+                        <div x-show="tab==='reviews'" class="space-y-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h2 class="font-bold text-xl mb-2">Guest Reviews</h2>
+                                <div class="text-center mb-6">
+                                    <div class="text-4xl font-bold text-blue-600 mb-2" x-text="hotel.rating"></div>
+                                    <div class="flex justify-center mb-2">
+                                        <template x-for="i in 5">
+                                            <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 24 24">
+                                                <polygon
+                                                    points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
+                                            </svg>
+                                        </template>
+                                    </div>
+                                    <p class="text-gray-600" x-text="'Based on ' + hotel.reviewCount + ' reviews'"></p>
+                                </div>
+                                <div class="space-y-4">
+                                    <!-- Example reviews, replace with your data -->
+                                    <div class="border-b pb-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="flex items-center">
+                                                <div class="flex text-yellow-400">
+                                                    <template x-for="i in 5">
+                                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                            <polygon
+                                                                points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
+                                                        </svg>
+                                                    </template>
+                                                </div>
+                                                <span class="ml-2 font-semibold">John D.</span>
+                                            </div>
+                                            <span class="text-sm text-gray-600">2 days ago</span>
+                                        </div>
+                                        <p class="text-gray-700">
+                                            "Exceptional service and beautiful accommodations. The staff went above and
+                                            beyond to make our stay memorable."
+                                        </p>
+                                    </div>
+                                    <div class="border-b pb-4">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div class="flex items-center">
+                                                <div class="flex text-yellow-400">
+                                                    <template x-for="i in 4">
+                                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                                            <polygon
+                                                                points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
+                                                        </svg>
+                                                    </template>
+                                                    <svg class="w-4 h-4 text-gray-300" viewBox="0 0 24 24">
+                                                        <polygon
+                                                            points="12 17.27 18.18 21 16.54 13.97 22 9.24 14.81 8.63 12 2 9.19 8.63 2 9.24 7.46 13.97 5.82 21 12 17.27" />
+                                                    </svg>
+                                                </div>
+                                                <span class="ml-2 font-semibold">Sarah M.</span>
+                                            </div>
+                                            <span class="text-sm text-gray-600">1 week ago</span>
+                                        </div>
+                                        <p class="text-gray-700">
+                                            "Great location and amenities. The room was spacious and clean. Would definitely
+                                            stay here again."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow p-6 sticky top-24 space-y-4">
+                        <h2 class="font-bold text-xl mb-2">Book Your Stay</h2>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Check-in Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" x-model="checkIn"
+                                :min="today" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Check-out Date</label>
+                            <input type="date" class="w-full border rounded px-3 py-2" x-model="checkOut"
+                                :min="checkIn || today" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Guests</label>
+                            <select class="w-full border rounded px-3 py-2" x-model="guests">
+                                <option value="1">1 Guest</option>
+                                <option value="2">2 Guests</option>
+                                <option value="3">3 Guests</option>
+                                <option value="4">4 Guests</option>
+                                <option value="5">5 Guests</option>
+                                <option value="6">6+ Guests</option>
+                            </select>
+                        </div>
+                        <template x-if="checkIn && checkOut">
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Duration:</span>
+                                    <span x-text="nights + ' nights'"></span>
+                                </div>
+                                <template x-if="selectedRoom">
+                                    <div class="flex justify-between text-sm">
+                                        <span>Room rate:</span>
+                                        <span
+                                            x-text="'$' + (hotel.rooms.find(r => r.id === selectedRoom)?.price) + '/night'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        {{-- Check Availability button --}}
+                        <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+                            :disabled="!checkIn || !checkOut" @click="selectedRoom = null">
+                            <span x-text="selectedRoom ? 'Change Dates' : 'Check Availability'"></span>
+                        </button>
+
+                        <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+                            :disabled="!checkIn || !checkOut || !selectedRoom" @click="bookNow">
+                            <span x-text="selectedRoom ? 'Book Now' : 'Select a Room First'"></span>
+                        </button>
+                        <div class="text-center text-sm text-gray-600">
+                            <p>✓ Free cancellation until 6 PM</p>
+                            <p>✓ Best price guarantee</p>
+                            <p>✓ Instant confirmation</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Not found -->
-    <div x-show="!hotel" class="min-h-screen flex items-center justify-center">
-        <div class="text-center">
-            <h1 class="text-2xl font-bold mb-4">Hotel not found</h1>
-            <a href="/hotels" class="bg-blue-600 text-white px-4 py-2 rounded">Back to Hotels</a>
+        <!-- Not found -->
+        <div x-show="!hotel" class="min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <h1 class="text-2xl font-bold mb-4">Hotel not found</h1>
+                <a href="/hotels" class="bg-blue-600 text-white px-4 py-2 rounded">Back to Hotels</a>
+            </div>
         </div>
+
     </div>
+@endsection
+
+
+@push('scripts')
+    <script>
+        // Initialize date pickers
+        flatpickr("#checkIn", {
+            dateFormat: "yyyy-MM-dd",
+            minDate: "today"
+        });
+
+        flatpickr("#checkOut", {
+            dateFormat: "yyyy-MM-dd",
+            minDate: "today"
+        });
+    </script>
 
     <script>
         function hotelPage() {
@@ -647,6 +632,4 @@
             }
         }
     </script>
-</body>
-
-</html>
+@endpush
