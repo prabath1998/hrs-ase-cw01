@@ -13,6 +13,7 @@
     </style>
 @endpush
 
+
 @section('content')
     <div x-data="hotelPage()" class="min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-show="hotel">
@@ -220,7 +221,7 @@
                                     class="bg-white rounded-lg shadow p-6 cursor-pointer transition-all">
                                     <div class="grid md:grid-cols-3 gap-6">
                                         <div class="relative h-48 rounded-lg overflow-hidden">
-                                            <img :src="room.images[0] || '/placeholder.svg'" :alt="room.name"
+                                            <img :src="room.images || '/placeholder.svg'" :alt="room.name"
                                                 class="object-cover w-full h-full absolute inset-0" />
                                             <template x-if="room.popularChoice">
                                                 <span
@@ -244,7 +245,7 @@
                                                 </div>
                                             </div>
                                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 text-sm text-gray-600">
-                                                <div x-text="'Size: ' + room.size"></div>
+                                                {{-- <div x-text="'Size: ' + room.size"></div> --}}
                                                 <div x-text="'Max: ' + room.maxGuests + ' guests'"></div>
                                                 <div x-text="'Bed: ' + room.bedType"></div>
                                                 <div x-text="'Views: ' + room.views.join(', ')"></div>
@@ -441,14 +442,14 @@
                     <div class="bg-white rounded-lg shadow p-6 sticky top-24 space-y-4">
                         <h2 class="font-bold text-xl mb-2">Book Your Stay</h2>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Check-in Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" x-model="checkIn"
-                                :min="today" />
+                            <label for="checkInDate" class="block text-sm font-medium mb-2">Check-in Date</label>
+                            <input id="checkInDate" type="date" class="w-full border rounded px-3 py-2"
+                                x-model="checkIn" :min="today" />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Check-out Date</label>
-                            <input type="date" class="w-full border rounded px-3 py-2" x-model="checkOut"
-                                :min="checkIn || today" />
+                            <label for="checkOutDate" class="block text-sm font-medium mb-2">Check-out Date</label>
+                            <input id="checkOutDate" type="date" class="w-full border rounded px-3 py-2"
+                                x-model="checkOut" :min="checkIn || today" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">Guests</label>
@@ -474,16 +475,23 @@
                                             x-text="'$' + (hotel.rooms.find(r => r.id === selectedRoom)?.price) + '/night'"></span>
                                     </div>
                                 </template>
+                                <template x-if="availabilityCount > 0">
+                                    <div class="flex justify-between text-sm text-green-600 mt-1">
+                                        <span>Availability:</span>
+                                        <span x-text="availabilityCount + ' rooms available'"></span>
+                                    </div>
+                                </template>
                             </div>
                         </template>
                         {{-- Check Availability button --}}
                         <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
-                            :disabled="!checkIn || !checkOut" @click="selectedRoom = null">
-                            <span x-text="selectedRoom ? 'Change Dates' : 'Check Availability'"></span>
+                            :disabled="!checkIn || !checkOut || !selectedRoom" @click="checkAvailability">
+                            <span>Check Availability</span>
                         </button>
 
                         <button class="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
-                            :disabled="!checkIn || !checkOut || !selectedRoom" @click="bookNow">
+                            :disabled="!checkIn || !checkOut || !selectedRoom || availabilityCount === 0"
+                            @click="bookNow">
                             <span x-text="selectedRoom ? 'Book Now' : 'Select a Room First'"></span>
                         </button>
                         <div class="text-center text-sm text-gray-600">
@@ -510,101 +518,71 @@
 
 @push('scripts')
     <script>
-        // Initialize date pickers
-        flatpickr("#checkIn", {
-            dateFormat: "yyyy-MM-dd",
-            minDate: "today"
+        document.addEventListener('DOMContentLoaded', function() {
+
+            flatpickr("#checkInDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkOutPicker = flatpickr("#checkOutDate");
+                    checkOutPicker.set('minDate', selectedDates[0]);
+                    if (selectedDates.length > 0) {
+                        checkOutPicker.setDate(selectedDates[0], true);
+                    }
+                }
+            });
+
+            flatpickr("#checkOutDate", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkInPicker = flatpickr("#checkInDate");
+                    checkInPicker.set('maxDate', selectedDates[0]);
+                }
+            });
         });
 
-        flatpickr("#checkOut", {
-            dateFormat: "yyyy-MM-dd",
-            minDate: "today"
-        });
-    </script>
 
-    <script>
         function hotelPage() {
             // Example hotel data, replace with your own data source
             const hotel = {
-                id: 1,
-                name: "Sunset Galle Fort",
-                rating: 4.7,
-                reviewCount: 234,
-                priceFrom: 120,
-                description: "A beautiful hotel located in the heart of Galle Fort, offering stunning views and luxurious amenities.",
-                address: "Galle City, Galle (Old Town)",
-                images: [
-                    '{{ asset('images/hotel/1/83871748.jpg') }}',
-                    '{{ asset('images/hotel/1/84220869.jpg') }}',
-                    '{{ asset('images/hotel/1/86161620.jpg') }}',
-                    '{{ asset('images/hotel/1/86161663.jpg') }}',
-                ],
-                features: ["Free WiFi", "Swimming Pool", "Spa & Wellness", "24/7 Reception"],
+                id: {{ $hotel->id }},
+                name: "{{ $hotel->name }}",
+                rating: {{ $hotel->rating }},
+                reviewCount: 0,
+                priceFrom: "{{ $priceFrom }}",
+                description: "{{ $hotel->description }}",
+                address: "{{ $hotel->address }}",
+                images: ({!! json_encode($hotel->images) !!}),
+                features: ({!! json_encode($hotel->features) !!}),
                 awards: ["Best Luxury Hotel 2023"],
-                sustainability: ["Solar Power", "Water Recycling"],
+                sustainability: [],
                 policies: {
-                    checkIn: "2:00 PM",
-                    checkOut: "12:00 PM",
-                    cancellation: "Free cancellation until 6 PM",
-                    pets: true,
-                    smoking: false
+                    checkIn: "{{ $hotel->default_check_in_time }}",
+                    checkOut: "{{ $hotel->default_check_out_time }}",
+                    cancellation: "{{ $hotel->cancellation_policy ?? '' }}",
+                    pets: {{ $hotel->pets_allowed ? 'true' : 'false' }},
+                    smoking: {{ $hotel->smoking_allowed ? 'true' : 'false' }}
                 },
-                amenities: ["Restaurant", "Bar", "Gym", "Airport Shuttle", "Room Service", "Laundry"],
-                nearbyAttractions: ["Central Park", "City Museum", "Shopping Mall"],
+                amenities: {!! json_encode($optionalServices) !!},
+                nearbyAttractions: [],
                 contact: {
-                    phone: "+94 91 222 3333",
-                    email: "TlW4t@example.com",
-                    website: "https://sunsetgallefort.com"
+                    phone: "{{ $hotel->phone_number }}",
+                    email: "{{ $hotel->contact_email }}",
+                    website: "{{ $hotel->website }}"
                 },
-                rooms: [{
-                        id: 1,
-                        name: "Standard Twin Room",
-                        description: "Spacious room with 2 twin beds.",
-                        images: [
-                            '{{ asset('images/room/deluxe-room.jpg') }}'
-                        ],
-                        price: 120,
-                        originalPrice: 150,
-                        size: "30m²",
-                        maxGuests: 2,
-                        bedType: "King",
-                        views: ["City"],
-                        amenities: ["WiFi", "TV", "Mini Bar"],
-                        popularChoice: true,
-                        lastBooked: "3 hours ago"
-                    },
-                    {
-                        id: 2,
-                        name: "Suite",
-                        description: "Luxury suite with living area.",
-                        images: [
-                            '{{ asset('images/room/executive-suite.jpg') }}',
-                        ],
-                        price: 200,
-                        size: "50m²",
-                        maxGuests: 4,
-                        bedType: "King",
-                        views: ["City", "Park"],
-                        amenities: ["WiFi", "TV", "Mini Bar", "Jacuzzi"],
-                        popularChoice: false,
-                        lastBooked: "1 day ago"
-                    }
-                ]
+                rooms: {!! json_encode($hotel->roomTypes) !!}
             };
 
-            // Simulate getting hotel by id from URL
-            const url = new URL(window.location.href);
-            const id = Number(url.pathname.split("/").filter(Boolean).pop());
-            const foundHotel = id === hotel.id ? hotel : null;
-
             return {
-                hotel: foundHotel,
+                hotel: hotel,
                 selectedImageIndex: 0,
                 tab: 'overview',
-                checkIn: '',
+                checkIn: (new Date().toISOString().split('T')[0]),
                 checkOut: '',
                 guests: '2',
                 selectedRoom: null,
+                availabilityCount: 0,
                 get today() {
                     return new Date().toISOString().split('T')[0];
                 },
@@ -628,8 +606,38 @@
                         });
                         window.location.href = `/reservations/create?${params.toString()}`;
                     }
+                },
+                checkAvailability() {
+                    const formData = new FormData();
+
+                    formData.append('check_in', this.checkIn);
+                    formData.append('check_out', this.checkOut);
+                    formData.append('room_type_id', this.selectedRoom);
+
+                    fetch(`/hotels/${this.hotel.id}/check-availability`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.available > 0) {
+                                this.availabilityCount = data.available;
+                                alert('Selected room is available for the selected dates.');
+                            } else {
+                                this.availabilityCount = 0;
+                                alert('Selected room is not available for the selected dates.');
+                            }
+                        })
+                        .catch(error => {
+                            this.availabilityCount = 0;
+                            console.error('Error checking availability:', error);
+                            alert('An error occurred while checking availability. Please try again later.');
+                        });
                 }
-            }
+            };
         }
     </script>
 @endpush

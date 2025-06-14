@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActionType;
 use App\Models\Hotel;
+use App\Models\RoomType;
+use App\Models\OptionalService;
 use App\Services\HotelService;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -12,7 +14,8 @@ class HotelController extends Controller
 {
     public function __construct(
         private readonly HotelService $hotelService
-    ) {}
+    ) {
+    }
     public function index()
     {
         $this->checkAuthorization(auth()->user(), ['dashboard.view']);
@@ -120,25 +123,56 @@ class HotelController extends Controller
             ->where('id', $hotel->id)
             ->firstOrFail();
 
-        $priceFrom = $hotel->roomTypes->min('price_per_night');
-        return view('landing.hotels.detail', compact('hotel', 'priceFrom'));
+        $priceFrom = $hotel->roomTypes->min('base_price_per_night');
+        $hotel->features = $hotel->roomTypes->pluck('features')->flatten()->unique()->values();
+        $hotel->default_check_in_time = $hotel->default_check_in_time->format('H:i');
+        $hotel->default_check_out_time = $hotel->default_check_out_time->format('H:i');
+        $optionalServices = OptionalService::where('is_active', true)->get('name')->pluck('name')->values();
+        $hotel->images = json_decode($hotel->images, true) ?? [];
+
+        $hotel->roomTypes = $hotel->roomTypes->map(function ($room) use ($hotel) {
+            return [
+                'id' => $room->id,
+                'name' => $room->name,
+                'description' => $room->description,
+                'images' => $hotel->images[array_rand($hotel->images)],
+                'price' => $room->base_price_per_night,
+                'originalPrice' => $room->base_price_per_night ?? null,
+                'size' => $room->size ?? '',
+                'maxGuests' => $room->occupancy_limit ?? 2,
+                'bedType' => $room->bed_type ?? '',
+                'views' => $room->views ?? [],
+                'amenities' => $room->amenities ?? [],
+                'popularChoice' => $room->popular_choice ?? false,
+                'lastBooked' => $room->last_booked ?? null,
+            ];
+        });
+
+        return view('landing.hotels.detail', compact('hotel', 'priceFrom', 'optionalServices'));
     }
 
     public function checkRoomAvailability(Request $request, Hotel $hotel)
     {
+
         $request->validate([
             'check_in' => 'required|date',
-            'check_out' => 'required|date|after:check_in',
+            'check_out' => 'required|date|after_or_equal:check_in',
             'room_type_id' => 'required|exists:room_types,id',
         ]);
 
-        $availability = $this->hotelService->checkRoomAvailability(
+        $roomType = RoomType::findOrFail($request->input('room_type_id'));
+        if (!$roomType->is_active) {
+            return response()->json(['available' => false, 'message' => __('Room type is not available.')], 400);
+        }
+
+        $availableCount = $this->hotelService->getAvailableRoomCount(
             $hotel,
             $request->input('check_in'),
             $request->input('check_out'),
-            $request->input('room_type_id')
+            $roomType
         );
+        info($availableCount);
 
-        return response()->json(['available' => $availability]);
+        return response()->json(['available' => $availableCount]);
     }
 }

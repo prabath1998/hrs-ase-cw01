@@ -14,6 +14,8 @@ class Hotel extends Model
 
     protected $casts = [
         'images' => 'array',
+        'default_check_in_time' => 'datetime:Y-m-d',
+        'default_check_out_time' => 'datetime:Y-m-d',
     ];
 
     public function rooms()

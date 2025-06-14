@@ -31,9 +31,11 @@ class HotelService
         return $query->latest()->paginate(config('settings.default_pagination') ?? 10);
     }
 
-    public function checkRoomAvailability(Hotel $hotel, string $checkInDate, string $checkOutDate, RoomType $roomType): bool
+    public function getAvailableRoomCount(Hotel $hotel, string $checkInDate, string $checkOutDate, RoomType $roomType): int
     {
-        $reservations = $hotel->reservations()
+        $totalRooms = $hotel->rooms()->where('room_type_id', $roomType->id)->count();
+
+        $reservedRooms = $hotel->reservations()
             ->where('room_type_id', $roomType->id)
             ->where(function ($query) use ($checkInDate, $checkOutDate) {
                 $query->whereBetween('check_in_date', [$checkInDate, $checkOutDate])
@@ -43,9 +45,9 @@ class HotelService
                             ->where('check_out_date', '>=', $checkOutDate);
                     });
             })
-            ->exists();
+            ->count();
 
-        return !$reservations;
+        return max($totalRooms - $reservedRooms, 0);
     }
 
 
