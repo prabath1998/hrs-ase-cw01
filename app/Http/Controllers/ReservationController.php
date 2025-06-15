@@ -53,6 +53,8 @@ class ReservationController extends Controller
 
         $hotel = Hotel::findOrFail($searchParams['hotelId']);
         $roomType = RoomType::findOrFail($searchParams['roomTypeId']);
+        $checkIn = Carbon::parse($searchParams['checkIn'])->format('Y-m-d');
+        $checkOut = Carbon::parse($searchParams['checkOut'])->format('Y-m-d');
 
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');
@@ -80,6 +82,8 @@ class ReservationController extends Controller
         return view('pages.reservations.create', compact(
             'hotel',
             'roomType',
+            'checkIn',
+            'checkOut',
             // 'searchParams',
             // 'estimatedRoomPrice',
             // 'numberOfNights',
@@ -142,7 +146,7 @@ class ReservationController extends Controller
                 'name' => $validated['first_name'] . ' ' . $validated['last_name'],
                 'username' => strtolower($validated['first_name']) . '_' . strtolower($validated['last_name']),
                 'email' => $validated['contact_email'],
-                'password' => Hash::make(Str::random(8)),
+                'password' => Hash::make('password'),
             ]);
             $user->assignRole('customer');
         }
@@ -225,11 +229,12 @@ class ReservationController extends Controller
         $this->storeActionLog(ActionType::CREATED, ['reservation' => $validated]);
         // dd('Reservation created successfully', $reservation);
 
-        if ($user->hasRole('customer')) {
-            return redirect()->route('customer.dashboard')->with('success', __('Reservation created successfully.'));
-        } else {
-            return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
-        }
+        // if ($user->hasRole('customer')) {
+            return response()->json(['success' => true, 'message' => 'Reservation created successfully.']);
+            // return redirect()->route('dashboard')->with('success', __('Reservation created successfully.'));
+        // } else {
+            // return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
+        // }
     }
 
     public function edit(RoomType $roomType)

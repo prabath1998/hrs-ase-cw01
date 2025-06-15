@@ -23,14 +23,6 @@
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-300"></div>
                     </a>
                     <a href="#" class="group relative px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-300">
-                        <span class="relative z-10">Destinations</span>
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-300"></div>
-                    </a>
-                    <a href="#" class="group relative px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-300">
-                        <span class="relative z-10">Deals</span>
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-300"></div>
-                    </a>
-                    <a href="#" class="group relative px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-300">
                         <span class="relative z-10">About</span>
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 transition-all duration-300"></div>
                     </a>
@@ -50,6 +42,12 @@
                         <span class="relative z-10">{{ __('Register') }}</span>
                     </a>
                 @else
+                <div class="flex items-center space-x-4">
+                    {{-- <button class="relative bg-transparent hover:bg-gray-100 rounded p-2">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    </button> --}}
+                    
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open" class="group flex items-center space-x-3 px-4 py-3 bg-white/60 backdrop-blur-sm border border-white/30 rounded-2xl hover:bg-white/80 hover:border-white/50 hover:shadow-lg active:scale-95 transition-all duration-200">
                             <div class="relative">
@@ -121,6 +119,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 @endguest
 
                 <!-- Mobile Menu Button -->

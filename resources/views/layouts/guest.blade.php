@@ -22,6 +22,9 @@
 
     <!-- Heroicons CDN -->
     <script src="https://unpkg.com/heroicons@2.0.18/dist/heroicons.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <!-- Date picker -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
