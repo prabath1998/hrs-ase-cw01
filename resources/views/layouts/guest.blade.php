@@ -59,6 +59,12 @@
 
     @stack('scripts')
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+
 </body>
 
 </html>
