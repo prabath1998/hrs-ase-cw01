@@ -93,7 +93,7 @@
 
                             <!-- Menu Items -->
                             <div class="py-2">
-                                <a href="/admin" class="group flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-blue-50/80 hover:text-blue-700 transition-all duration-150">
+                                <a href="{{ auth()->user()->hasRole('Customer') ? route('dashboard') : route('admin.dashboard') }}" class="group flex items-center px-6 py-3 text-sm text-gray-700 hover:bg-blue-50/80 hover:text-blue-700 transition-all duration-150">
                                     <div class="w-8 h-8 bg-gradient-to-tr from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center mr-3 group-hover:from-blue-200 group-hover:to-indigo-200 transition-all duration-150">
                                         <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

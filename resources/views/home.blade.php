@@ -77,7 +77,7 @@
                         </svg>
                         Filters
                     </button>
-                    <a href="hotels.html"
+                    <a href="{{ route('hotels.index') }}"
                         class="px-8 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
                             fill="currentColor">
