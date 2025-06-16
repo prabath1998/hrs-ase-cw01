@@ -1,18 +1,5 @@
 @extends('layouts.guest')
 
-@push('styles')
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .form-progress-bar {
-            height: 4px;
-            transition: width 0.3s ease;
-        }
-    </style>
-@endpush
-
 
 @section('content')
     <div x-data="hotelPage()" class="min-h-screen">

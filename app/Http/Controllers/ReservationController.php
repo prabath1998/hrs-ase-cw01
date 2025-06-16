@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReservationController extends Controller
 {
@@ -276,5 +277,30 @@ class ReservationController extends Controller
         $this->storeActionLog(ActionType::DELETED, ['room_type' => $roomType->name]);
 
         return redirect()->route('admin.room-types.index')->with('success', __('Room type deleted successfully.'));
+    }
+
+    public function downloadReceipt($id)
+    {
+        $bill = Reservation::findOrFail($id)->bill;
+
+        if (!$bill) {
+            abort(404, 'Bill not found for this reservation.');
+        }
+
+        $bill->load(['customer', 'travelCompany', 'reservation.hotel', 'reservation.roomType', 'payments', 'reservation.optionalServices']);
+
+        $numberOfNights = $bill->reservation ? Carbon::parse($bill->reservation->check_in_date)->diffInDays(Carbon::parse($bill->reservation->check_out_date)) : 0;
+
+        $data = [
+            'bill' => $bill,
+            'reservation' => $bill->reservation,
+            'billedTo' => $bill->customer ?? $bill->travelCompany,
+            'numberOfNights' => $numberOfNights,
+        ];
+
+        $pdf = Pdf::loadView('layouts.receipts.bill', $data);
+        $fileName = 'invoice-' . $bill->bill_number . '.pdf';
+
+        return $pdf->download($fileName);
     }
 }

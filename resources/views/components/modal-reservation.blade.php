@@ -318,11 +318,11 @@
 </div>
 
 <!-- Payment Methods Management Modal -->
-<div x-data="{ open: $persist(false).as('showPaymentMethods'), showAddPayment: false }" x-show="open" x-cloak
+<div x-data="{ paymentMethodEdit: $persist(false).as('showPaymentMethods'), showAddPayment: false }" x-show="paymentMethodEdit" x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-    @keydown.escape.window="open = false">
+    @keydown.escape.window="paymentMethodEdit = false">
     <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
-        <button @click="open = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <button @click="paymentMethodEdit = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>

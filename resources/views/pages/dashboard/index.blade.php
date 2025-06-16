@@ -169,7 +169,7 @@
                 </div>
 
                 <!-- Reservations Tab -->
-                <div x-show="tab==='reservations'" x-data="{ view: false, edit: false, selectedReservation: null }" class="space-y-6">
+                <div x-show="tab==='reservations'" x-data="{ view: false, edit: false, selectedReservation: null, paymentMethodEdit: false }" class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-bold">My Reservations</h2>
                         <div class="flex space-x-3">
@@ -233,7 +233,8 @@
                                                 <i data-lucide="square-pen" class="w-4 h-4 mr-2"></i>Edit
                                             </button>
                                             <button
-                                                class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50">
+                                                class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50"
+                                                @click="downloadReservationReceipt(r.id)">
                                                 <i data-lucide="download" class="w-4 h-4 mr-2"></i>Receipt
                                             </button>
                                         </div>
@@ -243,7 +244,8 @@
                         </template>
                     </div>
 
-                    <x-modal-reservation selectedReservation="selectedReservation" view="view" edit="edit" />
+                    <x-modal-reservation selectedReservation="selectedReservation" view="view" edit="edit"
+                        paymentMethodEdit="paymentMethodEdit" />
 
                 </div>
 
@@ -323,7 +325,7 @@
                                                 </p>
                                                 <span x-html="getPaymentStatusBadge(b.status)"></span>
                                             </div>
-                                            <button class="border px-2 py-2 rounded hover:bg-gray-50">
+                                            <button class="border px-2 py-2 rounded hover:bg-gray-50" @click="downloadPaymentReceipt(b.id)">
                                                 <i data-lucide="download" class="w-4 h-4"></i>
                                             </button>
                                         </div>
@@ -384,7 +386,8 @@
                                 </div>
                                 <div>
                                     <label for="phone" class="block text-sm font-medium">Phone</label>
-                                    <input id="phone" name="phone" type="tel" class="border rounded px-3 py-2 w-full"
+                                    <input id="phone" name="phone" type="tel"
+                                        class="border rounded px-3 py-2 w-full"
                                         value="{{ $customerDetails['phone'] }}" />
                                 </div>
                                 <div>
@@ -480,6 +483,12 @@
                 reservations: {!! json_encode($reservations) !!},
                 billing: {!! json_encode($bills) !!},
                 availableOptionalServices: {!! json_encode($availableOptionalServices) !!},
+                downloadReservationReceipt(id) {
+                    window.location.href = `/reservations/${id}/receipt/download`;
+                },
+                downloadPaymentReceipt(id) {
+                    window.location.href = `/payments/${id}/receipt/download`;
+                },
             }
         }
 

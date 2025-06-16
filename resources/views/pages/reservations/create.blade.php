@@ -1,18 +1,5 @@
 @extends('layouts.guest')
 
-@push('styles')
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .form-progress-bar {
-            height: 4px;
-            transition: width 0.3s ease;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="reservationForm()">

@@ -36,6 +36,18 @@
 
     @viteReactRefresh
     @vite(['resources/js/app.js', 'resources/css/app.css'], 'build')
+
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .form-progress-bar {
+            height: 4px;
+            transition: width 0.3s ease;
+        }
+    </style>
+
     @stack('styles')
     @yield('before_head')
 

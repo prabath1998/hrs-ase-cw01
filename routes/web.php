@@ -17,6 +17,7 @@ use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\OptionalServiceController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
@@ -61,7 +62,8 @@ Route::group(['middleware' => ['auth', 'role:Customer']], function () {
     Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
 
-    Route::get('/payments/{payment}/receipt/download', [PaymentReceiptController::class, 'download'])->name('payments.receipt.download');
+    Route::get('/reservations/{reservation}/receipt/download', [ReservationController::class, 'downloadReceipt'])->name('reservations.receipt.download');
+    Route::get('/payments/{payment}/receipt/download', [PaymentController::class, 'downloadReceipt'])->name('payments.receipt.download');
 
 });
 
