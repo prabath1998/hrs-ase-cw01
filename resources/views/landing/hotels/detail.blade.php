@@ -80,7 +80,7 @@
                         <img :src="hotel.images[selectedImageIndex] || '/placeholder.svg'" :alt="hotel.name"
                             class="object-cover w-full h-full absolute inset-0" />
                         <div
-                            class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all cursor-pointer">
+                            class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all cursor-pointer">
                         </div>
                     </div>
                     <div class="col-span-2 grid grid-cols-2 gap-4">
@@ -89,7 +89,7 @@
                                 @click="selectedImageIndex = index + 1">
                                 <img :src="image || '/placeholder.svg'" :alt="hotel.name + ' ' + (index + 2)"
                                     class="object-cover w-full h-full absolute inset-0" />
-                                <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
+                                <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all">
                                 </div>
                             </div>
                         </template>
@@ -604,7 +604,13 @@
                             checkOut: this.checkOut,
                             guests: this.guests
                         });
-                        window.location.href = `/reservations/create?${params.toString()}`;
+
+                        if ({{ auth()->check() ? 'true' : 'false' }}) {
+                            window.location.href = `/reservations/create?${params.toString()}`;
+                        } else {
+                            params.append('redirect', window.location.href);
+                            window.location.href = `/login?${params.toString()}`;
+                        }
                     }
                 },
                 checkAvailability() {

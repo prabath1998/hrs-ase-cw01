@@ -17,6 +17,7 @@
     <div>
       <form action="{{ route('admin.login.submit') }}" method="POST">
         @csrf
+        <input type="hidden" name="url" value="{{ URL::previous() }}">
         <div class="space-y-5">
           @include('backend.layouts.partials.messages')
           <!-- Email -->

@@ -17,6 +17,7 @@ use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HotelController;
 use App\Http\Controllers\OptionalServiceController;
+use App\Http\Controllers\PaymentReceiptController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTypeController;
@@ -39,34 +40,37 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', 'HomeController@redirectAdmin')->name('index');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Route::get('/reservations', [ReservationController::class, 'create'])
-//     ->name('hotel.reservations.create');
-
-Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 'store'])
-    ->name('hotel.reservations.store');
+Route::get('/hotels', [HotelController::class, 'showAllHotels'])->name('hotels.index');
+Route::get('/hotels/{hotel}', [HotelController::class, 'show'])->name('hotels.show');
+Route::post('/hotels/{hotel}/check-availability', [HotelController::class, 'checkRoomAvailability'])
+    ->name('hotels.check-availability');
 
 /**
  * Customer Dashboard
  */
-
-Route::middleware(['auth'])->group(function () {
+Route::group(['middleware' => ['auth', 'role:Customer']], function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
     Route::post('profile/update', [CustomerDashboardController::class, 'updateProfile'])->name('profile.update');
-});
 
-Route::group([], function () {
+    Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 'store'])
+    ->name('hotel.reservations.store');
+
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
     Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+
+    Route::get('/payments/{payment}/receipt/download', [PaymentReceiptController::class, 'download'])->name('payments.receipt.download');
+
 });
-Route::get('/payments/{payment}/receipt/download', [PaymentReceiptController::class, 'download'])->name('payments.receipt.download');
+
+
 
 /**
  * Admin routes.
  */
-Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], function () {
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'role:Superadmin|admin|Manager|Clerk']], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('roles', RolesController::class);
 
@@ -110,16 +114,12 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::get('/action-log', [ActionLogController::class, 'index'])->name('actionlog.index');
 });
 
-Route::get('/hotels', [HotelController::class, 'showAllHotels'])->name('hotels.index');
-Route::get('/hotels/{hotel}', [HotelController::class, 'show'])->name('hotels.show');
-Route::post('/hotels/{hotel}/check-availability', [HotelController::class, 'checkRoomAvailability'])
-    ->name('hotels.check-availability');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/travel-company/register', [TravelCompanyController::class, 'showRegistrationForm'])->name('travel-company.register');
     Route::post('/travel-company/register', [TravelCompanyController::class, 'register'])->name('travel-company.register.submit');
 });
-
 
 
 /**

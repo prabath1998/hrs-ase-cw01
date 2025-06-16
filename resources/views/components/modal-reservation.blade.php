@@ -319,7 +319,7 @@
 
 <!-- Payment Methods Management Modal -->
 <div x-data="{ open: $persist(false).as('showPaymentMethods'), showAddPayment: false }" x-show="open" x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
     @keydown.escape.window="open = false">
     <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
         <button @click="open = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">

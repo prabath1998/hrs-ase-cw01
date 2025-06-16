@@ -67,8 +67,13 @@ class LoginController extends Controller
             session()->flash('success', 'Successfully Logged in!');
 
             $user = Auth::guard('web')->user();
+
             if ($user->hasRole('Customer')) {
-                return redirect()->route('home');
+                if ($request->has('url')) {
+                    return redirect()->to($request->get('url'));
+                } else {
+                    return redirect()->route('dashboard');
+                }
             } else {
                 return redirect()->route('admin.dashboard');
             }
