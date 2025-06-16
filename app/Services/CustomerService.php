@@ -11,34 +11,60 @@ use App\Models\User;
 
 use App\Models\RoomType;
 use Hash;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 
 class CustomerService
 {
 
     public function getCustomerDashboardData(Customer $customer): array
     {
-        $reservations = $customer->reservations()->with(['hotel', 'roomType'])->latest()->get();
+        $reservations = $this->getCustomerReservations($customer);
         $totalReservations = $reservations->count();
         $totalReservationHotelCount = $reservations->pluck('hotel_id')->unique()->count();
         $lastMonthReservationCount = $reservations->where('created_at', '>=', now()->subMonth())->count();
         $activeReservations = $reservations->where('status', '!=', 'cancelled')->count();
 
         $formattedReservations = $reservations->map(function($reservation) {
+
+            $roomCharge = $reservation->total_estimated_room_charge;
+            $optionalServicesCharge = $reservation->optionalServices->sum(function($service) {
+                return $service->pivot->quantity * $service->pivot->price_at_booking;
+            });
+            $subtotal = $roomCharge + $optionalServicesCharge;
+            $discountTotal = ($subtotal * ($reservation->applied_discount_percentage ?? 0)) / 100;
+            $taxes = $reservation->taxes ?? 0;
+            $grandTotal = ($subtotal - $discountTotal) + $taxes;
+
             return [
                 'id' => $reservation->id,
                 'roomName' => $reservation->roomType->name,
                 'roomImage' => asset('images/hotel/1/86161620.jpg'),
                 'roomType' => $reservation->roomType->name,
                 'roomTypeId' => $reservation->room_type_id,
-                'hotel_name' => $reservation->hotel->name,
+                'hotelName' => $reservation->hotel->name,
                 'checkIn' => $reservation->check_in_date,
                 'checkOut' => $reservation->check_out_date,
-                'guest' => 2,
+                'guests' => 2,
                 'status' => $reservation->status,
                 'total' => $reservation->total_estimated_room_charge,
-                'nights' => 6,
+                'nights' => Carbon::parse($reservation->check_in_date)->diffInDays(Carbon::parse($reservation->check_out_date)),
                 'amenities' => $reservation->roomType->pluck('features')->flatten()->unique()->values(),
+                'optionalServices' => $reservation->optionalServices->map(function($service) {
+                        return [
+                            'id' => $service->id,
+                            'name' => $service->name,
+                            'quantity' => $service->pivot->quantity,
+                            'price' => $service->pivot->price_at_booking,
+                        ];
+                    }),
+                'priceBreakdown' => [
+                    'roomCharge' => $roomCharge,
+                    'optionalServicesCharge' => $optionalServicesCharge,
+                    'subTotal' => $subtotal,
+                    'discountTotal' => $discountTotal,
+                    'taxes' => $taxes,
+                    'grandTotal' => $grandTotal,
+                ],
             ];
         });
 
@@ -73,16 +99,17 @@ class CustomerService
         ];
     }
 
-    public function getCustomerReservations(Customer $customer): LengthAwarePaginator
+    public function getCustomerReservations(Customer $customer)
     {
-        return $customer->reservations()->with(['hotel', 'roomType'])->latest()->paginate(10);
+        return $customer->reservations()->with(['hotel', 'roomType', 'optionalServices'])->latest()->get();
     }
 
     public function getCustomerDetails(Customer $customer): array
     {
         return [
             'id' => $customer->id,
-            'name' => $customer->name,
+            'first_name' => $customer->first_name,
+            'last_name' => $customer->last_name,
             'email' => $customer->email,
             'phone' => $customer->phone,
             'address' => $customer->address,
@@ -93,50 +120,14 @@ class CustomerService
 
     public function updateCustomerDetails(Customer $customer, array $data): Customer
     {
-        $customer->name = $data['name'] ?? $customer->name;
-        $customer->email = $data['email'] ?? $customer->email;
-        $customer->phone = $data['phone'] ?? $customer->phone;
+        $customer->first_name = $data['first_name'] ?? $customer->first_name;
+        $customer->last_name = $data['last_name'] ?? $customer->last_name;
+        // $customer->email = $data['email'] ?? $customer->email;
+        $customer->phone_number = $data['phone'] ?? $customer->phone;
         $customer->address = $data['address'] ?? $customer->address;
 
-        if (isset($data['password']) && !empty($data['password'])) {
-            $customer->password = Hash::make($data['password']);
-        }
-
         $customer->save();
 
         return $customer;
-    }
-
-    public function getCustomerById(int $id): ?Customer
-    {
-        return Customer::find($id);
-    }
-
-    public function getCustomerByEmail(string $email): ?Customer
-    {
-        return Customer::where('email', $email)->first();
-    }
-
-    public function getAllCustomers(): LengthAwarePaginator
-    {
-        return Customer::paginate(10);
-    }
-
-    public function createCustomer(array $data): Customer
-    {
-        $customer = new Customer();
-        $customer->name = $data['name'];
-        $customer->email = $data['email'];
-        $customer->phone = $data['phone'] ?? null;
-        $customer->address = $data['address'] ?? null;
-        $customer->password = Hash::make($data['password']);
-        $customer->save();
-
-        return $customer;
-    }
-
-    public function deleteCustomer(Customer $customer): bool
-    {
-        return $customer->delete();
     }
 }

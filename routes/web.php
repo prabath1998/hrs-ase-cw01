@@ -49,8 +49,12 @@ Route::post('/hotels/{hotel:id}/reservations', [ReservationController::class, 's
  * Customer Dashboard
  */
 
-Route::group([], function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
+    Route::post('profile/update', [CustomerDashboardController::class, 'updateProfile'])->name('profile.update');
+});
+
+Route::group([], function () {
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');

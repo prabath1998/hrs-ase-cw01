@@ -1,9 +1,7 @@
 <!-- Reservation Details Modal -->
-<div x-data="{ open: $persist(false).as('showReservationDetails') }" x-show="open" x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
-    @keydown.escape.window="open = false">
+<div x-show="view" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
     <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
-        <button @click="open = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <button @click="view = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -26,9 +24,9 @@
                         <div>
                             <h3 class="text-2xl font-bold" x-text="selectedReservation.roomName"></h3>
                             <p class="text-lg text-gray-600" x-text="selectedReservation.hotelName"></p>
-                            <div class="mt-2">
+                            <div class="mt-2" x-html="getStatusBadge(selectedReservation.status)">
                                 <!-- Status Badge -->
-                                <template x-if="selectedReservation.status === 'confirmed'">
+                                {{-- <template x-if="selectedReservation.status === 'confirmed'">
                                     <span
                                         class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor"
@@ -66,56 +64,38 @@
                                         </svg>
                                         Cancelled
                                     </span>
-                                </template>
+                                </template> --}}
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <p class="text-gray-500">Check-in</p>
                                 <p class="font-semibold flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"
-                                            stroke="currentColor" fill="none" />
-                                        <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" />
-                                    </svg>
-                                    <span x-text="formatDate(selectedReservation.checkIn)"></span>
+                                    <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+                                    <span x-text="formatDate(selectedReservation.checkIn, 'MMM dd, yyyy')"></span>
                                 </p>
                                 <p class="text-xs text-gray-500">After 3:00 PM</p>
                             </div>
                             <div>
                                 <p class="text-gray-500">Check-out</p>
                                 <p class="font-semibold flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"
-                                            stroke="currentColor" fill="none" />
-                                        <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" />
-                                    </svg>
-                                    <span x-text="formatDate(selectedReservation.checkOut)"></span>
+                                    <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+                                    <span x-text="formatDate(selectedReservation.checkOut, 'MMM dd, yyyy')"></span>
                                 </p>
                                 <p class="text-xs text-gray-500">Before 11:00 AM</p>
                             </div>
                             <div>
                                 <p class="text-gray-500">Guests</p>
                                 <p class="font-semibold flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path
-                                            d="M17 21v-2a4 4 0 0 0-3-3.87M9 21v-2a4 4 0 0 1 3-3.87M12 7a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"
-                                            stroke="currentColor" stroke-width="2" fill="none" />
-                                    </svg>
-                                    <span x-text="selectedReservation.guests"></span> guests
+                                    <i data-lucide="users" class="w-4 h-4 mr-2"></i>
+                                    <span x-text="selectedReservation.guests + ' Guests'"></span>
                                 </p>
                             </div>
                             <div>
                                 <p class="text-gray-500">Nights</p>
                                 <p class="font-semibold flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path d="M3 7v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7" stroke="currentColor"
-                                            stroke-width="2" fill="none" />
-                                        <path d="M16 3v4M8 3v4M3 11h18" stroke="currentColor" stroke-width="2" />
-                                    </svg>
-                                    <span x-text="selectedReservation.nights"></span> nights
+                                    <i data-lucide="bed" class="w-4 h-4 mr-2"></i>
+                                    <span x-text="selectedReservation.nights + ' Nights'"></span>
                                 </p>
                             </div>
                         </div>
@@ -125,62 +105,12 @@
                 <div>
                     <h4 class="font-semibold mb-3">Room Amenities</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path
-                                    d="M2 8.5A6.5 6.5 0 0 1 8.5 2h7A6.5 6.5 0 0 1 22 8.5v7A6.5 6.5 0 0 1 15.5 22h-7A6.5 6.5 0 0 1 2 15.5v-7z"
-                                    stroke="currentColor" stroke-width="2" fill="none" />
-                                <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" />
-                            </svg>
-                            <span>Free WiFi</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path d="M3 17v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" stroke="currentColor"
-                                    stroke-width="2" fill="none" />
-                                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                    fill="none" />
-                            </svg>
-                            <span>Free Parking</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path d="M8 17v-1a4 4 0 0 1 8 0v1" stroke="currentColor" stroke-width="2"
-                                    fill="none" />
-                                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"
-                                    fill="none" />
-                            </svg>
-                            <span>Coffee Maker</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path d="M4 21v-7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v7" stroke="currentColor"
-                                    stroke-width="2" fill="none" />
-                                <path d="M16 3v4M8 3v4M3 11h18" stroke="currentColor" stroke-width="2" />
-                            </svg>
-                            <span>Room Service</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor"
-                                    stroke-width="2" fill="none" />
-                                <path d="M6 10v4M18 10v4" stroke="currentColor" stroke-width="2" />
-                            </svg>
-                            <span>Fitness Center</span>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path d="M2 20h20M2 16h20M2 12h20M2 8h20M2 4h20" stroke="currentColor"
-                                    stroke-width="2" />
-                            </svg>
-                            <span>Swimming Pool</span>
-                        </div>
+                        <template x-for="amenity in selectedReservation.amenities" :key="amenity">
+                            <div class="flex items-center">
+                                <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2"></i>
+                                <span class="text-sm" x-text="amenity"></span>
+                            </div>
+                        </template>
                     </div>
                 </div>
                 <!-- Pricing Breakdown -->
@@ -189,28 +119,42 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span>Room rate (<span x-text="selectedReservation.nights"></span> nights)</span>
-                            <span x-text="Math.round(selectedReservation.total * 0.85)"></span>
+                            <span x-text="Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
+                        </div>
+                        <div class="">
+                            <span>Optional Services</span>
+                            <template x-for="service in selectedReservation.optionalServices" :key="service.id">
+                                <div class="flex justify-between">
+                                    <span x-text="service.name" class="text-gray-500"></span>
+                                    <span x-text="Math.round(service.price * service.quantity)"
+                                        class="text-gray-500"></span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span>Sub Total</span>
+                            <span x-text="Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Discount Total</span>
+                            <span x-text="Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
                         </div>
                         <div class="flex justify-between">
                             <span>Taxes & fees</span>
-                            <span x-text="Math.round(selectedReservation.total * 0.15)"></span>
+                            <span x-text="Math.round(selectedReservation.priceBreakdown.taxes)"></span>
                         </div>
                         <div class="border-t my-2"></div>
                         <div class="flex justify-between font-semibold">
                             <span>Total</span>
-                            <span x-text="selectedReservation.total"></span>
+                            <span x-text="Math.round(selectedReservation.priceBreakdown.grandTotal)"></span>
                         </div>
                     </div>
                 </div>
                 <!-- Cancellation Policy -->
                 <div class="bg-blue-50 p-4 rounded-lg">
                     <h4 class="font-semibold mb-2 flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                                fill="none" />
-                            <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" />
-                        </svg>
+                        <i data-lucide="circle-alert" class="w-4 h-4 mr-2 text-blue-600"></i>
                         Cancellation Policy
                     </h4>
                     <p class="text-sm text-blue-800">
@@ -221,24 +165,16 @@
                 <div class="flex space-x-3 pt-4">
                     <template x-if="selectedReservation.status === 'confirmed'">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
-                            @click="open = false; $dispatch('open-modify', selectedReservation)">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 20h9" stroke="currentColor" stroke-width="2" />
-                                <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                                    stroke="currentColor" stroke-width="2" />
-                            </svg>
+                            @click="view = false; $dispatch('editReservation', selectedReservation); edit = true;">
+                            <i data-lucide="square-pen" class="w-4 h-4 mr-2"></i>
                             Modify Reservation
                         </button>
                     </template>
                     <button class="border border-gray-300 px-4 py-2 rounded flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor"
-                                stroke-width="2" />
-                            <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" />
-                        </svg>
+                        <i data-lucide="download" class="w-4 h-4 mr-2"></i>
                         Download Receipt
                     </button>
-                    <button class="border border-gray-300 px-4 py-2 rounded" @click="open = false">Close</button>
+                    <button class="border border-gray-300 px-4 py-2 rounded" @click="view = false">Close</button>
                 </div>
             </div>
         </template>
@@ -246,11 +182,10 @@
 </div>
 
 <!-- Modify Reservation Modal -->
-<div x-data="{ open: $persist(false).as('showModifyReservation') }" x-show="open" x-cloak
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
-    @keydown.escape.window="open = false" @open-modify.window="selectedReservation = $event.detail; open = true">
+<div x-show="edit" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+    @editReservation.window="selectedReservation = $event.detail;">
     <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
-        <button @click="open = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <button @click="edit = false" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -258,17 +193,12 @@
         <div>
             <h2 class="text-2xl font-bold mb-1">Modify Reservation</h2>
             <p class="text-gray-600 mb-6">Update your reservation details for <span
-                    x-text="selectedReservation?.hotelName"></span></p>
+                    x-text="selectedReservation.hotelName"></span></p>
         </div>
         <template x-if="selectedReservation">
             <div class="space-y-6">
                 <div class="flex items-center bg-blue-50 p-3 rounded">
-                    <svg class="h-4 w-4 mr-2 text-blue-600" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"
-                            fill="none" />
-                        <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" />
-                    </svg>
+                    <i data-lucide="circle-alert" class="w-4 h-4 mr-2 text-blue-600"></i>
                     <span class="text-blue-800 text-sm">Changes may affect your room rate. You'll see the updated
                         pricing before confirming.</span>
                 </div>
@@ -278,19 +208,21 @@
                     <div class="grid grid-cols-2 gap-4 text-sm">
                         <div>
                             <p class="text-gray-500">Check-in</p>
-                            <p class="font-medium" x-text="formatDate(selectedReservation.checkIn)"></p>
+                            <p class="font-medium" x-text="formatDate(selectedReservation.checkIn, 'MMM dd, yyyy')">
+                            </p>
                         </div>
                         <div>
                             <p class="text-gray-500">Check-out</p>
-                            <p class="font-medium" x-text="formatDate(selectedReservation.checkOut)"></p>
+                            <p class="font-medium" x-text="formatDate(selectedReservation.checkOut, 'MMM dd, yyyy')">
+                            </p>
                         </div>
                         <div>
-                            <p class="text-gray-500">Guests</p>
-                            <p class="font-medium"><span x-text="selectedReservation.guests"></span> guests</p>
+                            <p class="text-gray-500">Nights</p>
+                            <p class="font-medium"><span x-text="selectedReservation.nights"></span> nights</p>
                         </div>
                         <div>
                             <p class="text-gray-500">Total</p>
-                            <p class="font-medium">$<span x-text="selectedReservation.total"></span></p>
+                            <p class="font-medium">$<span x-text="selectedReservation.grandTotal"></span></p>
                         </div>
                     </div>
                 </div>
@@ -299,44 +231,30 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label for="newCheckIn" class="block text-sm font-medium mb-1">New Check-in Date</label>
-                            <input id="newCheckIn" type="date" x-model="modifyFormData.checkIn"
+                            <input id="newCheckIn" type="date" x-model="selectedReservation.checkIn"
                                 :min="formatDateInput(new Date())" class="w-full border rounded px-2 py-1" />
                         </div>
                         <div>
                             <label for="newCheckOut" class="block text-sm font-medium mb-1">New Check-out Date</label>
-                            <input id="newCheckOut" type="date" x-model="modifyFormData.checkOut"
-                                :min="modifyFormData.checkIn" class="w-full border rounded px-2 py-1" />
+                            <input id="newCheckOut" type="date" x-model="selectedReservation.checkOut"
+                                :min="selectedReservation.checkIn" class="w-full border rounded px-2 py-1" />
                         </div>
-                    </div>
-                    <div>
-                        <label for="newGuests" class="block text-sm font-medium mb-1">Number of Guests</label>
-                        <select id="newGuests" x-model.number="modifyFormData.guests"
-                            class="w-full border rounded px-2 py-1">
-                            <option value="1">1 Guest</option>
-                            <option value="2">2 Guests</option>
-                            <option value="3">3 Guests</option>
-                            <option value="4">4 Guests</option>
-                        </select>
                     </div>
                     <!-- Add-ons -->
                     <div class="space-y-3">
                         <label class="block text-sm font-medium">Additional Services</label>
                         <div class="space-y-2">
-                            <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="addBreakfast" x-model="modifyFormData.addBreakfast"
-                                    class="rounded" />
-                                <label for="addBreakfast" class="text-sm">Add breakfast (+$25/person/day)</label>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="earlyCheckIn" x-model="modifyFormData.earlyCheckIn"
-                                    class="rounded" />
-                                <label for="earlyCheckIn" class="text-sm">Early check-in (+$30)</label>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="lateCheckOut" x-model="modifyFormData.lateCheckOut"
-                                    class="rounded" />
-                                <label for="lateCheckOut" class="text-sm">Late check-out (+$30)</label>
-                            </div>
+                            <template x-for="service in availableOptionalServices" :key="service.id">
+                                <div class="flex items-center space-x-2">
+                                    <input type="checkbox" :id="'service-' + service.id"
+                                        x-model="modifyFormData.selectedServices[service.id]" class="rounded"
+                                        :checked="modifyFormData.selectedServices[service.id]" />
+                                    <label :for="'service-' + service.id" class="text-sm">
+                                        <span x-text="service.name"></span>
+                                        <span class="text-gray-500">(+ $<span x-text="service.price"></span>)</span>
+                                    </label>
+                                </div>
+                            </template>
                         </div>
                     </div>
                     <div>
@@ -349,39 +267,41 @@
                         <h4 class="font-semibold mb-2">Updated Pricing</h4>
                         <div class="space-y-1 text-sm">
                             <div class="flex justify-between">
-                                <span>Room rate (3 nights)</span>
-                                <span>$747</span>
+                                <span>Room rate (<span x-text="selectedReservation.nights"></span> nights)</span>
+                                <span x-text="Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
                             </div>
-                            <template x-if="modifyFormData.addBreakfast">
-                                <div class="flex justify-between">
-                                    <span>Breakfast</span>
-                                    <span>$150</span>
-                                </div>
-                            </template>
-                            <template x-if="modifyFormData.earlyCheckIn">
-                                <div class="flex justify-between">
-                                    <span>Early check-in</span>
-                                    <span>$30</span>
-                                </div>
-                            </template>
-                            <template x-if="modifyFormData.lateCheckOut">
-                                <div class="flex justify-between">
-                                    <span>Late check-out</span>
-                                    <span>$30</span>
-                                </div>
-                            </template>
+                            <div class="">
+                                <span>Optional Services</span>
+                                <template x-for="service in selectedReservation.optionalServices"
+                                    :key="service.id">
+                                    <div class="flex justify-between">
+                                        <span x-text="service.name" class="text-gray-500"></span>
+                                        <span x-text="Math.round(service.price * service.quantity)"
+                                            class="text-gray-500"></span>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <span>Sub Total</span>
+                                <span x-text="Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Discount Total</span>
+                                <span x-text="Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
+                            </div>
                             <div class="flex justify-between">
                                 <span>Taxes & fees</span>
-                                <span>$136</span>
+                                <span x-text="Math.round(selectedReservation.priceBreakdown.taxes)"></span>
                             </div>
                             <div class="border-t my-2"></div>
                             <div class="flex justify-between font-semibold">
                                 <span>New Total</span>
-                                <span>$1,093</span>
+                                <span>$0</span>
                             </div>
                             <div class="flex justify-between text-xs text-gray-600">
                                 <span>Difference from original</span>
-                                <span class="text-red-600">+$46</span>
+                                <span class="text-red-600">+$0</span>
                             </div>
                         </div>
                     </div>
@@ -389,7 +309,7 @@
                     <div class="flex space-x-3 pt-4">
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
                         <button type="button" class="border border-gray-300 px-4 py-2 rounded"
-                            @click="open = false">Cancel</button>
+                            @click="edit = false">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -519,4 +439,3 @@
         </div>
     </div>
 </div>
-

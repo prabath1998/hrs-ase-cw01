@@ -169,7 +169,7 @@
                 </div>
 
                 <!-- Reservations Tab -->
-                <div x-show="tab==='reservations'" x-data="{ open: false, selectedReservation: null }" class="space-y-6">
+                <div x-show="tab==='reservations'" x-data="{ view: false, edit: false, selectedReservation: null }" class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-bold">My Reservations</h2>
                         <div class="flex space-x-3">
@@ -224,8 +224,13 @@
                                         <div class="space-y-2">
                                             <button
                                                 class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50"
-                                                @click="selectedReservation = r; open = true">
-                                                <i data-lucide="eye" class="w-4 h-4 mr-2"></i>View / Edit
+                                                @click="selectedReservation = r; view = true; $nextTick(() => {lucide.createIcons()});">
+                                                <i data-lucide="eye" class="w-4 h-4 mr-2"></i>View
+                                            </button>
+                                            <button
+                                                class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50"
+                                                @click="selectedReservation = r; edit = true">
+                                                <i data-lucide="square-pen" class="w-4 h-4 mr-2"></i>Edit
                                             </button>
                                             <button
                                                 class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50">
@@ -238,194 +243,8 @@
                         </template>
                     </div>
 
+                    <x-modal-reservation selectedReservation="selectedReservation" view="view" edit="edit" />
 
-                    <!-- Reservation View/Edit Modal -->
-                    <div x-show="open" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8"
-                        style="display: none;">
-
-                        <div @click="open = false"
-                            class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer rounded-none">
-                        </div>
-
-
-                        <div x-show="open" x-transition:enter="transition ease-out duration-300 transform"
-                            x-transition:enter-start="opacity-0 scale-90 translate-y-4"
-                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave="transition ease-in duration-200 transform"
-                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-                            class="relative bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto border-t-4 border-indigo-500 transform transition-all duration-300 ease-in-out"
-                            @click.away="open = false" @keydown.escape.window="open = false">
-
-                            <div class="flex items-center justify-between mb-5">
-                                <h2 class="text-2xl font-extrabold text-gray-800">Reservation Details</h2>
-          
-                                <button @click="open = false"
-                                    class="text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    aria-label="Close modal">
-                                    <i data-lucide="x" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-
-
-                            <template x-if="selectedReservation">
-                                <form @submit.prevent="">
-                                    <div class="flex items-center space-x-4 mb-6">
-                                        <img :src="selectedReservation.roomImage" :alt="selectedReservation.roomName"
-                                            class="rounded object-cover w-24 h-20" />
-                                        <div>
-                                            <h2 class="text-2xl font-bold" x-text="selectedReservation.roomName"></h2>
-                                            <p class="text-gray-600" x-text="selectedReservation.hotelName"></p>
-                                            <div x-html="getStatusBadge(selectedReservation.status)" class="mt-2"></div>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <label class="block text-sm font-medium">Check In</label>
-                                            <input type="date" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.checkIn"
-                                                :readonly="selectedReservation.status !== 'confirmed'" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Check Out</label>
-                                            <input type="date" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.checkOut"
-                                                :readonly="selectedReservation.status !== 'confirmed'" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Room Category</label>
-                                            <select class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.roomType"
-                                                :disabled="selectedReservation.status !== 'confirmed'">
-                                                <option value="standard">Standard</option>
-                                                <option value="deluxe">Deluxe</option>
-                                                <option value="suite">Suite</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Nights</label>
-                                            <input type="number" min="1" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.nights" :readonly="true" />
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="block text-sm font-medium">Amenities</label>
-                                        <div class="flex flex-wrap gap-2 mt-1">
-                                            <template x-for="a in selectedReservation.amenities" :key="a">
-                                                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
-                                                    x-text="a"></span>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="block text-sm font-medium">Total</label>
-                                        <p class="text-xl font-bold" x-text="'$' + selectedReservation.total"></p>
-                                    </div>
-                                    <div class="flex justify-end space-x-2">
-                                        <button type="button" class="border px-4 py-2 rounded hover:bg-gray-50"
-                                            @click="showReservationModal = false">
-                                            Cancel
-                                        </button>
-                                        <template x-if="selectedReservation.status === 'confirmed'">
-                                            <button type="submit"
-                                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center">
-                                                <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
-                                                Save Changes
-                                            </button>
-                                        </template>
-                                    </div>
-                                </form>
-                            </template>
-                        </div>
-                    </div>
-
-                    <!-- Reservation View/Edit Modal (Background blurred) -->
-                    <div x-show="showReservationModal" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 flex items-center justify-center p-4"
-                        style="display: none;">
-                        <div @click="showReservationModal = false"
-                            class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
-
-
-
-                        <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative"
-                            @click.away="showReservationModal = false">
-                            <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-                                @click="showReservationModal = false">
-                                <i data-lucide="x" class="w-6 h-6"></i>
-                            </button>
-                            <template x-if="selectedReservation">
-                                <form @submit.prevent="">
-                                    <div class="flex items-center space-x-4 mb-6">
-                                        <img :src="selectedReservation.roomImage" :alt="selectedReservation.roomName"
-                                            class="rounded object-cover w-24 h-20" />
-                                        <div>
-                                            <h2 class="text-2xl font-bold" x-text="selectedReservation.roomName"></h2>
-                                            <p class="text-gray-600" x-text="selectedReservation.hotelName"></p>
-                                            <div x-html="getStatusBadge(selectedReservation.status)" class="mt-2"></div>
-                                        </div>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-4 mb-4">
-                                        <div>
-                                            <label class="block text-sm font-medium">Check In</label>
-                                            <input type="date" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.checkIn"
-                                                :readonly="selectedReservation.status !== 'confirmed'" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Check Out</label>
-                                            <input type="date" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.checkOut"
-                                                :readonly="selectedReservation.status !== 'confirmed'" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Guests</label>
-                                            <input type="number" min="1" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.guests"
-                                                :readonly="selectedReservation.status !== 'confirmed'" />
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium">Nights</label>
-                                            <input type="number" min="1" class="border rounded px-3 py-2 w-full"
-                                                x-model="selectedReservation.nights" :readonly="true" />
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="block text-sm font-medium">Amenities</label>
-                                        <div class="flex flex-wrap gap-2 mt-1">
-                                            <template x-for="a in selectedReservation.amenities" :key="a">
-                                                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
-                                                    x-text="a"></span>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <div class="mb-4">
-                                        <label class="block text-sm font-medium">Total</label>
-                                        <p class="text-xl font-bold" x-text="'$' + selectedReservation.total"></p>
-                                    </div>
-                                    <div class="flex justify-end space-x-2">
-                                        <button type="button" class="border px-4 py-2 rounded hover:bg-gray-50"
-                                            @click="showReservationModal = false">
-                                            Cancel
-                                        </button>
-                                        <template x-if="selectedReservation.status === 'confirmed'">
-                                            <button type="submit"
-                                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center">
-                                                <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
-                                                Save Changes
-                                            </button>
-                                        </template>
-                                    </div>
-                                </form>
-                            </template>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Billing Tab -->
@@ -536,10 +355,11 @@
                 <!-- Profile Tab -->
                 <div x-show="tab==='profile'" class="space-y-6">
                     <h2 class="text-2xl font-bold">Profile Settings</h2>
-                    <form class="p-6 space-y-4">
+                    <form class="p-6 space-y-4" action="{{ route('profile.update') }}" method="POST">
+                        @csrf
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Personal Information -->
-                            <div class="bg-white rounded shadow">
+                            <div class="bg-white rounded shadow flex flex-col gap-4 px-4 py-2">
                                 <div class="p-6 border-b">
                                     <h2 class="font-bold text-lg">Personal Information</h2>
                                     <p class="text-sm text-gray-500">Update your personal details</p>
@@ -548,30 +368,58 @@
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label for="firstName" class="block text-sm font-medium">First Name</label>
-                                        <input id="firstName" class="border rounded px-3 py-2 w-full" value="John" />
+                                        <input id="firstName" name="first_name" class="border rounded px-3 py-2 w-full"
+                                            value="{{ $customerDetails['first_name'] }}" />
                                     </div>
                                     <div>
                                         <label for="lastName" class="block text-sm font-medium">Last Name</label>
-                                        <input id="lastName" class="border rounded px-3 py-2 w-full" value="Doe" />
+                                        <input id="lastName" name="last_name" class="border rounded px-3 py-2 w-full"
+                                            value="{{ $customerDetails['last_name'] }}" />
                                     </div>
                                 </div>
                                 <div>
                                     <label for="email" class="block text-sm font-medium">Email</label>
                                     <input id="email" type="email" class="border rounded px-3 py-2 w-full"
-                                        value="john.doe@example.com" />
+                                        value="{{ $customerDetails['email'] }}" readonly />
                                 </div>
                                 <div>
                                     <label for="phone" class="block text-sm font-medium">Phone</label>
-                                    <input id="phone" type="tel" class="border rounded px-3 py-2 w-full"
-                                        value="+1 (555) 123-4567" />
+                                    <input id="phone" name="phone" type="tel" class="border rounded px-3 py-2 w-full"
+                                        value="{{ $customerDetails['phone'] }}" />
                                 </div>
                                 <div>
-                                    <label for="dateOfBirth" class="block text-sm font-medium">Date of Birth</label>
-                                    <input id="dateOfBirth" type="date" class="border rounded px-3 py-2 w-full"
-                                        value="1990-05-15" />
+                                    <label for="address" class="block text-sm font-medium">Address</label>
+                                    <textarea id="address" name="address" class="border rounded px-3 py-2 w-full" rows="3">{{ $customerDetails['address'] }}</textarea>
                                 </div>
-                                <button type="button"
-                                    class="bg-blue-600 text-white px-4 py-2 rounded flex items-center hover:bg-blue-700">
+
+                                <!-- Update Password -->
+                                <div class="border-t pt-4">
+                                    <h3 class="font-semibold text-lg">Update Password</h3>
+                                    <p class="text-sm text-gray-500">Change your account password</p>
+                                    <div class="grid grid-cols-2 gap-4 mt-4">
+                                        <div>
+                                            <label for="currentPassword" class="block text-sm font-medium">Current
+                                                Password</label>
+                                            <input id="currentPassword" type="password" name="current_password"
+                                                class="border rounded px-3 py-2 w-full" />
+                                        </div>
+                                        <div>
+                                            <label for="newPassword" class="block text-sm font-medium">New
+                                                Password</label>
+                                            <input id="newPassword" type="password" name="new_password"
+                                                class="border rounded px-3 py-2 w-full" />
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <label for="confirmPassword" class="block text-sm font-medium">Confirm
+                                            Password</label>
+                                        <input id="confirmPassword" type="password" name="confirm_password"
+                                            class="border rounded px-3 py-2 w-full" />
+                                    </div>
+                                </div>
+
+                                <button type="submit"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded flex self-end hover:bg-blue-700">
                                     <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
                                     Save Changes
                                 </button>
@@ -630,7 +478,8 @@
         function dashboardPage() {
             return {
                 reservations: {!! json_encode($reservations) !!},
-                billing: {!! json_encode($bills) !!}
+                billing: {!! json_encode($bills) !!},
+                availableOptionalServices: {!! json_encode($availableOptionalServices) !!},
             }
         }
 
