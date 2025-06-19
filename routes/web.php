@@ -118,10 +118,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
 
 
-Route::middleware('auth')->group(function () {
+// Route::middleware('auth')->group(function () {
     Route::get('/travel-company/register', [TravelCompanyController::class, 'showRegistrationForm'])->name('travel-company.register');
     Route::post('/travel-company/register', [TravelCompanyController::class, 'register'])->name('travel-company.register.submit');
-});
+// });
 
 
 /**

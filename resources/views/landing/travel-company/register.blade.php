@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,12 +33,17 @@
                 </div>
 
                 @if ($errors->any())
-    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-        @foreach ($errors->all() as $error)
-            <div>{{ $error }}</div>
-        @endforeach
-    </div>
-@endif
+                    <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
+                @if (session('success'))
+                    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
 
                 <form action="{{ route('travel-company.register.submit') }}" method="POST" class="p-8">
@@ -122,7 +128,7 @@
                         </div>
 
                         <!-- Negotiated Discount Percentage -->
-                        <div class="col-span-2 md:col-span-1">
+                        {{-- <div class="col-span-2 md:col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="negotiated_discount_percentage">
                                 Negotiated Discount (%)
                             </label>
@@ -137,7 +143,7 @@
                             @error('negotiated_discount_percentage')
                                 <p class="text-rose-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <!-- Company Type -->
                         <div class="col-span-2 md:col-span-1">
@@ -146,12 +152,18 @@
                             </label>
                             <select name="company_type" id="company_type"
                                 class="h-12 w-full border @error('company_type') border-rose-500 @else border-gray-300 @enderror rounded-lg px-4 text-sm transition-colors focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:outline-none">
-                                <option value="" disabled {{ old('company_type') ? '' : 'selected' }}>Select company type</option>
-                                <option value="hotel" {{ old('company_type') == 'hotel' ? 'selected' : '' }}>Hotel/Accommodation</option>
-                                <option value="airline" {{ old('company_type') == 'airline' ? 'selected' : '' }}>Airline</option>
-                                <option value="tour" {{ old('company_type') == 'tour' ? 'selected' : '' }}>Tour Operator</option>
-                                <option value="transport" {{ old('company_type') == 'transport' ? 'selected' : '' }}>Transportation</option>
-                                <option value="other" {{ old('company_type') == 'other' ? 'selected' : '' }}>Other</option>
+                                <option value="" disabled {{ old('company_type') ? '' : 'selected' }}>Select
+                                    company type</option>
+                                <option value="hotel" {{ old('company_type') == 'hotel' ? 'selected' : '' }}>
+                                    Hotel/Accommodation</option>
+                                <option value="airline" {{ old('company_type') == 'airline' ? 'selected' : '' }}>
+                                    Airline</option>
+                                <option value="tour" {{ old('company_type') == 'tour' ? 'selected' : '' }}>Tour
+                                    Operator</option>
+                                <option value="transport" {{ old('company_type') == 'transport' ? 'selected' : '' }}>
+                                    Transportation</option>
+                                <option value="other" {{ old('company_type') == 'other' ? 'selected' : '' }}>Other
+                                </option>
                             </select>
                             @error('company_type')
                                 <p class="text-rose-500 text-sm mt-1">{{ $message }}</p>
@@ -168,7 +180,9 @@
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="terms" class="font-medium text-gray-700">
-                                    I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>
+                                    I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and
+                                        Conditions</a> and <a href="#"
+                                        class="text-blue-600 hover:underline">Privacy Policy</a>
                                 </label>
                             </div>
                         </div>
@@ -192,8 +206,10 @@
             <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded-xl shadow-md">
                     <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Grow Your Business</h3>
@@ -202,8 +218,10 @@
 
                 <div class="bg-white p-6 rounded-xl shadow-md">
                     <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Easy Management</h3>
@@ -212,8 +230,10 @@
 
                 <div class="bg-white p-6 rounded-xl shadow-md">
                     <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">Flexible Payments</h3>
@@ -223,4 +243,5 @@
         </div>
     </section>
 </body>
+
 </html>

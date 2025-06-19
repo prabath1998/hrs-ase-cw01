@@ -59,15 +59,22 @@ class TravelCompanyController extends Controller
 
     public function register(TravelCompanyRegisterRequest $request)
     {
-        $user = auth()->user();
+        // $user = auth()->user();
 
-        if (!$user->hasRole('Travel Company')) {
-            $user->assignRole('Travel Company');
-        }
+        // if (!$user->hasRole('Travel Company')) {
+        //     $user->assignRole('Travel Company');
+        // }
 
-        if (TravelCompany::where('user_id', auth()->id())->exists()) {
-            return redirect()->back()->withErrors(['error' => 'You are already registered as a Travel Partner.']);
-        }
+        // if (TravelCompany::where('user_id', auth()->id())->exists()) {
+        //     return redirect()->back()->withErrors(['error' => 'You are already registered as a Travel Partner.']);
+        // }
+
+        $user = User::create([
+            'name' => $request->input('contact_name'),
+            'username' => Str::slug($request->input('contact_name')),
+            'email' => $request->input('contact_email'),
+            'password' => Hash::make('password'), // Default password
+        ]);
 
         $tr = TravelCompany::create([
             'user_id' => $user->id,
@@ -77,9 +84,9 @@ class TravelCompanyController extends Controller
             'phone_number' => $request->input('phone_number'),
             'address' => $request->input('address'),
             'registration_number' => $request->input('registration_number'),
-            'negotiated_discount_percentage' => $request->input('negotiated_discount_percentage'),
+            // 'negotiated_discount_percentage' => $request->input('negotiated_discount_percentage'),
         ]);
 
-        return redirect()->route('home')->with('success', 'You are now registered as a Travel Partner!');
+        return redirect()->back()->with('success', 'Travel Company registered successfully. Please wait for approval.');
     }
 }
