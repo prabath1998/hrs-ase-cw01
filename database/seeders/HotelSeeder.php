@@ -16,14 +16,14 @@ class HotelSeeder extends Seeder
         Hotel::firstOrCreate(
             ['name' => 'Sunset Galle Fort'],
             [
-                'address' => 'Galle City, Galle (Old Town)',
-                'contact_email' => 'TlW4t@example.com',
+                'address' => 'Galle City, Galle (Old Town), Sri Lanka',
+                'contact_email' => 'hotel1@example.com',
                 'phone_number' => '+94 91 222 3333',
                 'images' => json_encode([
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/83871748.jpg?k=1a0a78d60f129c5a6e29d1189ab6d9a174288ba270a4f9ff977b4d0a6977d58b&o=',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/84220869.jpg?k=d61f93267dc7680385f9898e3cf8e8eff91a99449192f7c63fa45e6364421277&o=&hp=1',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/86161620.jpg?k=08dc11fbb4e510d74712530d0b9f1b6b0b7c13923607279514ab27b2dabded97&o=&hp=1',
-                    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/86161663.jpg?k=ee5bd60f7ffdf9ff7b368dbd0e350dd61ab61baa7b503f531c8029febc64ff2b&o=&hp=1',
+                    asset('images/hotel/1/83871748.jpg'),
+                    asset('images/hotel/1/84220869.jpg'),
+                    asset('images/hotel/1/86161620.jpg'),
+                    asset('images/hotel/1/86161663.jpg'),
                 ]),
                 'description' => 'A beautiful hotel located in the heart of Galle Fort, offering stunning views and luxurious amenities.',
                 'website' => 'https://sunsetgallefort.com',
@@ -33,6 +33,47 @@ class HotelSeeder extends Seeder
             ]
         );
 
+        Hotel::firstOrCreate(
+            ['name' => 'Sheraton Colombo Hotel'],
+            [
+                'address' => '265 Galle Road, Kollupitiya, Kollupitiya, 00300 Colombo, Sri Lanka',
+                'contact_email' => 'hotel2@example.com',
+                'phone_number' => '+94 91 222 3333',
+                'images' => json_encode([
+                    asset('images/hotel/2/522468660.jpg'),
+                    asset('images/hotel/2/544295993.jpg'),
+                    asset('images/hotel/2/544296078.jpg'),
+                    asset('images/hotel/2/544317721.jpg'),
+                    asset('images/hotel/2/544334152.jpg'),
+                ]),
+                'description' => 'A luxurious hotel in Colombo with modern amenities and exceptional service.',
+                'website' => 'https://sheratoncolombo.com',
+                'rating' => 4.7,
+                'default_check_in_time' => now()->setTime(15, 0, 0)->format('Y-m-d H:i:s'),
+                'default_check_out_time' => now()->setTime(11, 0, 0)->format('Y-m-d H:i:s'),
+            ]
+        );
+
+        Hotel::firstOrCreate(
+            ['name' => 'Cinnamon Lakeside'],
+            [
+                'address' => '115,Sir Chittampalam A,Gardiner Mawatha, Fort, 00100 Colombo, Sri Lanka',
+                'contact_email' => 'hotel3@texample.com',
+                'phone_number' => '+94 91 222 3333',
+                'images' => json_encode([
+                    asset('images/hotel/3/64394922.jpg'),
+                    asset('images/hotel/3/112518665.jpg'),
+                    asset('images/hotel/3/647785366.jpg'),
+                    asset('images/hotel/3/647785414.jpg'),
+                    asset('images/hotel/3/647785431.jpg'),
+                ]),
+                'description' => 'Cinnamon Lakeside is a luxury hotel located in Colombo, offering a serene lakeside experience with top-notch amenities.',
+                'website' => 'https://cinnamonlakeside.com',
+                'rating' => 4.8,
+                'default_check_in_time' => now()->setTime(14, 0, 0)->format('Y-m-d H:i:s'),
+                'default_check_out_time' => now()->setTime(12, 0, 0)->format('Y-m-d H:i:s'),
+            ]
+        );
 
     }
 }

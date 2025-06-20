@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('room_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('hotel_id')->nullable()->constrained('hotels')->onDelete('set null');
-            $table->string('name')->unique();
+            $table->string('name');
             $table->text('description')->nullable();
             $table->integer('occupancy_limit'); // Maximum number of guests allowed
             $table->decimal('base_price_per_night', 12, 2);

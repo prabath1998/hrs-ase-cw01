@@ -238,12 +238,12 @@ class ReservationController extends Controller
         // }
     }
 
-    public function edit(RoomType $roomType)
+    public function edit(Reservation $reservation)
     {
-        return view('backend.pages.room-types.edit', compact('roomType'));
+        return view('backend.pages.reservations.edit', compact('reservation'));
     }
 
-    public function update(Request $request, RoomType $roomType)
+    public function update(Request $request, Reservation $reservation)
     {
         $request->merge([
             'is_active' => $request->has('is_active'),
@@ -263,20 +263,20 @@ class ReservationController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $roomType->update($validated);
-        $this->storeActionLog(ActionType::UPDATED, ['room_type' => $validated['name']]);
+        $reservation->update($validated);
+        $this->storeActionLog(ActionType::UPDATED, ['reservation' => $validated['name']]);
 
 
-        return redirect()->route('admin.room-types.index')->with('success', __('Room type updated successfully.'));
+        return redirect()->route('admin.room-types.index')->with('success', __('Reservation updated successfully.'));
     }
 
-    public function destroy(RoomType $roomType)
+    public function destroy(Reservation $reservation)
     {
-        $roomType->delete();
+        $reservation->delete();
 
-        $this->storeActionLog(ActionType::DELETED, ['room_type' => $roomType->name]);
+        $this->storeActionLog(ActionType::DELETED, ['reservation' => $reservation->name]);
 
-        return redirect()->route('admin.room-types.index')->with('success', __('Room type deleted successfully.'));
+        return redirect()->route('admin.room-types.index')->with('success', __('Reservation deleted successfully.'));
     }
 
     public function downloadReceipt($id)
