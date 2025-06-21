@@ -62,14 +62,15 @@ class Reservation extends Model
         });
         $discount = $totalCost * ($this->applied_discount_percentage ?? 0 / 100);
         $totalCost -= $discount;
-        return \Illuminate\Support\Number::currency($totalCost, 'LKR');
+        return \Illuminate\Support\Number::currency($totalCost, 'USD');
     }
 
     public function statusLabel()
     {
         return match ($this->status) {
-            'pending_payment' => __('Pending Payment'),
-            'confirmed' => __('Confirmed'),
+            'pending_confirmation' => __('Pending Payment'),
+            'confirmed_guaranteed' => __('Confirmed'),
+            'confirmed_no_cc_hold' => __('Confirmed - No CC Hold'),
             'checked_in' => __('Checked In'),
             'checked_out' => __('Checked Out'),
             'cancelled_customer' => __('Cancelled by Customer'),
@@ -83,8 +84,9 @@ class Reservation extends Model
     public function statusColor()
     {
         return match ($this->status) {
-            'pending_payment' => 'bg-yellow-100 text-yellow-800',
-            'confirmed' => 'bg-green-100 text-green-800',
+            'pending_confirmation' => 'bg-yellow-100 text-yellow-800',
+            'confirmed_guaranteed' => 'bg-green-100 text-green-800',
+            'confirmed_no_cc_hold' => 'bg-yellow-100 text-yellow-800',
             'checked_in' => 'bg-blue-100 text-blue-800',
             'checked_out' => 'bg-gray-100 text-gray-800',
             'cancelled_customer' => 'bg-red-100 text-red-800',

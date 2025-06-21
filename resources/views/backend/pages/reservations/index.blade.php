@@ -70,11 +70,17 @@
                             @forelse ($reservations as $reservation)
                                 <tr class="border-b border-gray-100 dark:border-gray-800">
                                     <td class="px-5 py-4">{{ $loop->iteration }}</td>
-                                    <td class="px-5 py-4">{{ $reservation->customer ? $reservation->customer->name() : $reservation->travelCompany->company_name }}</td>
+                                    <td class="px-5 py-4">
+                                        {{ $reservation->customer ? $reservation->customer->name() : $reservation->travelCompany->company_name }}
+                                    </td>
                                     <td class="px-5 py-4">{{ $reservation->hotel->name }}</td>
                                     <td class="px-5 py-4">{{ $reservation->roomType->name }}</td>
                                     <td class="px-5 py-4">{{ $reservation->room->room_number }}</td>
-                                    <td cclass="px-5 py-4">{{ $reservation->check_in_date }} / {{ $reservation->check_out_date }}</td>
+                                    <td cclass="px-5 py-4">
+                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_in_date)->format('Y-m-d H:i') }}
+                                        to
+                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_out_date)->format('Y-m-d H:i') }}
+                                    </td>
                                     <td class="px-5 py-4">{{ $reservation->totalEstimatedCost() }}</td>
                                     <td class="px-5 py-4">
                                         <span
@@ -84,10 +90,24 @@
                                     </td>
                                     <td class="px-5 py-4">
                                         <div class="flex gap-2">
-                                            <!-- Edit Button -->
-                                            <a href="{{ route('admin.reservations.edit', $reservation->id) }}"
-                                                class="btn-default !p-3" title="{{ __('Edit') }}">
-                                                <i class="bi bi-pencil"></i>
+                                            <!-- CheckIn Button -->
+                                            @if (in_array($reservation->status, ['confirmed_guaranteed', 'confirmed_no_cc_hold']))
+                                                <button data-toggle="modal" data-target="#checkInModal" type="button"
+                                                    class="btn-success !p-3" title="{{ __('Check In') }}">
+                                                    <i class="bi bi-check2"></i>
+                                                </button>
+                                            @elseif ($reservation->status === 'checked_in')
+                                                <button class="">Add Charge / Bill Item</button>
+                                                <button data-toggle="modal" data-target="#checkOutModal" type="button"
+                                                    class="btn-warning !p-3" title="{{ __('Check Out') }}">
+                                                    <i class="bi bi-box-arrow-right"></i>
+                                                </button>
+                                            @endif
+
+                                            <!-- Show Button -->
+                                            <a href="{{ route('admin.reservations.show', $reservation->id) }}"
+                                                class="btn-default !p-3" title="{{ __('Show') }}">
+                                                <i class="bi bi-eye"></i>
                                             </a>
 
                                             <!-- Delete Button Trigger -->
@@ -174,14 +194,14 @@
         </div>
 
     </div>
-
-    @push('scripts')
-        <script>
-            function handleRoleFilter(value) {
-                let currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('role', value);
-                window.location.href = currentUrl.toString();
-            }
-        </script>
-    @endpush
 @endsection
+
+@push('scripts')
+    <script>
+        function handleRoleFilter(value) {
+            let currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('role', value);
+            window.location.href = currentUrl.toString();
+        }
+    </script>
+@endpush

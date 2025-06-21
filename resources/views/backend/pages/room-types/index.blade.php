@@ -75,14 +75,14 @@
                                     <td class="px-5 py-4">{{ $roomType->name }}</td>
                                     <td class="px-5 py-4">{{ $roomType->description }}</td>
                                     <td class="px-5 py-4">{{ $roomType->occupancy_limit }}</td>
-                                    <td cclass="px-5 py-4">{{ \Illuminate\Support\Number::currency($roomType->base_price_per_night, 'LKR') }}</td>
+                                    <td cclass="px-5 py-4">{{ \Illuminate\Support\Number::currency($roomType->base_price_per_night, 'USD') }}</td>
                                     <td class="px-5 py-4">
                                         <span
                                             class="px-2 py-1 text-xs font-semibold rounded-full {{ $roomType->is_suite ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                             {{ $roomType->is_suite ? __('Yes') : __('No') }}
                                         </span>
                                     </td>
-                                    <td class="px-5 py-4">{!! $roomType->is_suite ? \Illuminate\Support\Number::currency($roomType->suite_weekly_rate, 'LKR') . ', <br>' . \Illuminate\Support\Number::currency($roomType->suite_monthly_rate, 'LKR') : '-' !!}</td>
+                                    <td class="px-5 py-4">{!! $roomType->is_suite ? \Illuminate\Support\Number::currency($roomType->suite_weekly_rate, 'USD') . ', <br>' . \Illuminate\Support\Number::currency($roomType->suite_monthly_rate, 'USD') : '-' !!}</td>
                                     <td class="px-5 py-4">
                                         <span
                                             class="px-2 py-1 text-xs font-semibold rounded-full {{ $roomType->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">

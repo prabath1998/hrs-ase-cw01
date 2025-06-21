@@ -25,7 +25,7 @@ class ReservationSeeder extends Seeder
             'status' => 'confirmed',
             'has_credit_card_guarantee' => true,
             'booked_by_user_id' => 1,
-            'total_estimated_room_charge' => 100.00,
+            'total_estimated_room_charge' => 40.00,
         ]);
 
         $reservation1->optionalServices()->attach([1, 2], ['quantity' => 1]); // Attach optional services with quantity
@@ -39,10 +39,10 @@ class ReservationSeeder extends Seeder
             'check_in_date' => '2023-07-01',
             'check_out_date' => '2023-07-03',
             'number_of_guests' => 1,
-            'status' => 'pending',
+            'status' => 'pending_confirmation',
             'has_credit_card_guarantee' => false,
             'booked_by_user_id' => 2,
-            'total_estimated_room_charge' => 60.00,
+            'total_estimated_room_charge' => 32.00,
         ]);
 
         $reservation2->optionalServices()->attach([3], ['quantity' => 2]); // Attach optional services with quantity
@@ -59,7 +59,10 @@ class ReservationSeeder extends Seeder
             'status' => 'checked_in',
             'has_credit_card_guarantee' => true,
             'booked_by_user_id' => 1,
-            'total_estimated_room_charge' => 280.00,
+            'total_estimated_room_charge' => 192.00,
+            'is_suit_booking' => true,
+            'suite_booking_period' => 'weekly',
+            'suit_rate_applied' => 40.00
         ]);
 
         $reservation3->optionalServices()->attach([1, 2, 3], ['quantity' => 1]); // Attach optional services with quantity

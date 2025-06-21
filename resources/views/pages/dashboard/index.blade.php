@@ -2,7 +2,23 @@
 
 @section('content')
     <div class="min-h-screen bg-gray-50" x-data="dashboardPage()">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+
+            {{-- Flash Messages --}}
+            @if (session('success'))
+                <x-alert type="success" :message="session('success')" />
+            @elseif (session('error'))
+                <x-alert type="error" :message="session('error')" />
+            @elseif (session('warning'))
+                <x-alert type="warning" :message="session('warning')" />
+            @elseif (session('info'))
+                <x-alert type="info" :message="session('info')" />
+            @endif
+
+            @if( $errors->any())
+                <x-alert type="error" :message="$errors->first()"/>
+            @endif
+
             <!-- Welcome Section -->
             <div class="mb-8">
                 <div class="flex items-center space-x-4 mb-6">
@@ -325,7 +341,8 @@
                                                 </p>
                                                 <span x-html="getPaymentStatusBadge(b.status)"></span>
                                             </div>
-                                            <button class="border px-2 py-2 rounded hover:bg-gray-50" @click="downloadPaymentReceipt(b.id)">
+                                            <button class="border px-2 py-2 rounded hover:bg-gray-50"
+                                                @click="downloadPaymentReceipt(b.id)">
                                                 <i data-lucide="download" class="w-4 h-4"></i>
                                             </button>
                                         </div>
@@ -372,23 +389,32 @@
                                         <label for="firstName" class="block text-sm font-medium">First Name</label>
                                         <input id="firstName" name="first_name" class="border rounded px-3 py-2 w-full"
                                             value="{{ $customerDetails['first_name'] }}" />
+                                        @error('first_name')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div>
                                         <label for="lastName" class="block text-sm font-medium">Last Name</label>
                                         <input id="lastName" name="last_name" class="border rounded px-3 py-2 w-full"
                                             value="{{ $customerDetails['last_name'] }}" />
+                                        @error('last_name')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="email" class="block text-sm font-medium">Email</label>
-                                    <input id="email" type="email" class="border rounded px-3 py-2 w-full"
-                                        value="{{ $customerDetails['email'] }}" readonly />
+                                    <label for="contact_email" class="block text-sm font-medium">Email</label>
+                                    <input id="contact_email" type="email" class="border rounded px-3 py-2 w-full bg-gray-100"
+                                        value="{{ $customerDetails['contact_email'] }}" readonly />
                                 </div>
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium">Phone</label>
-                                    <input id="phone" name="phone" type="tel"
+                                    <label for="phone_number" class="block text-sm font-medium">Phone Number</label>
+                                    <input id="phone_number" name="phone_number" type="text"
                                         class="border rounded px-3 py-2 w-full"
-                                        value="{{ $customerDetails['phone'] }}" />
+                                        value="{{ $customerDetails['phone_number'] }}" />
+                                    @error('phone_number')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 <div>
                                     <label for="address" class="block text-sm font-medium">Address</label>
@@ -405,12 +431,18 @@
                                                 Password</label>
                                             <input id="currentPassword" type="password" name="current_password"
                                                 class="border rounded px-3 py-2 w-full" />
+                                            @error('current_password')
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                         <div>
                                             <label for="newPassword" class="block text-sm font-medium">New
                                                 Password</label>
                                             <input id="newPassword" type="password" name="new_password"
                                                 class="border rounded px-3 py-2 w-full" />
+                                            @error('new_password')
+                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="mt-4">
@@ -418,6 +450,9 @@
                                             Password</label>
                                         <input id="confirmPassword" type="password" name="confirm_password"
                                             class="border rounded px-3 py-2 w-full" />
+                                        @error('confirm_password')
+                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
 

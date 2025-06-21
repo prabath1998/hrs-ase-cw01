@@ -69,13 +69,13 @@
     <!-- Footer -->
     <x-footer />
 
-    @stack('scripts')
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
         });
     </script>
+
+    @stack('scripts')
 
 </body>
 

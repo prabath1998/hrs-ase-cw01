@@ -74,7 +74,7 @@
                                     <td class="px-5 py-4">{{ $room->roomType->name }}</td>
                                     <td class="px-5 py-4">{{ $room->hotel->name }}</td>
                                     <td class="px-5 py-4">
-                                        @foreach ($room->features ?? [] as $key => $value)
+                                        @foreach ($room->roomType->features ?? [] as $key => $value)
                                             @if (!$value)
                                                 @continue
                                             @endif

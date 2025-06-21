@@ -110,8 +110,8 @@ class CustomerService
             'id' => $customer->id,
             'first_name' => $customer->first_name,
             'last_name' => $customer->last_name,
-            'email' => $customer->email,
-            'phone' => $customer->phone,
+            'contact_email' => $customer->contact_email,
+            'phone_number' => $customer->phone_number,
             'address' => $customer->address,
             'created_at' => $customer->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $customer->updated_at->format('Y-m-d H:i:s'),
@@ -123,7 +123,7 @@ class CustomerService
         $customer->first_name = $data['first_name'] ?? $customer->first_name;
         $customer->last_name = $data['last_name'] ?? $customer->last_name;
         // $customer->email = $data['email'] ?? $customer->email;
-        $customer->phone_number = $data['phone'] ?? $customer->phone;
+        $customer->phone_number = $data['phone'] ?? $customer->phone_number;
         $customer->address = $data['address'] ?? $customer->address;
 
         $customer->save();

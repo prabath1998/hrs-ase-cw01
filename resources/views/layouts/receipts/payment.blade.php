@@ -68,7 +68,7 @@
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th class="text-right">Amount Paid (LKR)</th>
+                    <th class="text-right">Amount Paid ($)</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,19 +89,19 @@
         <table class="summary-table">
             <tr>
                 <td class="label">Invoice Total:</td>
-                <td class="value">LKR {{ number_format($bill->grand_total, 2) }}</td>
+                <td class="value">${{ number_format($bill->grand_total, 2) }}</td>
             </tr>
              <tr class="total-paid">
                 <td class="label">Amount Paid (This Transaction):</td>
-                <td class="value">LKR {{ number_format($payment->amount, 2) }}</td>
+                <td class="value">${{ number_format($payment->amount, 2) }}</td>
             </tr>
              <tr>
                 <td class="label">Total Paid on Invoice:</td>
-                <td class="value">LKR {{ number_format($bill->amount_paid, 2) }}</td>
+                <td class="value">${{ number_format($bill->amount_paid, 2) }}</td>
             </tr>
              <tr style="font-weight: bold;">
                 <td class="label">Remaining Balance:</td>
-                <td class="value">LKR {{ number_format($bill->grand_total - $bill->amount_paid, 2) }}</td>
+                <td class="value">${{ number_format($bill->grand_total - $bill->amount_paid, 2) }}</td>
             </tr>
         </table>
 
