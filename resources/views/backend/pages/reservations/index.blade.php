@@ -75,11 +75,11 @@
                                     </td>
                                     <td class="px-5 py-4">{{ $reservation->hotel->name }}</td>
                                     <td class="px-5 py-4">{{ $reservation->roomType->name }}</td>
-                                    <td class="px-5 py-4">{{ $reservation->room->room_number }}</td>
+                                    <td class="px-5 py-4">{{ $reservation->room->room_number ?? '-' }}</td>
                                     <td cclass="px-5 py-4">
-                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_in_date)->format('Y-m-d H:i') }}
+                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_in_date)->format('M d') }}
                                         to
-                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_out_date)->format('Y-m-d H:i') }}
+                                        {{ \Illuminate\Support\Carbon::parse($reservation->check_out_date)->format('M d, Y') }}
                                     </td>
                                     <td class="px-5 py-4">{{ $reservation->totalEstimatedCost() }}</td>
                                     <td class="px-5 py-4">
@@ -90,19 +90,6 @@
                                     </td>
                                     <td class="px-5 py-4">
                                         <div class="flex gap-2">
-                                            <!-- CheckIn Button -->
-                                            @if (in_array($reservation->status, ['confirmed_guaranteed', 'confirmed_no_cc_hold']))
-                                                <button data-toggle="modal" data-target="#checkInModal" type="button"
-                                                    class="btn-success !p-3" title="{{ __('Check In') }}">
-                                                    <i class="bi bi-check2"></i>
-                                                </button>
-                                            @elseif ($reservation->status === 'checked_in')
-                                                <button class="">Add Charge / Bill Item</button>
-                                                <button data-toggle="modal" data-target="#checkOutModal" type="button"
-                                                    class="btn-warning !p-3" title="{{ __('Check Out') }}">
-                                                    <i class="bi bi-box-arrow-right"></i>
-                                                </button>
-                                            @endif
 
                                             <!-- Show Button -->
                                             <a href="{{ route('admin.reservations.show', $reservation->id) }}"

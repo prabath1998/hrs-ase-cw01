@@ -16,7 +16,7 @@ class ReservationSeeder extends Seeder
         // Create a reservation for a customer with ID 1
         $reservation1 = Reservation::create([
             'customer_id' => 1,
-            'room_id' => 1,
+            // 'room_id' => 1,
             'hotel_id' => 1,
             'room_type_id' => 1,
             'check_in_date' => '2025-03-01',
@@ -36,13 +36,13 @@ class ReservationSeeder extends Seeder
         // Create another reservation for a customer with ID 2
         $reservation2 = Reservation::create([
             'customer_id' => 1,
-            'room_id' => 2,
+            // 'room_id' => 2,
             'hotel_id' => 1,
             'room_type_id' => 2,
             'check_in_date' => '2025-04-01',
             'check_out_date' => '2025-04-03',
             'number_of_guests' => 1,
-            'status' => 'pending_confirmation',
+            'status' => 'confirmed_guaranteed',
             'has_credit_card_guarantee' => false,
             'booked_by_user_id' => 2,
             'total_estimated_room_charge' => 32.00,

@@ -81,6 +81,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
     Route::resource('reservations', ReservationController::class);
     Route::post('/reservations/{reservation}/check-in', [ReservationController::class, 'checkIn'])->name('reservations.checkin');
     Route::post('/reservations/{reservation}/check-out', [ReservationController::class, 'checkOut'])->name('reservations.checkout');
+    Route::post('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+    Route::post('/reservations/{reservation}/send-receipt', [ReservationController::class, 'generateBill'])->name('reservations.generateBill');
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);
