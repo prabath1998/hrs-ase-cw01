@@ -176,6 +176,23 @@ class ReservationController extends Controller
                 'suite_rate_applied' => $suiteRateApplied,
             ]);
 
+            $subject = 'Reservation Confirmation – ' . $hotel->name;
+
+            $body = "Hi {$reservation->customer->first_name},
+
+            Your reservation at {$hotel->name} has been confirmed!
+
+            Here are your reservation details:
+            - Check-in: " . \Carbon\Carbon::parse($reservation->check_in_date)->format('F j, Y') . "
+            - Check-out: " . \Carbon\Carbon::parse($reservation->check_out_date)->format('F j, Y') . "
+            - Room Type: {$roomType->name}
+            - Estimated Charge: $" . number_format($reservation->total_estimated_room_charge, 2) . "
+            " . ($reservation->special_requests ? "- Special Requests: {$reservation->special_requests}" : '') . "
+
+            Thank you for booking with us!";
+
+            sendNotificationEmail($reservation->customer->contact_email, $subject, nl2br($body));
+
             if (!empty($validated['optional_services'])) {
                 foreach ($validated['optional_services'] as $serviceId) {
                     $service = OptionalService::find($serviceId);
