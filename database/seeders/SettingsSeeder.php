@@ -57,6 +57,7 @@ class SettingsSeeder extends Seeder
             // Custom CSS and JS.
             ['option_name' => 'global_custom_css', 'option_value' => ''],
             ['option_name' => 'global_custom_js', 'option_value' => ''],
+            ['option_name' => 'tax_rate' , 'option_value' => '4.0'], // 4% tax rate
         ]);
     }
 }

@@ -12,6 +12,11 @@ class Reservation extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    protected $casts = [
+        'check_in_date' => 'date',
+        'check_out_date' => 'date',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -45,6 +50,13 @@ class Reservation extends Model
             ->withTimestamps();
     }
 
+    public function subTotalOptionalServices()
+    {
+        return $this->optionalServices->sum(function ($service) {
+            return $service->pivot->quantity * $service->pivot->price_at_booking;
+        });
+    }
+
     public function bill()
     {
         return $this->hasOne(Bill::class);
@@ -57,9 +69,7 @@ class Reservation extends Model
 
     public function totalEstimatedCost()
     {
-        $totalCost = $this->total_estimated_room_charge + $this->optionalServices->sum(function ($service) {
-            return $service->pivot->quantity * $service->pivot->price_at_booking;
-        });
+        $totalCost = $this->total_estimated_room_charge + $this->subTotalOptionalServices();
         $discount = $totalCost * ($this->applied_discount_percentage ?? 0 / 100);
         $totalCost -= $discount;
         return \Illuminate\Support\Number::currency($totalCost, 'USD');

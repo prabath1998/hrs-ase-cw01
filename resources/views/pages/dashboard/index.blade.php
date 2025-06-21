@@ -236,7 +236,7 @@
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-2xl font-bold mb-2" x-text="'$' + r.total"></p>
+                                        <p class="text-2xl font-bold mb-2" x-text="'$' + r.priceBreakdown.grandTotal"></p>
                                         <div class="space-y-2">
                                             <button
                                                 class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50"

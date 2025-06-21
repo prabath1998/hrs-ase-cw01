@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ActionType;
+use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\Hotel;
 use App\Models\OptionalService;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\RoomType;
+use App\Models\Setting;
 use App\Models\User;
 use DB;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +40,7 @@ class ReservationController extends Controller
 
         ])->orderBy('created_at', 'desc')->paginate(10);
 
-         $today = Carbon::now('Asia/Colombo')->toDateString();
+        $today = Carbon::now('Asia/Colombo')->toDateString();
 
         return view('backend.pages.reservations.index', [
             'reservations' => $reservations,
@@ -82,19 +85,18 @@ class ReservationController extends Controller
 
     public function store(Request $request, Hotel $hotel)
     {
-        // dd($hotel, $request->all());
         Log::debug(json_decode($request->input('optional_services', [])));
         Log::debug($request->input('optional_services', []));
         Log::debug(gettype($request->input('optional_services', [])));
 
         $request->merge([
             'optional_services' => array_values(json_decode($request->input('optional_services', []))),
-            'has_credit_card_guarantee' => (bool)$request->input('payment_method') === 'credit_card',
             // 'nic_or_passport_number' => $request->input('nic_or_passport_number', null),
         ]);
 
+        $hasCreditCardGuarantee = $request->input('paymentMethod', false) === 'credit-card';
+        $request->merge(['has_credit_card_guarantee' => $hasCreditCardGuarantee]);
 
-        Log::debug($request->all());
         $validator = Validator::make($request->all(), [
             'hotel_id' => 'required|exists:hotels,id',
             'room_type_id' => 'required|exists:room_types,id',
@@ -108,15 +110,13 @@ class ReservationController extends Controller
             // 'nic_or_passport_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'special_requests' => 'nullable|string',
-            'has_credit_card_guarantee' => 'sometimes|boolean',
+            'has_credit_card_guarantee' => 'boolean',
             'optional_services' => 'sometimes|array',
             'optional_services.*' => 'exists:optional_services,id',
 
         ]);
 
         if ($validator->fails()) {
-            Log::debug(100);
-            Log::debug($validator->errors()->all());
             return back()
                 ->withErrors($validator)
                 ->withInput();
@@ -124,30 +124,11 @@ class ReservationController extends Controller
 
         $validated = $validator->validated();
 
-        Log::debug(110);
-        Log::debug($validated);
-
         $user = Auth::user();
-
-        if (!$user) {
-            $user = User::create([
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-                'username' => strtolower($validated['first_name']) . '_' . strtolower($validated['last_name']),
-                'email' => $validated['contact_email'],
-                'password' => Hash::make('password'),
-            ]);
-            $user->assignRole('customer');
-        }
 
         $customer = Customer::updateOrCreate(
             ['user_id' => $user->id],
             [
-                'first_name' => $validated['first_name'],
-                'last_name' => $validated['last_name'],
-                'contact_email' => $validated['contact_email'],
-                'phone_number' => $validated['phone_number'],
-                // 'nic_or_passport_number' => $validated['nic_or_passport_number'],
-                'address' => $validated['address'],
                 'payment_info_token' => $validated['has_credit_card_guarantee'] ? Hash::make(Str::random(12)) : null,
                 'credit_card_last_four' => $validated['has_credit_card_guarantee'] ? Str::random(4) : null,
             ]
@@ -176,7 +157,6 @@ class ReservationController extends Controller
                 $suiteRateApplied = $roomType->suite_weekly_rate;
             }
         }
-        Log::debug(160);
 
         try {
             $reservation = Reservation::create([
@@ -207,31 +187,35 @@ class ReservationController extends Controller
                     }
                 }
             }
+            $this->generateAndGetBill($reservation);
 
-            // Send confirmation email to customer
         } catch (\Exception $e) {
+            Log::error('Error creating reservation: ' . $e->getMessage());
             return back()->withErrors(['reservation' => 'Failed to create reservation: ' . $e->getMessage()])->withInput();
         }
 
         $this->storeActionLog(ActionType::CREATED, ['reservation' => $validated]);
-        // dd('Reservation created successfully', $reservation);
 
         // if ($user->hasRole('customer')) {
-            return response()->json(['success' => true, 'message' => 'Reservation created successfully.']);
-            // return redirect()->route('dashboard')->with('success', __('Reservation created successfully.'));
+        return response()->json(['success' => true, 'message' => 'Reservation created successfully.']);
+        // return redirect()->route('dashboard')->with('success', __('Reservation created successfully.'));
         // } else {
-            // return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
+        // return redirect()->route('admin.reservations.index')->with('success', __('Reservation created successfully.'));
         // }
     }
 
     public function show(Reservation $reservation)
     {
-        $reservation->load('customer', 'travelCompany', 'hotel', 'roomType', 'room', 'bill.payments', 'optionalServices');
+        $reservation->load('customer', 'travelCompany', 'hotel', 'roomType', 'room', 'bill', 'optionalServices');
 
-        $availableRooms = Room::where('hotel_id', $reservation->hotel_id)
-                              ->where('room_type_id', $reservation->room_type_id)
-                              ->where('status', 'available')
-                              ->get();
+        $availableRooms = Collection::make();
+        if (in_array($reservation->status, ['confirmed_guaranteed', 'confirmed_no_cc_hold', 'checked_in'])) {
+            $availableRooms = Room::where('hotel_id', $reservation->hotel_id)
+                ->where('room_type_id', $reservation->room_type_id)
+                ->where('status', 'available')
+                ->orWhere('id', $reservation->room_id)
+                ->get();
+        }
 
         return view('backend.pages.reservations.show', compact('reservation', 'availableRooms'));
     }
@@ -272,10 +256,12 @@ class ReservationController extends Controller
         return redirect()->route('admin.room-types.index')->with('success', __('Reservation deleted successfully.'));
     }
 
-    public function downloadReceipt(Reservation $id)
+    public function downloadReceipt(Reservation $reservation)
     {
         try {
-            $bill = Reservation::findOrFail($id)->bill;
+            $bill = $reservation->bill;
+
+            // dd($reservation);
 
             if (!$bill) {
                 abort(404, 'Bill not found for this reservation.');
@@ -298,7 +284,7 @@ class ReservationController extends Controller
             return $pdf->download($fileName);
         } catch (\Exception $e) {
             Log::error('Error generating receipt: ' . $e->getMessage());
-             abort(404, 'Bill not found for this reservation.');
+            abort(404, 'Bill not found for this reservation.');
         }
     }
 
@@ -307,10 +293,10 @@ class ReservationController extends Controller
         $request->validate(['room_id' => 'required|exists:rooms,id']);
 
         $room = Room::where('id', $request->room_id)
-                    ->where('status', 'available')
-                    ->where('hotel_id', $reservation->hotel_id)
-                    ->where('room_type_id', $reservation->room_type_id)
-                    ->first();
+            ->where('status', 'available')
+            ->where('hotel_id', $reservation->hotel_id)
+            ->where('room_type_id', $reservation->room_type_id)
+            ->first();
 
         if (!$room) {
             return back()->with('error', 'The selected room is not available or does not match the reservation type.');
@@ -322,11 +308,121 @@ class ReservationController extends Controller
                 'status' => 'checked_in',
                 'actual_check_in_timestamp' => now('Asia/Colombo'),
             ]);
-
             $room->update(['status' => 'occupied']);
         });
 
         return redirect()->route('admin.reservations.show', $reservation)
-                         ->with('success', 'Guest checked in successfully to Room ' . $room->room_number);
+            ->with('success', 'Guest checked in successfully to Room ' . $room->room_number);
+    }
+
+    public function updateRoom(Request $request, Reservation $reservation)
+    {
+        if ($reservation->status !== 'checked_in') {
+            return back()->with('error', 'Cannot change room for a reservation that is not checked-in.');
+        }
+
+        $validated = $request->validate(['new_room_id' => 'required|exists:rooms,id']);
+        $newRoom = Room::find($validated['new_room_id']);
+        $oldRoom = $reservation->room;
+
+        if ($newRoom->id === $oldRoom->id) {
+            return back()->with('info', 'The selected room is the same as the current room.');
+        }
+
+        if ($newRoom->status !== 'available' || $newRoom->room_type_id !== $reservation->room_type_id) {
+            return back()->with('error', 'The new room must be available and of the same type.');
+        }
+
+        DB::transaction(function () use ($reservation, $newRoom, $oldRoom) {
+            $oldRoom->update(['status' => 'cleaning']);
+            $newRoom->update(['status' => 'occupied']);
+
+            $reservation->update(['room_id' => $newRoom->id]);
+        });
+
+        return redirect()->route('admin.reservations.show', $reservation)
+            ->with('success', 'Room successfully changed from ' . $oldRoom->room_number . ' to ' . $newRoom->room_number . '.');
+    }
+
+    public function checkOut(Reservation $reservation)
+    {
+        if ($reservation->status !== 'checked_in') {
+            return back()->with('error', 'This guest is not currently checked in.');
+        }
+
+        DB::transaction(function () use ($reservation) {
+            if (!$reservation->bill) {
+                $this->generateAndGetBill($reservation);
+            }
+
+            $reservation->update([
+                'status' => 'checked_out',
+                'actual_check_out_timestamp' => now('Asia/Colombo'),
+            ]);
+
+            if ($reservation->room) {
+                $reservation->room->update(['status' => 'cleaning']);
+            }
+        });
+
+        return redirect()->route('admin.reservations.show', $reservation)
+            ->with('success', 'Guest checked out successfully from Room ' . $reservation->room->room_number);
+    }
+
+    public function cancel(Reservation $reservation)
+    {
+        if (!in_array($reservation->status, ['confirmed_guaranteed', 'confirmed_no_cc_hold'])) {
+            return back()->with('error', 'Only confirmed reservations can be cancelled.');
+        }
+
+        $reservation->update(['status' => 'cancelled_by_clerk']);
+
+        return redirect()->route('admin.reservations.show', $reservation)
+            ->with('success', 'Reservation has been successfully cancelled.');
+    }
+
+    public function generateBill(Reservation $reservation)
+    {
+        if ($reservation->bill) {
+            return back()->with('info', 'A bill already exists for this reservation.');
+        }
+
+        $this->generateAndGetBill($reservation);
+
+        return redirect()->route('admin.reservations.show', $reservation)
+            ->with('success', 'Bill / Folio has been successfully created.');
+    }
+
+
+    private function generateAndGetBill(Reservation $reservation): Bill
+    {
+        $roomCharges = $reservation->total_estimated_room_charge;
+
+        $optionalServiceCharges = $reservation->subTotalOptionalServices();
+
+        $subtotal = $roomCharges + $optionalServiceCharges;
+        $taxPercentage = Setting::where('option_name', 'tax_rate')->value('option_value') ?? 0;
+        $taxAmount = $subtotal * ($taxPercentage / 100);
+        $discountAmount = $subtotal * (($reservation->applied_discount_percentage ?? 0) / 100);
+        $grandTotal = ($subtotal - $discountAmount) + $taxAmount;
+
+        return Bill::create([
+            'reservation_id' => $reservation->id,
+            'customer_id' => $reservation->customer_id,
+            'travel_company_id' => $reservation->travel_company_id,
+            'bill_number' => 'INV-' . time() . '-' . $reservation->id,
+            'bill_date' => now('Asia/Colombo'),
+            'due_date' => now('Asia/Colombo')->addDays(30),
+            'subtotal_room_charges' => $roomCharges,
+            'subtotal_optional_services' => $optionalServiceCharges,
+            'total_amount' => $subtotal,
+            'tax_percentage_applied' => $taxPercentage,
+            'tax_amount' => $taxAmount,
+            'discount_amount_applied' => $discountAmount,
+            'grand_total' => $grandTotal,
+            'amount_paid' => 0,
+            'payment_status' => 'pending',
+            'generated_by_user_id' => auth()->id(),
+        ]);
     }
 }

@@ -786,7 +786,7 @@
                     if (!service) return 0;
 
                     const nights = this.calculateNights();
-                    return (nights * service.price) * this.amount;
+                    return service.price * this.amount;
                 },
 
                 // Calculation methods
@@ -804,7 +804,7 @@
                 calculateTaxes() {
                     const subtotal = this.calculateSubtotal();
                     // return 0;
-                    return Math.round(subtotal * 0.4); // 4% tax rate
+                    return Math.round(subtotal * 0.04); // 4% tax rate
                 },
 
                 calculateSubtotal() {
