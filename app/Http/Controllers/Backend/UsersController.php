@@ -10,17 +10,18 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use App\Services\UserService;
 use App\Services\RolesService;
+use Exception;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UsersController extends Controller
 {
     public function __construct(
         private readonly UserService $userService,
         private readonly RolesService $rolesService
-    ) {
-    }
+    ) {}
 
     public function index(): Renderable
     {
@@ -60,6 +61,8 @@ class UsersController extends Controller
         if ($request->roles) {
             $user->assignRole($request->roles);
         }
+
+        sendNotificationEmail($user->email, 'Account Created', 'Your account has been created successfully.');
 
         $this->storeActionLog(ActionType::CREATED, ['user' => $user]);
 

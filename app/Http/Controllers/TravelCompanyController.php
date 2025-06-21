@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TravelCompanyRegisterRequest;
 use App\Models\TravelCompany;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -42,8 +44,20 @@ class TravelCompanyController extends Controller
 
         $travelCompany->update($request->all());
 
-        return redirect()->route('admin.travel-companies.index')->with('success', 'Travel Company updated successfully.');
+        $isApproved = (bool) $request->is_approved;
+        $subject = $isApproved
+            ? 'Travel Company Approved'
+            : 'Travel Company Approval Update';
+        $body = $isApproved
+            ? 'Congratulations! Your travel company has been approved.'
+            : 'We regret to inform you that your travel company request has not been approved. Please contact us for more details.';
+
+        sendNotificationEmail($request->contact_email, $subject, $body);
+
+        return redirect()->route('admin.travel-companies.index')
+            ->with('success', 'Travel Company updated successfully.');
     }
+
 
     public function destroy($id)
     {
