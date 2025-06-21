@@ -119,7 +119,7 @@ class HotelController extends Controller
             $destination = $request->input('destination');
             $query->where(function ($q) use ($destination) {
                 $q->where('name', 'like', "%{$destination}%")
-                  ->orWhere('description', 'like', "%{$destination}%")
+                //   ->orWhere('description', 'like', "%{$destination}%")
                   ->orWhere('address', 'like', "%{$destination}%");
             });
         }
@@ -168,7 +168,7 @@ class HotelController extends Controller
                 'id' => $room->id,
                 'name' => $room->name,
                 'description' => $room->description,
-                'images' => $hotel->images[array_rand($hotel->images)],
+                'images' => $hotel->images ?$hotel->images[array_rand($hotel->images)] : [],
                 'price' => $room->base_price_per_night,
                 'originalPrice' => $room->base_price_per_night ?? null,
                 'size' => $room->size ?? '',
