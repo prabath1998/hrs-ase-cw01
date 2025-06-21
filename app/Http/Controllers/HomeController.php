@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Hotel;
+
 class HomeController extends Controller
 {
     /**
@@ -30,6 +32,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $hotels = Hotel::latest()->take(3)->get();
+        return view('home', compact('hotels'));
     }
 }

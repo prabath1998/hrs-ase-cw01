@@ -79,7 +79,7 @@
         </div>
         <div class="border-t border-gray-800 mt-12 pt-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400">© 2024 TravelEase. All rights reserved.</p>
+                <p class="text-gray-400">© 2025 TravelEase. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0"><a href="/privacy"
                         class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a><a href="/cookies"
                         class="text-gray-400 hover:text-white transition-colors">Cookie

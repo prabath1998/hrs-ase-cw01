@@ -203,259 +203,92 @@
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Hotel Card 1 -->
-                <div
-                    class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
-                            alt="Grand Plaza Miami Beach"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-white text-gray-900 px-2 py-1 rounded text-xs font-semibold">Featured</span>
-                        </div>
-                        <div class="absolute top-4 right-4">
-                            <button class="bg-white/80 hover:bg-white p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="absolute bottom-4 left-4 right-4">
-                            <div class="bg-white/90 backdrop-blur-sm rounded-lg p-3">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-600">Starting from</p>
-                                        <p class="text-xl font-bold">$299/night</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            <span class="ml-1 font-semibold">4.8</span>
+                @foreach ($hotels as $hotel)
+                    <div
+                        class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
+                        <div class="relative h-64 overflow-hidden">
+                            <img src="{{ json_decode($hotel->images)[0] }}"
+                                alt="{{ $hotel->name }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-white text-gray-900 px-2 py-1 rounded text-xs font-semibold">Featured</span>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <button class="bg-white/80 hover:bg-white p-2 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <div class="bg-white/90 backdrop-blur-sm rounded-lg p-3">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-gray-600">Starting from</p>
+                                            <p class="text-xl font-bold">${{ $hotel->minimumPrice() }}/night</p>
                                         </div>
-                                        <p class="text-xs text-gray-600">2847 reviews</p>
+                                        <div class="text-right">
+                                            <div class="flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
+                                                    viewBox="0 0 20 20" fill="currentColor">
+                                                    <path
+                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                                <span class="ml-1 font-semibold">{{ $hotel->rating }}</span>
+                                            </div>
+                                            <p class="text-xs text-gray-600">{{ rand(500, 3000) }} reviews</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="p-6">
-                        <div class="mb-3">
-                            <h3 class="text-xl font-bold mb-1">Grand Plaza Miami Beach</h3>
-                            <div class="flex items-center text-gray-600 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span>Miami Beach, Florida</span>
-                            </div>
-                        </div>
-
-                        <p class="text-gray-600 mb-4 line-clamp-2">Luxury beachfront resort offering world-class
-                            amenities, stunning ocean views, and exceptional service in the heart of South Beach.</p>
-
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Private Beach</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Spa</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Pool</span>
-                            <span class="border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded">+9 more</span>
-                        </div>
-
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="text-xs text-gray-600 ml-1">Award Winner</span>
-                            </div>
-                            <a href="hotel-detail.html"
-                                class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                                View Details
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hotel Card 2 -->
-                <div
-                    class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
-                            alt="Ocean Resort California"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-white text-gray-900 px-2 py-1 rounded text-xs font-semibold">Featured</span>
-                        </div>
-                        <div class="absolute top-4 right-4">
-                            <button class="bg-white/80 hover:bg-white p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="absolute bottom-4 left-4 right-4">
-                            <div class="bg-white/90 backdrop-blur-sm rounded-lg p-3">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-600">Starting from</p>
-                                        <p class="text-xl font-bold">$399/night</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            <span class="ml-1 font-semibold">4.7</span>
-                                        </div>
-                                        <p class="text-xs text-gray-600">1923 reviews</p>
-                                    </div>
+                        <div class="p-6">
+                            <div class="mb-3">
+                                <h3 class="text-xl font-bold mb-1">{{ $hotel->name }}</h3>
+                                <div class="flex items-center text-gray-600 text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span>{{ $hotel->address }}</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="p-6">
-                        <div class="mb-3">
-                            <h3 class="text-xl font-bold mb-1">Ocean Resort California</h3>
-                            <div class="flex items-center text-gray-600 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span>Malibu, California</span>
+                            <p class="text-gray-600 mb-4 line-clamp-2">{{ $hotel->description }}</p>
+
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Private Beach</span>
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Spa</span>
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Pool</span>
+                                <span class="border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded">+9 more</span>
                             </div>
-                        </div>
 
-                        <p class="text-gray-600 mb-4 line-clamp-2">Stunning clifftop resort overlooking the Pacific
-                            Ocean, featuring world-class dining and spa facilities.</p>
-
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Ocean View</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Spa</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Fine Dining</span>
-                            <span class="border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded">+7 more</span>
-                        </div>
-
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="text-xs text-gray-600 ml-1">Eco-Friendly</span>
-                            </div>
-                            <a href="hotel-detail.html"
-                                class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                                View Details
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Hotel Card 3 -->
-                <div
-                    class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
-                            alt="Mountain Lodge Aspen"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute top-4 left-4">
-                            <span class="bg-white text-gray-900 px-2 py-1 rounded text-xs font-semibold">Featured</span>
-                        </div>
-                        <div class="absolute top-4 right-4">
-                            <button class="bg-white/80 hover:bg-white p-2 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="absolute bottom-4 left-4 right-4">
-                            <div class="bg-white/90 backdrop-blur-sm rounded-lg p-3">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-600">Starting from</p>
-                                        <p class="text-xl font-bold">$549/night</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                            <span class="ml-1 font-semibold">4.9</span>
-                                        </div>
-                                        <p class="text-xs text-gray-600">1456 reviews</p>
-                                    </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="text-xs text-gray-600 ml-1">Award Winner</span>
                                 </div>
+                                <a href="{{ route('hotels.show', $hotel->id) }}"
+                                    class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
+                                    View Details
+                                </a>
                             </div>
                         </div>
                     </div>
 
-                    <div class="p-6">
-                        <div class="mb-3">
-                            <h3 class="text-xl font-bold mb-1">Mountain Lodge Aspen</h3>
-                            <div class="flex items-center text-gray-600 text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span>Aspen, Colorado</span>
-                            </div>
-                        </div>
+                @endforeach
 
-                        <p class="text-gray-600 mb-4 line-clamp-2">Luxury mountain retreat offering ski-in/ski-out
-                            access, alpine spa, and breathtaking mountain views.</p>
-
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Ski-in/Ski-out</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Spa</span>
-                            <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Hot Tub</span>
-                            <span class="border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded">+7 more</span>
-                        </div>
-
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500"
-                                    viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="text-xs text-gray-600 ml-1">Award Winner</span>
-                            </div>
-                            <a href="hotel-detail.html"
-                                class="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                                View Details
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="text-center mt-12">

@@ -32,4 +32,11 @@ class Hotel extends Model
     {
         return $this->hasMany(RoomType::class);
     }
+
+    public function minimumPrice()
+    {
+        return $this->roomTypes()
+            ->where('is_active', true)
+            ->min('base_price_per_night');
+    }
 }
