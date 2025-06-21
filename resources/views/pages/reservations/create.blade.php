@@ -27,7 +27,7 @@
                                     <div class="border rounded-lg overflow-hidden mb-7 bg-gray-50">
                                         <div class="flex flex-col md:flex-row">
                                             <div class="md:w-1/3">
-                                                <img src="{{ asset('images/hotel/ocean-resort-california.jpg') }}"
+                                                <img src="{{ json_decode($hotel->images)[1] }}"
                                                     alt="Deluxe Room" class="w-full h-full object-cover aspect-square">
                                             </div>
                                             <div class="p-5 md:w-2/3">
@@ -786,7 +786,7 @@
                     if (!service) return 0;
 
                     const nights = this.calculateNights();
-                    return (nights * service.price) * this.amount;
+                    return service.price * this.amount;
                 },
 
                 // Calculation methods
@@ -804,7 +804,7 @@
                 calculateTaxes() {
                     const subtotal = this.calculateSubtotal();
                     // return 0;
-                    return Math.round(subtotal * 0.4); // 4% tax rate
+                    return Math.round(subtotal * 0.04); // 4% tax rate
                 },
 
                 calculateSubtotal() {

@@ -98,7 +98,7 @@
                                     New</a>
                             </div>
                             <div class="p-6" id="upcoming-reservations">
-                                <template x-for="r in reservations.filter(r => r.status === 'confirmed').slice(0, 2)"
+                                <template x-for="r in reservations.filter(r => (r.status === 'confirmed_guaranteed' || r.status === 'pending_confirmation' || r.status === 'confirmed_no_cc_hold') ).slice(0, 2)"
                                     :key="r.id">
                                     <div class="flex items-center space-x-4 p-4 border rounded-lg mb-4 last:mb-0">
                                         <img :src="r.roomImage" :alt="r.roomName"
@@ -112,7 +112,7 @@
                                         </div>
                                         <div class="text-right">
                                             <span x-html="getStatusBadge(r.status)"></span>
-                                            <p class="text-sm font-bold mt-1" x-text="r.total"></p>
+                                            <p class="text-sm font-bold mt-1" x-text="'$' + r.total"></p>
                                         </div>
                                     </div>
                                 </template>
@@ -185,7 +185,7 @@
                 </div>
 
                 <!-- Reservations Tab -->
-                <div x-show="tab==='reservations'" x-data="{ view: false, edit: false, selectedReservation: null, paymentMethodEdit: false }" class="space-y-6">
+                <div x-show="tab==='reservations'" x-data="{ view: false, edit: false, selectedReservation: undefined, paymentMethodEdit: false }" class="space-y-6">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-bold">My Reservations</h2>
                         <div class="flex space-x-3">
@@ -236,7 +236,7 @@
                                         </div>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-2xl font-bold mb-2" x-text="'$' + r.total"></p>
+                                        <p class="text-2xl font-bold mb-2" x-text="'$' + r.priceBreakdown.grandTotal"></p>
                                         <div class="space-y-2">
                                             <button
                                                 class="border px-3 py-1 rounded w-full flex items-center justify-center hover:bg-gray-50"
@@ -537,13 +537,29 @@
         }
 
         function getStatusBadge(status) {
-            if (status === "confirmed") {
+            if (status === "pending_confirmation") {
+                return `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i>Pending Confirmation</span>`;
+            }
+            if (status === "confirmed_guaranteed") {
                 return `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Confirmed</span>`;
             }
+            if (status === "confirmed_no_cc_hold") {
+                return `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i>Confirmed - No CC Hold</span>`;
+            }
+            if (status === "checked_in") {
+                return `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Checked In</span>`;
+            }
+            if (status === "checked_out") {
+                return `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Checked Out</span>`;
+            }
+            if (status === "no_show") {
+                return `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="x-circle" class="w-3 h-3 mr-1"></i>No Show</span>`;
+            }
+
             if (status === "completed") {
                 return `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i>Completed</span>`;
             }
-            if (status === "cancelled") {
+            if (status === "cancelled_customer" || status === "cancelled_system") {
                 return `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs flex items-center"><i data-lucide="clock" class="w-3 h-3 mr-1"></i>Cancelled</span>`;
             }
             return `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${status}</span>`;
@@ -561,5 +577,29 @@
             }
             return `<span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${status}</span>`;
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            flatpickr("#newCheckIn", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkOutPicker = flatpickr("#newCheckOut");
+                    checkOutPicker.set('minDate', selectedDates[0]);
+                    if (selectedDates.length > 0) {
+                        checkOutPicker.setDate(selectedDates[0], true);
+                    }
+                }
+            });
+
+            flatpickr("#newCheckOut", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkInPicker = flatpickr("#newCheckIn");
+                    checkInPicker.set('maxDate', selectedDates[0]);
+                }
+            });
+        });
     </script>
 @endpush

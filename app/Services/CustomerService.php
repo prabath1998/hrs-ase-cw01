@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Reservation;
 use App\Models\Bill;
 use App\Models\Hotel;
+use App\Models\Setting;
 use App\Models\User;
 
 use App\Models\RoomType;
@@ -26,19 +27,19 @@ class CustomerService
 
         $formattedReservations = $reservations->map(function($reservation) {
 
-            $roomCharge = $reservation->total_estimated_room_charge;
-            $optionalServicesCharge = $reservation->optionalServices->sum(function($service) {
-                return $service->pivot->quantity * $service->pivot->price_at_booking;
-            });
-            $subtotal = $roomCharge + $optionalServicesCharge;
-            $discountTotal = ($subtotal * ($reservation->applied_discount_percentage ?? 0)) / 100;
-            $taxes = $reservation->taxes ?? 0;
-            $grandTotal = ($subtotal - $discountTotal) + $taxes;
+            $roomCharges = $reservation->total_estimated_room_charge;
+            $optionalServiceCharges = $reservation->subTotalOptionalServices();
+
+            $subtotal = $roomCharges + $optionalServiceCharges;
+            $taxPercentage = Setting::where('option_name', 'tax_rate')->value('option_value') ?? 0;
+            $taxAmount = $subtotal * ($taxPercentage / 100);
+            $discountAmount = $subtotal * (($reservation->applied_discount_percentage ?? 0) / 100);
+            $grandTotal = ($subtotal - $discountAmount) + $taxAmount;
 
             return [
                 'id' => $reservation->id,
                 'roomName' => $reservation->roomType->name,
-                'roomImage' => asset('images/hotel/1/86161620.jpg'),
+                'roomImage' => json_decode($reservation->hotel->images, true)[0] ?? null,
                 'roomType' => $reservation->roomType->name,
                 'roomTypeId' => $reservation->room_type_id,
                 'hotelName' => $reservation->hotel->name,
@@ -58,11 +59,11 @@ class CustomerService
                         ];
                     }),
                 'priceBreakdown' => [
-                    'roomCharge' => $roomCharge,
-                    'optionalServicesCharge' => $optionalServicesCharge,
+                    'roomCharge' => $roomCharges,
+                    'optionalServicesCharge' => $optionalServiceCharges,
                     'subTotal' => $subtotal,
-                    'discountTotal' => $discountTotal,
-                    'taxes' => $taxes,
+                    'discountTotal' => $discountAmount,
+                    'taxes' => $taxAmount,
                     'grandTotal' => $grandTotal,
                 ],
             ];

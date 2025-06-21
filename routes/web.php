@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Backend\ActionLogController;
 use App\Http\Controllers\Backend\DashboardController;
+use App\Http\Controllers\BillController;
 use App\Http\Controllers\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Backend\ModulesController;
 use App\Http\Controllers\Backend\PermissionsController;
@@ -81,6 +82,11 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
     Route::resource('reservations', ReservationController::class);
     Route::post('/reservations/{reservation}/check-in', [ReservationController::class, 'checkIn'])->name('reservations.checkin');
     Route::post('/reservations/{reservation}/check-out', [ReservationController::class, 'checkOut'])->name('reservations.checkout');
+    Route::post('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+    Route::post('/reservations/{reservation}/send-receipt', [ReservationController::class, 'generateBill'])->name('reservations.generateBill');
+
+    // Bill Routes.
+    Route::get('/bills/{bill}/receipt', [BillController::class, 'showReceipt'])->name('bills.receipt.show');
 
     // Optional Services Routes.
     Route::resource('optional-services', OptionalServiceController::class);

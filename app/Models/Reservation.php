@@ -12,6 +12,11 @@ class Reservation extends Model
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    protected $casts = [
+        'check_in_date' => 'date',
+        'check_out_date' => 'date',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -45,6 +50,13 @@ class Reservation extends Model
             ->withTimestamps();
     }
 
+    public function subTotalOptionalServices()
+    {
+        return $this->optionalServices->sum(function ($service) {
+            return $service->pivot->quantity * $service->pivot->price_at_booking;
+        });
+    }
+
     public function bill()
     {
         return $this->hasOne(Bill::class);
@@ -57,9 +69,7 @@ class Reservation extends Model
 
     public function totalEstimatedCost()
     {
-        $totalCost = $this->total_estimated_room_charge + $this->optionalServices->sum(function ($service) {
-            return $service->pivot->quantity * $service->pivot->price_at_booking;
-        });
+        $totalCost = $this->total_estimated_room_charge + $this->subTotalOptionalServices();
         $discount = $totalCost * ($this->applied_discount_percentage ?? 0 / 100);
         $totalCost -= $discount;
         return \Illuminate\Support\Number::currency($totalCost, 'USD');
@@ -77,6 +87,7 @@ class Reservation extends Model
             'cancelled_system' => __('Cancelled by System'),
             'no_show' => __('No Show'),
             'block_booking_pending_names' => __('Block Booking - Pending Names'),
+            'completed' => __('Completed'),
             default => __('Unknown Status'),
         };
     }
@@ -93,6 +104,7 @@ class Reservation extends Model
             'cancelled_system' => 'bg-red-200 text-red-900',
             'no_show' => 'bg-orange-100 text-orange-800',
             'block_booking_pending_names' => 'bg-purple-100 text-purple-800',
+            'completed' => 'bg-green-200 text-green-900',
             default => 'bg-gray-200 text-gray-900',
         };
     }

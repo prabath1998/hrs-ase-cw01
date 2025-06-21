@@ -163,14 +163,17 @@
                 </div>
                 <!-- Action Buttons -->
                 <div class="flex space-x-3 pt-4">
-                    <template x-if="selectedReservation.status === 'confirmed'">
+                    <template
+                        x-if="selectedReservation.status === 'confirmed_guaranteed' || selectedReservation.status === 'confirmed_no_cc_hold'">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
                             @click="view = false; $dispatch('editReservation', selectedReservation); edit = true;">
                             <i data-lucide="square-pen" class="w-4 h-4 mr-2"></i>
                             Modify Reservation
                         </button>
                     </template>
-                    <template x-if="selectedReservation.status === 'pending'">
+                    {{-- Cancellation allow only before hotel arriavl date and confirmed reservations --}}
+                    <template
+                        x-if="(selectedReservation.status === 'confirmed_guaranteed' || selectedReservation.status === 'confirmed_no_cc_hold') && new Date(selectedReservation.checkIn) > new Date()">
                         <button class="bg-red-600 text-white px-4 py-2 rounded flex items-center">
                             <i data-lucide="ban" class="w-4 h-4 mr-2"></i>
                             Cancel Reservation</button>
@@ -227,24 +230,29 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Total</p>
-                            <p class="font-medium">$<span x-text="selectedReservation.priceBreakdown.grandTotal"></span></p>
+                            <p class="font-medium">$<span
+                                    x-text="selectedReservation.priceBreakdown.grandTotal"></span></p>
                         </div>
                     </div>
                 </div>
                 <!-- Modification Form -->
                 <form class="space-y-4" @submit.prevent="handleSaveModification">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="newCheckIn" class="block text-sm font-medium mb-1">New Check-in Date</label>
-                            <input id="newCheckIn" type="date" x-model="selectedReservation.checkIn"
-                                :min="formatDateInput(new Date())" class="w-full border rounded px-2 py-1" />
+                    <template x-if="new Date(selectedReservation.checkIn) > new Date()">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="newCheckIn" class="block text-sm font-medium mb-1">New Check-in
+                                    Date</label>
+                                <input id="newCheckIn" type="date" x-model="selectedReservation.checkIn"
+                                    :min="today" class="w-full border rounded px-2 py-1" />
+                            </div>
+                            <div>
+                                <label for="newCheckOut" class="block text-sm font-medium mb-1">New Check-out
+                                    Date</label>
+                                <input id="newCheckOut" type="date" x-model="selectedReservation.checkOut"
+                                    :min="selectedReservation.checkIn || today" class="w-full border rounded px-2 py-1" />
+                            </div>
                         </div>
-                        <div>
-                            <label for="newCheckOut" class="block text-sm font-medium mb-1">New Check-out Date</label>
-                            <input id="newCheckOut" type="date" x-model="selectedReservation.checkOut"
-                                :min="selectedReservation.checkIn" class="w-full border rounded px-2 py-1" />
-                        </div>
-                    </div>
+                    </template>
                     <!-- Add-ons -->
                     <div class="space-y-3">
                         <label class="block text-sm font-medium">Additional Services</label>
@@ -293,7 +301,8 @@
                             </div>
                             <div class="flex justify-between">
                                 <span>Discount Total</span>
-                                <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
+                                <span
+                                    x-text="'$' + Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Taxes & fees</span>
@@ -444,3 +453,32 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+            flatpickr("#newCheckIn", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkOutPicker = flatpickr("#newCheckOut");
+                    checkOutPicker.set('minDate', selectedDates[0]);
+                    if (selectedDates.length > 0) {
+                        checkOutPicker.setDate(selectedDates[0], true);
+                    }
+                }
+            });
+
+            flatpickr("#newCheckOut", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    const checkInPicker = flatpickr("#newCheckIn");
+                    checkInPicker.set('maxDate', selectedDates[0]);
+                }
+            });
+        });
+    </script>
+
+@endpush
