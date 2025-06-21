@@ -184,7 +184,7 @@
                 <tr>
                     <th>Date</th>
                     <th>Description</th>
-                    <th class="text-right">Amount (LKR)</th>
+                    <th class="text-right">Amount ($)</th>
                 </tr>
             </thead>
             <tbody>
@@ -215,30 +215,30 @@
         <table class="summary-table">
             <tr>
                 <td class="label">Subtotal:</td>
-                <td class="value">LKR
+                <td class="value">$
                     {{ number_format($bill->subtotal_room_charges + $bill->subtotal_optional_services, 2) }}</td>
             </tr>
             @if ($bill->discount_amount_applied > 0)
                 <tr>
                     <td class="label">Discount:</td>
-                    <td class="value">- LKR {{ number_format($bill->discount_amount_applied, 2) }}</td>
+                    <td class="value">- $ {{ number_format($bill->discount_amount_applied, 2) }}</td>
                 </tr>
             @endif
             <tr>
                 <td class="label">Tax ({{ (float) $bill->tax_percentage_applied }}%):</td>
-                <td class="value">LKR {{ number_format($bill->tax_amount, 2) }}</td>
+                <td class="value">$ {{ number_format($bill->tax_amount, 2) }}</td>
             </tr>
             <tr class="grand-total">
                 <td class="label">Grand Total:</td>
-                <td class="value">LKR {{ number_format($bill->grand_total, 2) }}</td>
+                <td class="value">$ {{ number_format($bill->grand_total, 2) }}</td>
             </tr>
             <tr>
                 <td class="label">Payments Received:</td>
-                <td class="value">- LKR {{ number_format($bill->amount_paid, 2) }}</td>
+                <td class="value">- $ {{ number_format($bill->amount_paid, 2) }}</td>
             </tr>
             <tr class="grand-total" style="background-color: #f2f2f2;">
                 <td class="label">Balance Due:</td>
-                <td class="value">LKR {{ number_format($bill->grand_total - $bill->amount_paid, 2) }}</td>
+                <td class="value">$ {{ number_format($bill->grand_total - $bill->amount_paid, 2) }}</td>
             </tr>
         </table>
 

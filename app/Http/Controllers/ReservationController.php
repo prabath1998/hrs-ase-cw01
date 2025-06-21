@@ -7,8 +7,10 @@ use App\Models\Customer;
 use App\Models\Hotel;
 use App\Models\OptionalService;
 use App\Models\Reservation;
+use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\User;
+use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -35,6 +37,8 @@ class ReservationController extends Controller
 
         ])->orderBy('created_at', 'desc')->paginate(10);
 
+         $today = Carbon::now('Asia/Colombo')->toDateString();
+
         return view('backend.pages.reservations.index', [
             'reservations' => $reservations,
         ]);
@@ -60,23 +64,6 @@ class ReservationController extends Controller
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');
         }
-
-        // $checkIn = Carbon::parse($searchParams['check_in_date']);
-        // $checkOut = Carbon::parse($searchParams['check_out_date']);
-        // $numberOfNights = $checkIn->diffInDays($checkOut);
-
-        // $estimatedRoomPrice = $roomType->base_price_per_night * $numberOfNights;
-        // $appliedRateType = 'Nightly';
-
-        // if ($roomType->is_suite) {
-        //     if ($numberOfNights >= 28 && $roomType->suite_monthly_rate > 0) {
-        //         $estimatedRoomPrice = $roomType->suite_monthly_rate * ceil($numberOfNights / 28);
-        //         $appliedRateType = 'Monthly';
-        //     } elseif ($numberOfNights >= 7 && $roomType->suite_weekly_rate > 0) {
-        //         $estimatedRoomPrice = $roomType->suite_weekly_rate * ceil($numberOfNights / 7);
-        //         $appliedRateType = 'Weekly';
-        //     }
-        // }
 
         $optionalServices = OptionalService::where('is_active', true)->get(); // Or filter by hotel if services are hotel-specific
 
@@ -171,7 +158,6 @@ class ReservationController extends Controller
             return back()->withErrors(['room_type_id' => 'Invalid room type for this hotel.'])->withInput();
         }
 
-        // Recalculate price on backend to ensure integrity
         $checkIn = Carbon::parse($validated['check_in_date']);
         $checkOut = Carbon::parse($validated['check_out_date']);
         $numberOfNights = $checkIn->diffInDays($checkOut);
@@ -238,9 +224,16 @@ class ReservationController extends Controller
         // }
     }
 
-    public function edit(Reservation $reservation)
+    public function show(Reservation $reservation)
     {
-        return view('backend.pages.reservations.edit', compact('reservation'));
+        $reservation->load('customer', 'travelCompany', 'hotel', 'roomType', 'room', 'bill.payments', 'optionalServices');
+
+        $availableRooms = Room::where('hotel_id', $reservation->hotel_id)
+                              ->where('room_type_id', $reservation->room_type_id)
+                              ->where('status', 'available')
+                              ->get();
+
+        return view('backend.pages.reservations.show', compact('reservation', 'availableRooms'));
     }
 
     public function update(Request $request, Reservation $reservation)
@@ -279,28 +272,61 @@ class ReservationController extends Controller
         return redirect()->route('admin.room-types.index')->with('success', __('Reservation deleted successfully.'));
     }
 
-    public function downloadReceipt($id)
+    public function downloadReceipt(Reservation $id)
     {
-        $bill = Reservation::findOrFail($id)->bill;
+        try {
+            $bill = Reservation::findOrFail($id)->bill;
 
-        if (!$bill) {
-            abort(404, 'Bill not found for this reservation.');
+            if (!$bill) {
+                abort(404, 'Bill not found for this reservation.');
+            }
+
+            $bill->load(['customer', 'travelCompany', 'reservation.hotel', 'reservation.roomType', 'payments', 'reservation.optionalServices']);
+
+            $numberOfNights = $bill->reservation ? Carbon::parse($bill->reservation->check_in_date)->diffInDays(Carbon::parse($bill->reservation->check_out_date)) : 0;
+
+            $data = [
+                'bill' => $bill,
+                'reservation' => $bill->reservation,
+                'billedTo' => $bill->customer ?? $bill->travelCompany,
+                'numberOfNights' => $numberOfNights,
+            ];
+
+            $pdf = Pdf::loadView('layouts.receipts.bill', $data);
+            $fileName = 'invoice-' . $bill->bill_number . '.pdf';
+
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            Log::error('Error generating receipt: ' . $e->getMessage());
+             abort(404, 'Bill not found for this reservation.');
+        }
+    }
+
+    public function checkIn(Request $request, Reservation $reservation)
+    {
+        $request->validate(['room_id' => 'required|exists:rooms,id']);
+
+        $room = Room::where('id', $request->room_id)
+                    ->where('status', 'available')
+                    ->where('hotel_id', $reservation->hotel_id)
+                    ->where('room_type_id', $reservation->room_type_id)
+                    ->first();
+
+        if (!$room) {
+            return back()->with('error', 'The selected room is not available or does not match the reservation type.');
         }
 
-        $bill->load(['customer', 'travelCompany', 'reservation.hotel', 'reservation.roomType', 'payments', 'reservation.optionalServices']);
+        DB::transaction(function () use ($reservation, $room) {
+            $reservation->update([
+                'room_id' => $room->id,
+                'status' => 'checked_in',
+                'actual_check_in_timestamp' => now('Asia/Colombo'),
+            ]);
 
-        $numberOfNights = $bill->reservation ? Carbon::parse($bill->reservation->check_in_date)->diffInDays(Carbon::parse($bill->reservation->check_out_date)) : 0;
+            $room->update(['status' => 'occupied']);
+        });
 
-        $data = [
-            'bill' => $bill,
-            'reservation' => $bill->reservation,
-            'billedTo' => $bill->customer ?? $bill->travelCompany,
-            'numberOfNights' => $numberOfNights,
-        ];
-
-        $pdf = Pdf::loadView('layouts.receipts.bill', $data);
-        $fileName = 'invoice-' . $bill->bill_number . '.pdf';
-
-        return $pdf->download($fileName);
+        return redirect()->route('admin.reservations.show', $reservation)
+                         ->with('success', 'Guest checked in successfully to Room ' . $room->room_number);
     }
 }

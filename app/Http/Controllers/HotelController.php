@@ -9,6 +9,7 @@ use App\Models\OptionalService;
 use App\Services\HotelService;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class HotelController extends Controller
 {
@@ -110,9 +111,41 @@ class HotelController extends Controller
         return redirect()->route('admin.hotels.index')->with('success', __('Hotel deleted successfully.'));
     }
 
-    public function showAllHotels()
+    public function showAllHotels(Request $request)
     {
-        $hotels = $this->hotelService->getHotels();
+        $query = Hotel::query()->where('is_active', true);
+
+        if ($request->filled('destination')) {
+            $destination = $request->input('destination');
+            $query->where(function ($q) use ($destination) {
+                $q->where('name', 'like', "%{$destination}%")
+                  ->orWhere('description', 'like', "%{$destination}%")
+                  ->orWhere('address', 'like', "%{$destination}%");
+            });
+        }
+
+        if ($request->filled('checkin') && $request->filled('checkout')) {
+            $checkinDate = Carbon::parse($request->input('checkin'));
+            $checkoutDate = Carbon::parse($request->input('checkout'));
+            $guests = (int) $request->input('guests', 1);
+
+
+            $query->whereHas('roomTypes', function ($roomTypeQuery) use ($checkinDate, $checkoutDate, $guests) {
+                $roomTypeQuery->where('occupancy_limit', '>=', $guests)
+                    ->where(function($q) use ($checkinDate, $checkoutDate) {
+                        $q->whereHas('rooms')
+                          ->withCount(['rooms as total_rooms'])
+                          ->withCount(['reservations as conflicting_reservations' => function ($reservationQuery) use ($checkinDate, $checkoutDate) {
+                                $reservationQuery->where('check_in_date', '<', $checkoutDate)
+                                                 ->where('check_out_date', '>', $checkinDate)
+                                                 ->whereIn('status', ['confirmed', 'confirmed_guaranteed', 'confirmed_no_cc_hold', 'checked_in']);
+                            }])
+                          ->havingRaw('total_rooms > conflicting_reservations');
+                    });
+            });
+        }
+
+        $hotels = $query->latest()->get();
 
         return view('landing.hotels.index', compact('hotels'));
     }

@@ -24,69 +24,63 @@
             </p>
 
             <!-- Search Form -->
-            <div class="bg-white text-gray-900 p-6 rounded-lg shadow-xl max-w-4xl mx-auto" x-data="{ showFilters: false }">
+            <div class="bg-white text-gray-900 p-6 rounded-lg shadow-xl max-w-4xl mx-auto" x-data="hotelSearchForm()">
                 <div class="grid md:grid-cols-5 gap-4">
+
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-medium mb-2">Where are you going?</label>
+                        <label for="destination" class="block text-sm font-medium mb-2">Where are you going?</label>
                         <div class="relative">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3 text-gray-400"
-                                viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
+                                class="h-5 w-5 absolute left-3 top-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <input type="text" placeholder="Destination, hotel name, or landmark"
-                                class="pl-10 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input id="destination" type="text" placeholder="Destination, hotel name..."
+                                class="pl-10 w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                x-model="destination">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-2">Check-in</label>
+                        <label for="check-in" class="block text-sm font-medium mb-2">Check-in</label>
                         <input type="text" id="check-in" placeholder="Add dates"
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            x-ref="checkin">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-2">Check-out</label>
+                        <label for="check-out" class="block text-sm font-medium mb-2">Check-out</label>
                         <input type="text" id="check-out" placeholder="Add dates"
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            x-ref="checkout">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-2">Guests</label>
-                        <select
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label for="guests" class="block text-sm font-medium mb-2">Guests</label>
+                        <select id="guests"
+                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            x-model="guests">
                             <option value="1">1 Guest</option>
-                            <option value="2" selected>2 Guests</option>
+                            <option value="2">2 Guests</option>
                             <option value="3">3 Guests</option>
                             <option value="4">4 Guests</option>
-                            <option value="5">5 Guests</option>
-                            <option value="6">6+ Guests</option>
+                            <option value="5">5+ Guests</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center mt-6">
-                    <button @click="showFilters = !showFilters"
-                        class="flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Filters
-                    </button>
-                    <a href="{{ route('hotels.index') }}"
+                <div class="flex justify-end items-center mt-6">
+                    <button @click="performSearch()"
                         class="px-8 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="h-5 w-5 mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
                                 clip-rule="evenodd" />
                         </svg>
                         Search Hotels
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -570,5 +564,62 @@
             <p class="text-sm text-blue-200 mt-4">No spam, unsubscribe at any time</p>
         </div>
     </section>
-
 @endsection
+
+
+@push('scripts')
+    <script>
+        function hotelSearchForm() {
+            return {
+                destination: '',
+                checkin: '',
+                checkout: '',
+                guests: 2,
+
+                init() {
+                    const fpIn = flatpickr(this.$refs.checkin, {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        onChange: (selectedDates) => {
+                            this.checkin = selectedDates[0] ? this.formatDate(selectedDates[0]) : '';
+                            if (this.checkin) {
+                                fpOut.set('minDate', new Date(this.checkin).fp_incr(1));
+                            }
+                        },
+                    });
+
+                    const fpOut = flatpickr(this.$refs.checkout, {
+                        dateFormat: "Y-m-d",
+                    });
+                },
+
+                formatDate(date) {
+
+                    let d = new Date(date),
+                        month = '' + (d.getMonth() + 1),
+                        day = '' + d.getDate(),
+                        year = d.getFullYear();
+
+                    if (month.length < 2)
+                        month = '0' + month;
+                    if (day.length < 2)
+                        day = '0' + day;
+
+                    return [year, month, day].join('-');
+                },
+
+                performSearch() {
+                    const baseUrl = "{{ route('hotels.index') }}";
+
+                    const params = new URLSearchParams();
+                    if (this.destination) params.append('destination', this.destination);
+                    if (this.checkin) params.append('checkin', this.checkin);
+                    if (this.checkout) params.append('checkout', this.checkout);
+                    if (this.guests) params.append('guests', this.guests);
+
+                    window.location.href = `${baseUrl}?${params.toString()}`;
+                }
+            }
+        }
+    </script>
+@endpush

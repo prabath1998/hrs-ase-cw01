@@ -67,18 +67,18 @@ class DashboardController extends Controller
         $data = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
         ]);
 
-        $customer =$this->customerService->updateCustomerDetails($customer, $data);
+        $customer = $this->customerService->updateCustomerDetails($customer, $data);
 
         // Password validation if password is provided
         if($request->filled('current_password')) {
             $request->validate([
                 'current_password' => 'required|string|current_password',
-                'new_password' => 'nullable|string|min:8|confirmed',
-                'confirm_password' => 'nullable|string|min:8',
+                'new_password' => 'required|string|min:8|confirmed',
+                'confirm_password' => 'required|string|min:8',
             ]);
 
             if (!\Hash::check($request->input('current_password'), $user->password)) {

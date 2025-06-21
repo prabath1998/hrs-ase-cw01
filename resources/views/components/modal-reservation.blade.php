@@ -119,14 +119,14 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span>Room rate (<span x-text="selectedReservation.nights"></span> nights)</span>
-                            <span x-text="Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
+                            <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
                         </div>
                         <div class="">
                             <span>Optional Services</span>
                             <template x-for="service in selectedReservation.optionalServices" :key="service.id">
                                 <div class="flex justify-between">
                                     <span x-text="service.name" class="text-gray-500"></span>
-                                    <span x-text="Math.round(service.price * service.quantity)"
+                                    <span x-text="'$' + Math.round(service.price * service.quantity)"
                                         class="text-gray-500"></span>
                                 </div>
                             </template>
@@ -134,20 +134,20 @@
 
                         <div class="flex justify-between">
                             <span>Sub Total</span>
-                            <span x-text="Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
+                            <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
                         </div>
                         <div class="flex justify-between">
                             <span>Discount Total</span>
-                            <span x-text="Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
+                            <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
                         </div>
                         <div class="flex justify-between">
                             <span>Taxes & fees</span>
-                            <span x-text="Math.round(selectedReservation.priceBreakdown.taxes)"></span>
+                            <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.taxes)"></span>
                         </div>
                         <div class="border-t my-2"></div>
                         <div class="flex justify-between font-semibold">
                             <span>Total</span>
-                            <span x-text="Math.round(selectedReservation.priceBreakdown.grandTotal)"></span>
+                            <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.grandTotal)"></span>
                         </div>
                     </div>
                 </div>
@@ -169,6 +169,11 @@
                             <i data-lucide="square-pen" class="w-4 h-4 mr-2"></i>
                             Modify Reservation
                         </button>
+                    </template>
+                    <template x-if="selectedReservation.status === 'pending'">
+                        <button class="bg-red-600 text-white px-4 py-2 rounded flex items-center">
+                            <i data-lucide="ban" class="w-4 h-4 mr-2"></i>
+                            Cancel Reservation</button>
                     </template>
                     <button class="border border-gray-300 px-4 py-2 rounded flex items-center">
                         <i data-lucide="download" class="w-4 h-4 mr-2"></i>
@@ -222,7 +227,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Total</p>
-                            <p class="font-medium">$<span x-text="selectedReservation.grandTotal"></span></p>
+                            <p class="font-medium">$<span x-text="selectedReservation.priceBreakdown.grandTotal"></span></p>
                         </div>
                     </div>
                 </div>
@@ -268,7 +273,7 @@
                         <div class="space-y-1 text-sm">
                             <div class="flex justify-between">
                                 <span>Room rate (<span x-text="selectedReservation.nights"></span> nights)</span>
-                                <span x-text="Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
+                                <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.roomCharge)"></span>
                             </div>
                             <div class="">
                                 <span>Optional Services</span>
@@ -276,7 +281,7 @@
                                     :key="service.id">
                                     <div class="flex justify-between">
                                         <span x-text="service.name" class="text-gray-500"></span>
-                                        <span x-text="Math.round(service.price * service.quantity)"
+                                        <span x-text="'$' + Math.round(service.price * service.quantity)"
                                             class="text-gray-500"></span>
                                     </div>
                                 </template>
@@ -284,15 +289,15 @@
 
                             <div class="flex justify-between">
                                 <span>Sub Total</span>
-                                <span x-text="Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
+                                <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.subTotal)"></span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Discount Total</span>
-                                <span x-text="Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
+                                <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.discountTotal)"></span>
                             </div>
                             <div class="flex justify-between">
                                 <span>Taxes & fees</span>
-                                <span x-text="Math.round(selectedReservation.priceBreakdown.taxes)"></span>
+                                <span x-text="'$' + Math.round(selectedReservation.priceBreakdown.taxes)"></span>
                             </div>
                             <div class="border-t my-2"></div>
                             <div class="flex justify-between font-semibold">
