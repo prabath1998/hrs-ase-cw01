@@ -9,6 +9,11 @@
         var userGrowthData = @json($user_growth_data['data']);
         var userGrowthLabels = @json($user_growth_data['labels']);
     </script>
+    <script>
+        var billingLabels = @json($billing_months);
+        var billingData = @json($billing_totals);
+    </script>
+
 @endsection
 
 @section('admin-content')
@@ -46,31 +51,70 @@
                         'class' => 'bg-white',
                         'url' => route('admin.permissions.index'),
                     ])
-                    @include('backend.pages.dashboard.partials.card', [
+                    {{-- @include('backend.pages.dashboard.partials.card', [
                         'icon' => 'bi bi-translate',
                         'label' => __('Translations'),
                         'value' => $languages['total'] . ' / ' . $languages['active'],
                         'bg' => '#22C55E',
                         'class' => 'bg-white',
                         'url' => route('admin.translations.index'),
+                    ]) --}}
+                    @include('backend.pages.dashboard.partials.card', [
+                        'icon' => 'bi bi-receipt',
+                        'label' => __('Bills'),
+                        'value' => $total_bills,
+                        'bg' => '#3B82F6',
+                        'class' => 'bg-white',
+                        // 'url' => route('admin.bills.index'),
                     ])
+                    {{-- @include('backend.pages.dashboard.partials.card', [
+                        'icon' => 'bi bi-cash-coin',
+                        'label' => __('Total Paid'),
+                        'value' => '$' . $total_paid,
+                        'bg' => '#10B981',
+                        'class' => 'bg-white',
+                        // 'url' => route('admin.bills.index'),
+                    ]) --}}
+                    {{-- @include('backend.pages.dashboard.partials.card', [
+                        'icon' => 'bi bi-exclamation-circle',
+                        'label' => __('Unpaid Amount'),
+                        'value' => '$' . $total_unpaid,
+                        'bg' => '#EF4444',
+                        'class' => 'bg-white',
+                        // 'url' => route('admin.bills.index'),
+                    ]) --}}
+                    {{-- @include('backend.pages.dashboard.partials.card', [
+                        'icon' => 'bi bi-percent',
+                        'label' => __('Avg. Discount'),
+                        'value' => $average_discount . '%',
+                        'bg' => '#F59E0B',
+                        'class' => 'bg-white',
+                        // 'url' => route('admin.bills.index'),
+                    ]) --}}
+
                 </div>
             </div>
         </div>
 
         <div class="mt-6">
             <div class="grid grid-cols-12 gap-4 md:gap-6">
-                <div class="col-span-12">
-                    <div class="grid grid-cols-12 gap-4 md:gap-6">
-                        <div class="col-span-12 md:col-span-8">
-                            @include('backend.pages.dashboard.partials.user-growth')
-                        </div>
-                        <div class="col-span-12 md:col-span-4">
-                            @include('backend.pages.dashboard.partials.user-history')
-                        </div>
-                    </div>
+                <div class="col-span-12 md:col-span-8">
+                    @include('backend.pages.dashboard.partials.user-growth')
                 </div>
+
+                <div class="col-span-12 md:col-span-4">
+                    @include('backend.pages.dashboard.partials.user-history')
+                </div>
+
+                <div class="col-span-12 lg:col-span-12">
+                    @include('backend.pages.dashboard.partials.billing-chart')
+                </div>
+
+                {{-- <div class="col-span-12 lg:col-span-6">
+                    @include('backend.pages.dashboard.partials.payment-status-chart')
+                </div> --}}
             </div>
         </div>
+
     </div>
 @endsection
