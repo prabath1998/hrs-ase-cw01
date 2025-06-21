@@ -168,18 +168,22 @@ class HotelController extends Controller
                 'id' => $room->id,
                 'name' => $room->name,
                 'description' => $room->description,
-                'images' => $hotel->images ?$hotel->images[array_rand($hotel->images)] : [],
+                'images' => $hotel->images[1] ?? [],
                 'price' => $room->base_price_per_night,
                 'originalPrice' => $room->base_price_per_night ?? null,
                 'size' => $room->size ?? '',
                 'maxGuests' => $room->occupancy_limit ?? 2,
                 'bedType' => $room->bed_type ?? '',
                 'views' => $room->views ?? [],
-                'amenities' => $room->amenities ?? [],
+                'amenities' => $room->features ?? [],
                 'popularChoice' => $room->popular_choice ?? false,
                 'lastBooked' => $room->last_booked ?? null,
             ];
         });
+        $hotel->default_check_in_time = Carbon::parse($hotel->default_check_in_time)->format('H:i');
+        $hotel->default_check_out_time = Carbon::parse($hotel->default_check_out_time)->format('H:i');
+
+        // dd($hotel->roomTypes);
 
         return view('landing.hotels.detail', compact('hotel', 'priceFrom', 'optionalServices'));
     }

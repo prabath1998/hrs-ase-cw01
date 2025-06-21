@@ -98,9 +98,9 @@
 
         <!-- Results Header -->
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">6 hotels found</h2>
+            <h2 class="text-2xl font-bold">{{ count($hotels) }} hotels found</h2>
             <div class="text-sm text-gray-600">
-                Showing 6 of 6 hotels
+                Showing {{ count($hotels) }} of {{ count($hotels) }} hotels
             </div>
         </div>
 
@@ -110,16 +110,16 @@
                 <div
                     class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
                     <div class="relative h-64 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                        <img src="{{ json_decode($hotel->images)[0] }}"
                             alt="Grand Plaza Miami Beach"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                         <div class="absolute top-4 left-4 flex flex-col space-y-2">
                             <span class="bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold">
                                 {{ __('Featured') }}
                             </span>
-                            <span class="bg-yellow-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                            {{-- <span class="bg-yellow-600 text-white px-2 py-1 rounded text-xs font-semibold">
                                 {{ __('Save $50/night') }}
-                            </span>
+                            </span> --}}
                         </div>
 
                         <div class="absolute top-4 right-4">
@@ -138,7 +138,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <p class="text-sm opacity-90">{{ __('Starting from') }}</p>
-                                        <p class="text-2xl font-bold">${{ rand(100, 500) }}/night</p>
+                                        <p class="text-2xl font-bold">${{ $hotel->roomTypes->min('base_price_per_night') }}/night</p>
                                     </div>
                                     <div class="text-right">
                                         <div class="flex items-center">

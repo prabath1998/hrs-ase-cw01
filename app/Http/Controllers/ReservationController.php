@@ -89,7 +89,7 @@ class ReservationController extends Controller
 
         $request->merge([
             'optional_services' => array_values(json_decode($request->input('optional_services', []))),
-            'has_credit_card_guarantee' => (bool)$request->input('has_credit_card_guarantee'),
+            'has_credit_card_guarantee' => (bool)$request->input('payment_method') === 'credit_card',
             // 'nic_or_passport_number' => $request->input('nic_or_passport_number', null),
         ]);
 
