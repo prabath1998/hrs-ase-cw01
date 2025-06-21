@@ -38,7 +38,7 @@ class CustomerService
             return [
                 'id' => $reservation->id,
                 'roomName' => $reservation->roomType->name,
-                'roomImage' => asset('images/hotel/1/86161620.jpg'),
+                'roomImage' => json_decode($reservation->hotel->images, true)[0] ?? null,
                 'roomType' => $reservation->roomType->name,
                 'roomTypeId' => $reservation->room_type_id,
                 'hotelName' => $reservation->hotel->name,

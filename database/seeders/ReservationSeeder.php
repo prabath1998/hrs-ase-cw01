@@ -19,25 +19,28 @@ class ReservationSeeder extends Seeder
             'room_id' => 1,
             'hotel_id' => 1,
             'room_type_id' => 1,
-            'check_in_date' => '2023-06-01',
-            'check_out_date' => '2023-06-05',
+            'check_in_date' => '2025-03-01',
+            'check_out_date' => '2025-03-05',
             'number_of_guests' => 2,
-            'status' => 'confirmed',
+            'status' => 'confirmed_guaranteed',
             'has_credit_card_guarantee' => true,
             'booked_by_user_id' => 1,
             'total_estimated_room_charge' => 40.00,
         ]);
 
-        $reservation1->optionalServices()->attach([1, 2], ['quantity' => 1]); // Attach optional services with quantity
+        $reservation1->optionalServices()->attach([
+            1 => ['quantity' => 1, 'price_at_booking' => 8.00],
+            2 => ['quantity' => 1, 'price_at_booking' => 6.00],
+        ]);
 
         // Create another reservation for a customer with ID 2
         $reservation2 = Reservation::create([
-            'customer_id' => 2,
+            'customer_id' => 1,
             'room_id' => 2,
             'hotel_id' => 1,
             'room_type_id' => 2,
-            'check_in_date' => '2023-07-01',
-            'check_out_date' => '2023-07-03',
+            'check_in_date' => '2025-04-01',
+            'check_out_date' => '2025-04-03',
             'number_of_guests' => 1,
             'status' => 'pending_confirmation',
             'has_credit_card_guarantee' => false,
@@ -45,26 +48,32 @@ class ReservationSeeder extends Seeder
             'total_estimated_room_charge' => 32.00,
         ]);
 
-        $reservation2->optionalServices()->attach([3], ['quantity' => 2]); // Attach optional services with quantity
+        $reservation2->optionalServices()->attach([
+            3 => ['quantity' => 1, 'price_at_booking' => 3.00],
+        ]);
 
         // Create a reservation for a customer with ID 3
         $reservation3 = Reservation::create([
-            'customer_id' => 3,
+            'customer_id' => 1,
             'room_id' => 3,
             'hotel_id' => 1,
             'room_type_id' => 3,
-            'check_in_date' => '2023-08-01',
-            'check_out_date' => '2023-08-07',
+            'check_in_date' => '2025-05-01',
+            'check_out_date' => '2025-05-07',
             'number_of_guests' => 4,
             'status' => 'checked_in',
             'has_credit_card_guarantee' => true,
             'booked_by_user_id' => 1,
             'total_estimated_room_charge' => 192.00,
-            'is_suit_booking' => true,
+            'is_suite_booking' => true,
             'suite_booking_period' => 'weekly',
-            'suit_rate_applied' => 40.00
+            'suite_rate_applied' => 40.00
         ]);
 
-        $reservation3->optionalServices()->attach([1, 2, 3], ['quantity' => 1]); // Attach optional services with quantity
+        $reservation3->optionalServices()->attach([
+            1 => ['quantity' => 1, 'price_at_booking' => 8.00],
+            2 => ['quantity' => 1, 'price_at_booking' => 6.00],
+            3 => ['quantity' => 1, 'price_at_booking' => 3.00],
+        ]);
     }
 }

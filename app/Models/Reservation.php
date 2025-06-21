@@ -77,6 +77,7 @@ class Reservation extends Model
             'cancelled_system' => __('Cancelled by System'),
             'no_show' => __('No Show'),
             'block_booking_pending_names' => __('Block Booking - Pending Names'),
+            'completed' => __('Completed'),
             default => __('Unknown Status'),
         };
     }
@@ -93,6 +94,7 @@ class Reservation extends Model
             'cancelled_system' => 'bg-red-200 text-red-900',
             'no_show' => 'bg-orange-100 text-orange-800',
             'block_booking_pending_names' => 'bg-purple-100 text-purple-800',
+            'completed' => 'bg-green-200 text-green-900',
             default => 'bg-gray-200 text-gray-900',
         };
     }

@@ -545,8 +545,8 @@
                 awards: ["Best Luxury Hotel 2023"],
                 sustainability: [],
                 policies: {
-                    checkIn: "{{ $hotel->default_check_in_time }}",
-                    checkOut: "{{ $hotel->default_check_out_time }}",
+                    checkIn: "{{ \Illuminate\Support\Carbon::parse($hotel->default_check_in_time)->format('H:i') }}",
+                    checkOut: "{{ \Illuminate\Support\Carbon::parse($hotel->default_check_out_time)->format('H:i') }}",
                     cancellation: "{{ $hotel->cancellation_policy ?? '' }}",
                     pets: {{ $hotel->pets_allowed ? 'true' : 'false' }},
                     smoking: {{ $hotel->smoking_allowed ? 'true' : 'false' }}
@@ -618,7 +618,7 @@
                         .then(data => {
                             if (data.available > 0) {
                                 this.availabilityCount = data.available;
-                                alert('Selected room is available for the selected dates.');
+                                // alert('Selected room is available for the selected dates.');
                             } else {
                                 this.availabilityCount = 0;
                                 alert('Selected room is not available for the selected dates.');
