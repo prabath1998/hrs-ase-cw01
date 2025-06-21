@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -29,7 +30,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::ADMIN_DASHBOARD;
+    protected $redirectTo = RouteServiceProvider::CUSTOMER_DASHBOARD;
 
     /**
      * Create a new controller instance.
@@ -70,13 +71,21 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
-            'email' => $data['email'],
+            'email' =>$data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
-        if (isset($data['role']) && in_array($data['role'], ['Customer', 'Travel Company'])) {
-            $user->assignRole($data['role']);
-        }
+        $user->assignRole('Customer');
+
+        Customer::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'first_name' => $data['name'],
+                'last_name' => '',
+                'contact_email' => $data['email'],
+                'phone_number' => ''
+            ]
+        );
 
         return $user;
     }
