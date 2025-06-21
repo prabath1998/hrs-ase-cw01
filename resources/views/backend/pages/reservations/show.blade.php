@@ -145,7 +145,7 @@
 
                                     <!-- View Bill Action -->
                                     @if ($reservation->bill)
-                                        <a href="{{ route('bills.receipt.show', $reservation->bill->id) }}" target="_blank"
+                                        <a href="{{ route('admin.bills.receipt.show', $reservation->bill->id) }}" target="_blank"
                                             class="w-full block text-center text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                             View Bill / Folio
                                         </a>
