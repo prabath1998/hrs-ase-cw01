@@ -1,131 +1,55 @@
-@extends('backend.layouts.app')
+<form action="{{ route('admin.reservations.update', $reservation->id) }}" method="POST">
+    @csrf
+    @method('PUT')
 
-@section('title')
-    {{ __('Room Type Edit') }} - {{ config('app.name') }}
-@endsection
-
-@section('admin-content')
-    <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-        <div x-data="{ pageName: '{{ __('Edit Room Type') }}' }">
-            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-white/90">{{ __('Edit Room Type') }}</h2>
-                <nav>
-                    <ol class="flex items-center gap-1.5">
-                        <li>
-                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-                                href="{{ route('admin.dashboard') }}">
-                                {{ __('Home') }}
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400"
-                                href="{{ route('admin.room-types.index') }}">
-                                {{ __('Room Types') }}
-                                <i class="bi bi-chevron-right"></i>
-                            </a>
-                        </li>
-                        <li class="text-sm text-gray-800 dark:text-white/90">{{ __('Edit Room Type') }}</li>
-                    </ol>
-                </nav>
-            </div>
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+            <label for="guest_name" class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Guest Name') }}</label>
+            <input type="text" name="guest_name" id="guest_name" required autofocus
+                value="{{ old('guest_name', $reservation->guest_name) }}"
+                placeholder="{{ __('Enter Guest Name') }}"
+                class="dark:bg-dark-900 ...">
         </div>
 
-        <div class="space-y-6">
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                <div class="px-5 py-4 sm:px-6 sm:py-5">
-                    <h3 class="text-base font-medium text-gray-800 dark:text-white/90">
-                        {{ __('Update Room Type Information') }}</h3>
-                </div>
-                <div class="p-5 space-y-6 border-t border-gray-100 dark:border-gray-800 sm:p-6">
-                    @include('backend.layouts.partials.messages')
+        <div>
+            <label for="room_id" class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Room') }}</label>
+            <select name="room_id" id="room_id" required class="dark:bg-dark-900 ...">
+                @foreach($rooms as $room)
+                    <option value="{{ $room->id }}" {{ old('room_id', $reservation->room_id) == $room->id ? 'selected' : '' }}>
+                        {{ $room->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-                    <form action="{{ route('admin.room-types.update', $roomType->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
+        <div>
+            <label for="check_in" class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Check-in Time') }}</label>
+            <input type="datetime-local" name="check_in" id="check_in" required
+                value="{{ old('check_in', $reservation->check_in ? $reservation->check_in->format('Y-m-d\TH:i') : '') }}"
+                class="dark:bg-dark-900 ...">
+        </div>
 
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2" x-data="{ suiteChecked: {{ $roomType->is_suite ? 'true' : 'false' }} }">
-                            <div>
-                                <label for="name"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Name') }}</label>
-                                <input type="text" name="name" id="name" required autofocus
-                                    value="{{ old('name', $roomType->name) }}"
-                                    placeholder="{{ __('Enter Room Type Name') }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
+        <div>
+            <label for="check_out" class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Check-out Time') }}</label>
+            <input type="datetime-local" name="check_out" id="check_out" required
+                value="{{ old('check_out', $reservation->check_out ? $reservation->check_out->format('Y-m-d\TH:i') : '') }}"
+                class="dark:bg-dark-900 ...">
+        </div>
 
-                            <div>
-                                <label for="description"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Description') }}</label>
-                                <input type="text" name="description" id="description"
-                                    value="{{ old('description', $roomType->description) }}"
-                                    placeholder="{{ __('Enter Description') }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
-
-                            <div>
-                                <label for="occupancy_limit"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Occupancy Limit') }}</label>
-                                <input type="number" name="occupancy_limit" id="occupancy_limit" required
-                                    value="{{ old('occupancy_limit', $roomType->occupancy_limit) }}"
-                                    placeholder="{{ __('Enter Occupancy Limit') }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
-
-                            <div>
-                                <label for="base_price_per_night"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Base Price Per Night') }}</label>
-                                <input type="number" name="base_price_per_night" id="base_price_per_night" required
-                                    value="{{ old('base_price_per_night', $roomType->base_price_per_night) }}"
-                                    placeholder="{{ __('Enter Base Price Per Night') }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
-
-                            <div class="flex items-center mt-2 col-span-full">
-                                <input type="checkbox" name="is_suite" id="is_suite"
-                                    value="{{ old('is_suite', $roomType->is_suite) }}"
-                                    {{ old('is_suite', $roomType->is_suite) ? 'checked' : '' }}
-                                    x-bind:checked="suiteChecked" @change="suiteChecked = !suiteChecked"
-                                    class="h-4 w-4 text-brand-500 border-gray-300 rounded focus:ring-brand-400 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-brand-500">
-                                <label for="is_suite"
-                                    class="ml-2 text-sm text-gray-700 dark:text-gray-400">{{ __('Is Suite?') }}</label>
-                            </div>
-
-                            <div x-show="suiteChecked" x-transition>
-                                <label for="suite_weekly_rate"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Suite Weekly Price') }}</label>
-                                <input type="number" name="suite_weekly_rate" id="suite_weekly_rate"
-                                    x-bind:disabled="!suiteChecked"
-                                    value="{{ old('suite_weekly_rate', $roomType->suite_weekly_rate) }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
-
-                            <div x-show="suiteChecked" x-transition>
-                                <label for="suite_monthly_rate"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Suite Monthly Price') }}</label>
-                                <input type="number" name="suite_monthly_rate" id="suite_monthly_rate"
-                                    x-bind:disabled="!suiteChecked"
-                                    value="{{ old('suite_monthly_rate', $roomType->suite_monthly_rate) }}"
-                                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                            </div>
-
-                            <div class="flex items-center mt-2">
-                                <input type="checkbox" name="is_active" id="is_active"
-                                    value="{{ old('is_active', $roomType->is_active) }}"
-                                    {{ old('is_active', $roomType->is_active) ? 'checked' : '' }}
-                                    class="h-4 w-4 text-brand-500 border-gray-300 rounded focus:ring-brand-400 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-brand-500">
-                                <label for="is_active"
-                                    class="ml-2 text-sm text-gray-700 dark:text-gray-400">{{ __('Is Active') }}</label>
-                            </div>
-                        </div>
-
-                        <div class="mt-6 flex justify-start gap-4">
-                            <button type="submit" class="btn-primary">{{ __('Update') }}</button>
-                            <a href="{{ route('admin.room-types.index') }}" class="btn-default">{{ __('Cancel') }}</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div>
+            <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-400">{{ __('Status') }}</label>
+            <select name="status" id="status" required class="dark:bg-dark-900 ...">
+                @foreach(['pending' => 'Pending', 'confirmed' => 'Confirmed', 'checked_in' => 'Checked-in', 'checked_out' => 'Checked-out', 'cancelled' => 'Cancelled'] as $key => $label)
+                    <option value="{{ $key }}" {{ old('status', $reservation->status) == $key ? 'selected' : '' }}>
+                        {{ __($label) }}
+                    </option>
+                @endforeach
+            </select>
         </div>
     </div>
-@endsection
+
+    <div class="mt-6 flex justify-start gap-4">
+        <button type="submit" class="btn-primary">{{ __('Update') }}</button>
+        <a href="{{ route('admin.reservations.index') }}" class="btn-default">{{ __('Cancel') }}</a>
+    </div>
+</form>
