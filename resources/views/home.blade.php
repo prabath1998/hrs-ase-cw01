@@ -207,7 +207,7 @@
                     <div
                         class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group">
                         <div class="relative h-64 overflow-hidden">
-                            <img src="{{ json_decode($hotel->images)[0] }}"
+                            <img src="{{ json_decode($hotel->images)[0] ?? '' }}"
                                 alt="{{ $hotel->name }}"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             <div class="absolute top-4 left-4">
