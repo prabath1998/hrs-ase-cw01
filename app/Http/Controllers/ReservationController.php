@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ActionType;
+use App\Exports\ReservationsExport;
 use App\Models\Bill;
 use App\Models\Customer;
 use App\Models\Hotel;
@@ -12,7 +13,6 @@ use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\Setting;
 use App\Models\User;
-use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReservationController extends Controller
 {
@@ -50,7 +52,6 @@ class ReservationController extends Controller
     public function create(Request $request): Renderable
     {
         // dd($request->all());
-        // Validate incoming search parameters (dates, guests) from the query string
         $searchParams = $request->validate([
             'hotelId' => 'required|exists:hotels,id',
             'roomTypeId' => 'required|exists:room_types,id',
@@ -191,7 +192,7 @@ class ReservationController extends Controller
 
             Thank you for booking with us!";
 
-            sendNotificationEmail($reservation->customer->contact_email, $subject, nl2br($body));
+            sendNotificationEmail($reservation->customer->contact_email, $subject, ($body));
 
             if (!empty($validated['optional_services'])) {
                 foreach ($validated['optional_services'] as $serviceId) {
@@ -205,7 +206,6 @@ class ReservationController extends Controller
                 }
             }
             $this->generateAndGetBill($reservation);
-
         } catch (\Exception $e) {
             Log::error('Error creating reservation: ' . $e->getMessage());
             return back()->withErrors(['reservation' => 'Failed to create reservation: ' . $e->getMessage()])->withInput();
@@ -441,5 +441,15 @@ class ReservationController extends Controller
             'payment_status' => 'pending',
             'generated_by_user_id' => auth()->id(),
         ]);
+    }
+
+    public function exportExcel(Request $request)
+    {
+
+        $reservations = Reservation::with(['customer', 'travelCompany', 'hotel', 'roomType', 'room'])
+            ->latest()
+            ->get();
+
+        return Excel::download(new ReservationsExport($reservations), 'reservations-' . now()->format('Y-m-d') . '.xlsx');
     }
 }

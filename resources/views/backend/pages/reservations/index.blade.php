@@ -42,12 +42,21 @@
                         'placeholder' => __('Search by name or email'),
                     ])
 
-                    @if (auth()->user()->can('reservation.manage'))
-                        <a href="{{ route('admin.reservations.create') }}" class="btn-primary">
-                            <i class="bi bi-plus-circle mr-2"></i>
-                            {{ __('New Reservation') }}
-                        </a>
-                    @endif
+                    <div class="flex gap-3">
+                        @if (auth()->user()->can('reservation.manage'))
+                            <a href="{{ route('admin.reservations.export') }}" class="btn-primary">
+                                <i class="bi bi-file-earmark-excel mr-2"></i>
+                                {{ __('Export to Excel') }}
+                            </a>
+                        @endif
+
+                        @if (auth()->user()->can('reservation.manage'))
+                            <a href="{{ route('admin.reservations.create') }}" class="btn-primary">
+                                <i class="bi bi-plus-circle mr-2"></i>
+                                {{ __('New Reservation') }}
+                            </a>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="space-y-3 border-t border-gray-100 dark:border-gray-800 overflow-x-auto">

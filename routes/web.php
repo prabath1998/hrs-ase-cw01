@@ -79,6 +79,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth', 'r
 
     // Hotel Routes.
     Route::resource('hotels', HotelController::class);
+
+    Route::get('/reservations/export', [ReservationController::class, 'exportExcel'])->name('reservations.export');
     Route::resource('reservations', ReservationController::class);
     Route::post('/reservations/{reservation}/check-in', [ReservationController::class, 'checkIn'])->name('reservations.checkin');
     Route::post('/reservations/{reservation}/check-out', [ReservationController::class, 'checkOut'])->name('reservations.checkout');
