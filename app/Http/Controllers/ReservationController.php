@@ -486,11 +486,44 @@ class ReservationController extends Controller
 
     public function exportExcel(Request $request)
     {
+        $query = Reservation::with(['customer', 'travelCompany', 'hotel', 'roomType', 'room'])
+            ->latest();
 
-        $reservations = Reservation::with(['customer', 'travelCompany', 'hotel', 'roomType', 'room'])
-            ->latest()
-            ->get();
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->whereHas('customer', function($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('travelCompany', function($q) use ($search) {
+                    $q->where('company_name', 'like', "%{$search}%");
+                })
+                ->orWhere('reference_number', 'like', "%{$search}%");
+            });
+        }
 
-        return Excel::download(new ReservationsExport($reservations), 'reservations-' . now()->format('Y-m-d') . '.xlsx');
+        if ($request->has('check_in_date') && !empty($request->check_in_date)) {
+            $query->whereDate('check_in_date', '>=', $request->check_in_date);
+        }
+
+        if ($request->has('check_out_date') && !empty($request->check_out_date)) {
+            $query->whereDate('check_out_date', '<=', $request->check_out_date);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('hotel_id') && !empty($request->hotel_id)) {
+            $query->where('hotel_id', $request->hotel_id);
+        }
+
+        $reservations = $query->get();
+
+        return Excel::download(
+            new ReservationsExport($reservations, $request),
+            'reservations-' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
 }
