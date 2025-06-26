@@ -15,6 +15,8 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class ReservationsExport implements
     FromCollection,
@@ -39,17 +41,20 @@ class ReservationsExport implements
     public function headings(): array
     {
         return [
-            'ID',
-            'Guest Name',
-            'Hotel',
-            'Room Type',
-            'Room Number',
-            'Check-in Date',
-            'Check-out Date',
-            'Total Cost',
-            'Status',
-            'Booking Date',
-            'Payment Method',
+            __('ID'),
+            __('Guest Name'),
+            __('Hotel'),
+            __('Room Type'),
+            __('Room Number'),
+            __('Check-in Date'),
+            __('Check-out Date'),
+            __('Nights'),
+            __('Total Cost'),
+            __('Status'),
+            __('Booking Date'),
+            __('Payment Method'),
+            __('Booked By'),
+            __('Special Requests'),
         ];
     }
 
@@ -61,40 +66,60 @@ class ReservationsExport implements
             $reservation->hotel->name,
             $reservation->roomType->name,
             $reservation->room->room_number ?? '-',
-            $reservation->check_in_date->format('d-m-Y'),
-            $reservation->check_out_date->format('d-m-Y'),
+            $reservation->check_in_date->format('Y-m-d'),
+            $reservation->check_out_date->format('Y-m-d'),
+            $reservation->check_in_date->diffInDays($reservation->check_out_date),
             $reservation->totalEstimatedCost(),
             $reservation->statusLabel(),
-            $reservation->created_at->format('d-m-Y H:i'),
+            $reservation->created_at->format('Y-m-d H:i'),
             $reservation->payment_method ?? 'N/A',
+            $reservation->bookedBy->name ?? 'System',
+            $reservation->special_requests ?? '-',
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
         // Set default font
-        $sheet->getParent()->getDefaultStyle()->getFont()->setName('Arial')->setSize(10);
+        $sheet->getParent()->getDefaultStyle()
+            ->getFont()
+            ->setName('Calibri')
+            ->setSize(10);
+
+        // Set column widths for specific columns
+        $sheet->getColumnDimension('A')->setWidth(8);  // ID
+        $sheet->getColumnDimension('B')->setWidth(25); // Guest Name
+        $sheet->getColumnDimension('C')->setWidth(20); // Hotel
+        $sheet->getColumnDimension('D')->setWidth(20); // Room Type
+        $sheet->getColumnDimension('N')->setWidth(30); // Special Requests
 
         return [
             // Header row style
             1 => [
                 'font' => [
                     'bold' => true,
-                    'color' => ['rgb' => 'FFFFFF'],
+                    'color' => ['rgb' => Color::COLOR_WHITE],
                     'size' => 11,
                 ],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
-                    'color' => ['rgb' => '2F75B5'], // Nice blue
+                    'color' => ['rgb' => '4472C4'], // Darker blue
                 ],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
                     'vertical' => Alignment::VERTICAL_CENTER,
+                    'wrapText' => true,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['rgb' => 'FFFFFF'],
+                    ],
                 ],
             ],
 
             // Data rows style
-            'A2:K' . ($this->reservations->count() + 1) => [
+            'A2:N' . ($this->reservations->count() + 1) => [
                 'alignment' => [
                     'vertical' => Alignment::VERTICAL_CENTER,
                     'wrapText' => true,
@@ -107,11 +132,30 @@ class ReservationsExport implements
                 ],
             ],
 
-            // Numeric and date formatting
-            'A' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
-            'F:G' => ['numberFormat' => ['formatCode' => NumberFormat::FORMAT_DATE_DDMMYYYY]],
-            'H' => ['numberFormat' => ['formatCode' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1]],
-            'J' => ['numberFormat' => ['formatCode' => 'dd-mm-yyyy hh:mm']],
+            // Specific column formatting
+            'A' => [ // ID column
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'numberFormat' => ['formatCode' => '0'],
+            ],
+            'F:G' => [ // Date columns
+                'numberFormat' => ['formatCode' => NumberFormat::FORMAT_DATE_YYYYMMDD],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ],
+            'H' => [ // Nights column
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                'numberFormat' => ['formatCode' => '0'],
+            ],
+            'I' => [ // Total Cost column
+                'numberFormat' => ['formatCode' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
+            ],
+            'K' => [ // Booking Date column
+                'numberFormat' => ['formatCode' => 'yyyy-mm-dd hh:mm'],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ],
+            'N' => [ // Special Requests column
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ],
         ];
     }
 
@@ -119,63 +163,79 @@ class ReservationsExport implements
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
-                // Freeze the first row
-                $event->sheet->freezePane('A2');
-
-                // Set alternate row coloring
+                $sheet = $event->sheet->getDelegate();
                 $totalRows = $this->reservations->count() + 1; // +1 for header
-                $range = 'A2:K' . $totalRows;
 
-                $event->sheet->getDelegate()->getStyle($range)
-                    ->getFill()
-                    ->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()
-                    ->setARGB('FFFFFF');
+                // Freeze the header row
+                $sheet->freezePane('A2');
+
+                // Set auto-filter
+                $sheet->setAutoFilter('A1:N1');
 
                 // Apply alternate row coloring
                 for ($i = 2; $i <= $totalRows; $i++) {
-                    if ($i % 2 == 0) {
-                        $event->sheet->getDelegate()->getStyle('A'.$i.':K'.$i)
-                            ->getFill()
-                            ->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()
-                            ->setARGB('F2F2F2');
-                    }
+                    $fillColor = $i % 2 == 0 ? 'FFFFFF' : 'F2F2F2';
+                    $sheet->getStyle('A'.$i.':N'.$i)
+                        ->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()
+                        ->setARGB($fillColor);
                 }
 
                 // Apply conditional formatting for status column
-                $statusColumn = 'I';
+                $statusColumn = 'J';
+                $statusColors = [
+                    'Confirmed' => 'C6EFCE', // Light green
+                    'Cancelled' => 'FFC7CE', // Light red
+                    'Pending' => 'FFEB9C',   // Light yellow
+                    'Checked In' => '8DB4E2', // Light blue
+                    'Checked Out' => 'A9D08E', // Green
+                    'No Show' => 'FF9C9C',    // Red
+                ];
+
                 for ($i = 2; $i <= $totalRows; $i++) {
-                    $cellValue = $event->sheet->getCell($statusColumn.$i)->getValue();
-                    $color = null;
-
-                    if (str_contains($cellValue, 'Confirmed')) {
-                        $color = 'C6EFCE'; // Light green
-                    } elseif (str_contains($cellValue, 'Cancelled')) {
-                        $color = 'FFC7CE'; // Light red
-                    } elseif (str_contains($cellValue, 'Pending')) {
-                        $color = 'FFEB9C'; // Light yellow
-                    } elseif (str_contains($cellValue, 'Checked In')) {
-                        $color = '8DB4E2'; // Light blue
-                    }
-
-                    if ($color) {
-                        $event->sheet->getDelegate()->getStyle($statusColumn.$i)
-                            ->getFill()
-                            ->setFillType(Fill::FILL_SOLID)
-                            ->getStartColor()
-                            ->setARGB($color);
+                    $cellValue = $sheet->getCell($statusColumn.$i)->getValue();
+                    foreach ($statusColors as $status => $color) {
+                        if (str_contains($cellValue, $status)) {
+                            $sheet->getStyle($statusColumn.$i)
+                                ->getFill()
+                                ->setFillType(Fill::FILL_SOLID)
+                                ->getStartColor()
+                                ->setARGB($color);
+                            break;
+                        }
                     }
                 }
 
-                // Add filters to header row
-                $event->sheet->setAutoFilter('A1:K1');
+                // Format total row if needed
+                if ($totalRows > 1) {
+                    $lastRow = $totalRows + 1;
+                    $sheet->setCellValue('H'.$lastRow, 'Total:');
+                    $sheet->setCellValue('I'.$lastRow, '=SUM(I2:I'.$totalRows.')');
+                    $sheet->getStyle('H'.$lastRow.':I'.$lastRow)
+                        ->applyFromArray([
+                            'font' => ['bold' => true],
+                            'fill' => [
+                                'fillType' => Fill::FILL_SOLID,
+                                'color' => ['rgb' => 'D9E1F2'],
+                            ],
+                            'borders' => [
+                                'top' => ['borderStyle' => Border::BORDER_MEDIUM],
+                            ],
+                        ]);
+                }
 
                 // Set print settings
-                $event->sheet->getPageSetup()
+                $sheet->getPageSetup()
                     ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE)
                     ->setFitToWidth(1)
-                    ->setFitToHeight(0);
+                    ->setFitToHeight(0)
+                    ->setHorizontalCentered(true);
+
+                // Set header/footer
+                $sheet->getHeaderFooter()
+                    ->setOddHeader('&C&H&"Calibri,Bold"&14' . __('Reservations Report'))
+                    ->setOddFooter('&L&D &RPage &P of &N');
             },
         ];
     }

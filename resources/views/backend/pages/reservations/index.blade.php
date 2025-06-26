@@ -41,22 +41,48 @@
                     @include('backend.partials.search-form', [
                         'placeholder' => __('Search by name or email'),
                     ])
-
-                    <div class="flex gap-3">
-                        @if (auth()->user()->can('reservation.manage'))
-                            <a href="{{ route('admin.reservations.export') }}" class="btn-primary">
-                                <i class="bi bi-file-earmark-excel mr-2"></i>
-                                {{ __('Export to Excel') }}
-                            </a>
-                        @endif
-
-                        @if (auth()->user()->can('reservation.manage'))
-                            <a href="{{ route('admin.reservations.create') }}" class="btn-primary">
-                                <i class="bi bi-plus-circle mr-2"></i>
-                                {{ __('New Reservation') }}
-                            </a>
-                        @endif
+                   <form method="GET" action="{{ route('admin.reservations.index') }}" class="flex items-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <label for="check_in_date" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('From') }}</label>
+                        <input type="date" id="check_in_date" name="check_in_date"
+                            value="{{ request('check_in_date') }}"
+                            class="border border-gray-300 rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700">
                     </div>
+                    <div class="flex items-center gap-2">
+                        <label for="check_out_date" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('To') }}</label>
+                        <input type="date" id="check_out_date" name="check_out_date"
+                            value="{{ request('check_out_date') }}"
+                            class="border border-gray-300 rounded-md px-3 py-2 text-sm dark:bg-gray-800 dark:border-gray-700">
+                    </div>
+                    <button type="submit" class="btn-primary px-4 py-2 text-sm">
+                        {{ __('Filter') }}
+                    </button>
+                    <a href="{{ route('admin.reservations.index') }}" class="btn-default px-4 py-2 text-sm">
+                        {{ __('Reset') }}
+                    </a>
+
+                    <!-- Hidden input to preserve search parameter -->
+                    @if(request('search'))
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    @endif
+                </form>
+
+
+                <div class="flex gap-3">
+                    @if (auth()->user()->can('reservation.manage'))
+                        <a href="{{ route('admin.reservations.export', request()->query()) }}"
+                            class="btn-primary flex items-center gap-2 px-4 py-2 text-sm"
+                            title="{{ __('Export to Excel') }}">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </a>
+                    @endif
+
+                    @if (auth()->user()->can('reservation.manage'))
+                        <a href="{{ route('admin.reservations.create') }}" class="btn-primary" title="{{ __('New Reservation') }}">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    @endif
+                </div>
                 </div>
 
                 <div class="space-y-3 border-t border-gray-100 dark:border-gray-800 overflow-x-auto">
@@ -199,5 +225,42 @@
             currentUrl.searchParams.set('role', value);
             window.location.href = currentUrl.toString();
         }
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#check_in_date, #check_out_date", {
+                dateFormat: "Y-m-d",
+                allowInput: true
+            });
+        });
+    </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update export button URL when filters change
+        function updateExportUrl() {
+            const exportBtn = document.querySelector('a[href*="export"]');
+            if (exportBtn) {
+                const search = document.querySelector('input[name="search"]')?.value;
+                const checkIn = document.getElementById('check_in_date')?.value;
+                const checkOut = document.getElementById('check_out_date')?.value;
+
+                const params = new URLSearchParams();
+                if (search) params.set('search', search);
+                if (checkIn) params.set('check_in_date', checkIn);
+                if (checkOut) params.set('check_out_date', checkOut);
+
+                exportBtn.href = "{{ route('admin.reservations.export') }}?" + params.toString();
+            }
+        }
+
+        // Watch for changes in filter inputs
+        document.querySelectorAll('input[name="search"], #check_in_date, #check_out_date').forEach(input => {
+            input.addEventListener('change', updateExportUrl);
+        });
+    });
     </script>
 @endpush

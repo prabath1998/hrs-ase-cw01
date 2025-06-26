@@ -28,26 +28,67 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ReservationController extends Controller
 {
-    public function index()
-    {
-        $this->checkAuthorization(auth()->user(), ['reservation.manage']);
-        $reservations = Reservation::with([
-            'customer',
-            'travelCompany',
-            'room',
-            'roomType',
-            'bookedBy',
-            'hotel',
-            'optionalServices',
+    public function index(Request $request)
+{
+    $this->checkAuthorization(auth()->user(), ['reservation.manage']);
 
-        ])->orderBy('created_at', 'desc')->paginate(10);
+    $query = Reservation::with([
+        'customer',
+        'travelCompany',
+        'room',
+        'roomType',
+        'bookedBy',
+        'hotel',
+        'optionalServices',
+    ])->orderBy('created_at', 'desc');
 
-        $today = Carbon::now('Asia/Colombo')->toDateString();
-
-        return view('backend.pages.reservations.index', [
-            'reservations' => $reservations,
-        ]);
+    // Search filter
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->whereHas('customer', function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orWhereHas('travelCompany', function($q) use ($search) {
+                $q->where('company_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orWhere('reference_number', 'like', "%{$search}%");
+        });
     }
+
+    if ($request->has('check_in_date') && !empty($request->check_in_date)) {
+        $query->whereDate('check_in_date', '>=', $request->check_in_date);
+    }
+
+    if ($request->has('check_out_date') && !empty($request->check_out_date)) {
+        $query->whereDate('check_out_date', '<=', $request->check_out_date);
+    }
+
+    if ($request->has('status') && !empty($request->status)) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->has('hotel_id') && !empty($request->hotel_id)) {
+        $query->where('hotel_id', $request->hotel_id);
+    }
+
+    $reservations = $query->paginate(10);
+
+    return view('backend.pages.reservations.index', [
+        'reservations' => $reservations,
+        'hotels' => Hotel::pluck('name', 'id'), // For hotel filter dropdown
+        'statuses' => [ // For status filter dropdown
+            'pending' => 'Pending',
+            'confirmed' => 'Confirmed',
+            'checked_in' => 'Checked In',
+            'checked_out' => 'Checked Out',
+            'cancelled' => 'Cancelled',
+        ],
+    ]);
+}
 
     public function create(Request $request): Renderable
     {
