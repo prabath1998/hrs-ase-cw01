@@ -27,8 +27,8 @@
                                     <div class="border rounded-lg overflow-hidden mb-7 bg-gray-50">
                                         <div class="flex flex-col md:flex-row">
                                             <div class="md:w-1/3">
-                                                <img src="{{ json_decode($hotel->images)[1] }}"
-                                                    alt="Deluxe Room" class="w-full h-full object-cover aspect-square">
+                                                <img src="{{ json_decode($hotel->images)[1] }}" alt="Deluxe Room"
+                                                    class="w-full h-full object-cover aspect-square">
                                             </div>
                                             <div class="p-5 md:w-2/3">
                                                 <div class="flex justify-between items-start">
@@ -96,16 +96,19 @@
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                         <div>
-                                            <label class="block text-xs font-medium text-gray-700 mb-1">Number of
+                                            <label for="amount" class="block text-xs font-medium text-gray-700 mb-1">Number of
                                                 Rooms</label>
-                                            <select
+                                            <input type="number" min="1" max="10" id="amount"
                                                 class="w-full px-4 py-2 border border-gray-200 rounded focus:ring-primary-500 focus:border-primary-500 text-sm"
                                                 x-model="amount" required>
-                                                <option selected value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4">4</option>
-                                            </select>
+                                        </div>
+                                        <div>
+                                            <label for="guests"
+                                                class="block text-xs font-medium text-gray-700 mb-1">Number of
+                                                Guests</label>
+                                            <input type="number" min="1" max="40" id="guests"
+                                                class="w-full px-4 py-2 border border-gray-200 rounded focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                                x-model="guests" required>
                                         </div>
                                     </div>
 
@@ -125,10 +128,24 @@
                                             </div>
                                         @endif
                                     </div>
+
+                                    <div class="mb-6">
+                                        <label for="special-requests"
+                                            class="block text-xs font-medium text-gray-700 mb-1">Special Requests
+                                            (Optional)</label>
+                                        <textarea id="special-requests" rows="3"
+                                            class="w-full px-4 py-2 border border-gray-200 rounded focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                            placeholder="Enter any special requests or requirements" x-model="special_requests"></textarea>
+                                        <p class="text-xs text-gray-400 mt-1">Special requests cannot be guaranteed but we
+                                            will
+                                            do our best to accommodate your needs.</p>
+                                    </div>
+
                                 </div>
 
+
                                 <!-- Step 2: Guest Information -->
-                                <div x-show="currentStep === 2" x-cloak>
+                                {{-- <div x-show="currentStep === 2" x-cloak>
                                     <h2 class="text-xl font-semibold mb-5 text-gray-800">Guest Information</h2>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                         <div>
@@ -218,22 +235,10 @@
                                             <option value="LK">Sri lanka</option>
                                         </select>
                                     </div>
-
-                                    <div class="mb-6">
-                                        <label for="special-requests"
-                                            class="block text-xs font-medium text-gray-700 mb-1">Special Requests
-                                            (Optional)</label>
-                                        <textarea id="special-requests" rows="3"
-                                            class="w-full px-4 py-2 border border-gray-200 rounded focus:ring-primary-500 focus:border-primary-500 text-sm"
-                                            placeholder="Enter any special requests or requirements" x-model="special_requests"></textarea>
-                                        <p class="text-xs text-gray-400 mt-1">Special requests cannot be guaranteed but we
-                                            will
-                                            do our best to accommodate your needs.</p>
-                                    </div>
-                                </div>
+                                </div> --}}
 
                                 <!-- Step 3: Payment Information -->
-                                <div x-show="currentStep === 3" x-cloak>
+                                <div x-show="currentStep === 2" x-cloak>
                                     <h2 class="text-xl font-semibold mb-5 text-gray-800">Payment Information</h2>
                                     <div class="mb-6">
                                         <label class="block text-xs font-medium text-gray-700 mb-1">Payment Method</label>
@@ -347,7 +352,7 @@
                                 </div>
 
                                 <!-- Step 4: Review & Confirm -->
-                                <div x-show="currentStep === 4" x-cloak>
+                                <div x-show="currentStep === 3" x-cloak>
                                     <h2 class="text-xl font-semibold mb-5 text-gray-800">Review & Confirm</h2>
 
                                     <div class="bg-gray-50 p-4 rounded mb-6 border">
@@ -372,7 +377,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="bg-gray-50 p-4 rounded mb-6 border">
+                                    {{-- <div class="bg-gray-50 p-4 rounded mb-6 border">
                                         <h3 class="font-medium text-gray-900 mb-2">Guest Information</h3>
                                         <div class="grid grid-cols-2 gap-4 text-xs">
                                             <div>
@@ -393,7 +398,7 @@
                                                     x-text="`${address}, ${city}, ${state} ${zipCode}, ${country}`"></p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="bg-gray-50 p-4 rounded mb-6 border">
                                         <h3 class="font-medium text-gray-900 mb-2">Payment Method</h3>
@@ -551,9 +556,8 @@
                     <div x-show="showModal" x-transition:enter="ease-out duration-300"
                         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                         x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"
-                        @click="showModal = false"></div>
+                        x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500/75 transition-opacity"
+                        aria-hidden="true" @click="showModal = false"></div>
 
                     <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -620,7 +624,7 @@
                 roomBasePrice: {{ $roomType->base_price_per_night }},
                 // Form steps
                 currentStep: 1,
-                totalSteps: 4,
+                totalSteps: 3,
 
                 // Step 1: Room Selection
                 hotelId: {{ $hotel->id }},
@@ -628,7 +632,9 @@
                 check_in_date: '{{ $checkIn }}',
                 check_out_date: '{{ $checkOut }}',
                 amount: 1,
+                guests: 1,
                 selectedServices: [],
+                special_requests: '',
 
                 // Define optional services
                 service1: false,
@@ -639,18 +645,18 @@
                 service6: false,
 
                 // Step 2: Guest Information
-                first_name: '',
-                last_name: '',
-                contact_email: '',
-                phone_number: '',
-                address: '',
-                city: '',
-                state: '',
-                zipCode: '',
-                country: '',
-                special_requests: '',
+                // first_name: '',
+                // last_name: '',
+                // contact_email: '',
+                // phone_number: '',
+                // address: '',
+                // city: '',
+                // state: '',
+                // zipCode: '',
+                // country: '',
 
-                // Step 3: Payment Information
+
+                // Step 2: Payment Information
                 paymentMethod: 'credit-card',
                 cardholderName: '',
                 cardNumber: '',
@@ -715,8 +721,8 @@
                             return this.validateStep1();
                         case 2:
                             return this.validateStep2();
-                        case 3:
-                            return this.validateStep3();
+                        // case 2:
+                        //     return this.validateStep3();
                         default:
                             return true;
                     }
@@ -730,27 +736,27 @@
                     return true;
                 },
 
+                // validateStep2() {
+                //     const requiredFields = ['first_name', 'last_name', 'contact_email', 'phone_number', 'address', 'city',
+                //         'state', 'zipCode', 'country'
+                //     ];
+                //     for (let field of requiredFields) {
+                //         if (!this[field]) {
+                //             alert('Please fill in all required fields.');
+                //             return false;
+                //         }
+                //     }
+
+                //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                //     if (!emailRegex.test(this.contact_email)) {
+                //         alert('Please enter a valid email address.');
+                //         return false;
+                //     }
+
+                //     return true;
+                // },
+
                 validateStep2() {
-                    const requiredFields = ['first_name', 'last_name', 'contact_email', 'phone_number', 'address', 'city',
-                        'state', 'zipCode', 'country'
-                    ];
-                    for (let field of requiredFields) {
-                        if (!this[field]) {
-                            alert('Please fill in all required fields.');
-                            return false;
-                        }
-                    }
-
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(this.contact_email)) {
-                        alert('Please enter a valid email address.');
-                        return false;
-                    }
-
-                    return true;
-                },
-
-                validateStep3() {
                     if (!this.agreeToTerms) {
                         alert('Please agree to the terms and conditions.');
                         return false;
@@ -862,17 +868,17 @@
                     formData.append('check_in_date', this.check_in_date);
                     formData.append('check_out_date', this.check_out_date);
                     formData.append('amount', this.amount);
-                    // formData.append('children', this.children);
+                    formData.append('guests', this.guests);
                     formData.append('optional_services', JSON.stringify(this.selectedServices));
-                    formData.append('first_name', this.first_name);
-                    formData.append('last_name', this.last_name);
-                    formData.append('contact_email', this.contact_email);
-                    formData.append('phone_number', this.phone_number);
-                    formData.append('address', this.address);
-                    formData.append('city', this.city);
-                    formData.append('state', this.state);
-                    formData.append('zipCode', this.zipCode);
-                    formData.append('country', this.country);
+                    // formData.append('first_name', this.first_name);
+                    // formData.append('last_name', this.last_name);
+                    // formData.append('contact_email', this.contact_email);
+                    // formData.append('phone_number', this.phone_number);
+                    // formData.append('address', this.address);
+                    // formData.append('city', this.city);
+                    // formData.append('state', this.state);
+                    // formData.append('zipCode', this.zipCode);
+                    // formData.append('country', this.country);
                     formData.append('special_requests', this.special_requests);
                     formData.append('paymentMethod', this.paymentMethod);
                     formData.append('has_credit_card_guarantee', this.has_credit_card_guarantee);

@@ -68,7 +68,7 @@ class LoginController extends Controller
 
             $user = Auth::guard('web')->user();
 
-            if ($user->hasRole('Customer')) {
+            if ($user->hasRole('Customer') || $user->hasRole('Travel Company')) {
                 if ($request->has('url')) {
                     return redirect()->to($request->get('url'));
                 } else {

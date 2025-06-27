@@ -8,6 +8,7 @@ use App\Models\Reservation;
 use App\Models\Bill;
 use App\Models\Hotel;
 use App\Models\Setting;
+use App\Models\TravelCompany;
 use App\Models\User;
 
 use App\Models\RoomType;
@@ -17,7 +18,7 @@ use Illuminate\Support\Carbon;
 class CustomerService
 {
 
-    public function getCustomerDashboardData(Customer $customer): array
+    public function getCustomerDashboardData(Customer|TravelCompany $customer): array
     {
         $reservations = $this->getCustomerReservations($customer);
         $totalReservations = $reservations->count();
@@ -77,7 +78,7 @@ class CustomerService
             'activeReservationsCount' => $activeReservations,
         ];
     }
-    public function getCustomerBills(Customer $customer): array
+    public function getCustomerBills(Customer|TravelCompany $customer): array
     {
         $bills = $customer->bills()->with(['reservation', 'reservation.roomType'])->latest()->get();
         $totalSpent = $bills->sum('amount_paid');
@@ -100,12 +101,12 @@ class CustomerService
         ];
     }
 
-    public function getCustomerReservations(Customer $customer)
+    public function getCustomerReservations(Customer|TravelCompany $customer)
     {
         return $customer->reservations()->with(['hotel', 'roomType', 'optionalServices'])->latest()->get();
     }
 
-    public function getCustomerDetails(Customer $customer): array
+    public function getCustomerDetails(Customer|TravelCompany $customer): array
     {
         return [
             'id' => $customer->id,
@@ -119,7 +120,7 @@ class CustomerService
         ];
     }
 
-    public function updateCustomerDetails(Customer $customer, array $data): Customer
+    public function updateCustomerDetails(Customer|TravelCompany $customer, array $data): Customer
     {
         $customer->first_name = $data['first_name'] ?? $customer->first_name;
         $customer->last_name = $data['last_name'] ?? $customer->last_name;

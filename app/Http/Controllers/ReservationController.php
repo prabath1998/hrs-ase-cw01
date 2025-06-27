@@ -133,7 +133,6 @@ class ReservationController extends Controller
 
         $request->merge([
             'optional_services' => array_values(json_decode($request->input('optional_services', []))),
-            // 'nic_or_passport_number' => $request->input('nic_or_passport_number', null),
         ]);
 
         $hasCreditCardGuarantee = $request->input('paymentMethod', false) === 'credit-card';
@@ -145,12 +144,6 @@ class ReservationController extends Controller
             'check_in_date' => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
             'amount' => 'numeric|min:1',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'contact_email' => 'required|email|max:255',
-            'phone_number' => 'required|string|max:20',
-            // 'nic_or_passport_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
             'special_requests' => 'nullable|string',
             'has_credit_card_guarantee' => 'boolean',
             'optional_services' => 'sometimes|array',
@@ -168,13 +161,22 @@ class ReservationController extends Controller
 
         $user = Auth::user();
 
-        $customer = Customer::updateOrCreate(
-            ['user_id' => $user->id],
-            [
-                'payment_info_token' => $validated['has_credit_card_guarantee'] ? Hash::make(Str::random(12)) : null,
-                'credit_card_last_four' => $validated['has_credit_card_guarantee'] ? Str::random(4) : null,
-            ]
-        );
+        if ($user->hasRole('Customer')) {
+            $reservationUser = $user->customer;
+        } elseif ($user->hasRole('Travel Company')) {
+            $reservationUser = $user->travelCompany;
+        } else {
+            $reservationUser = null;
+        }
+
+        if (!$reservationUser) {
+            return back()->withErrors(['user' => 'You must be logged in as a customer or travel company to make a reservation.'])->withInput();
+        }
+
+        $reservationUser->update([
+            'payment_info_token' => $validated['has_credit_card_guarantee'] ? Hash::make(Str::random(12)) : null,
+            'credit_card_last_four' => $validated['has_credit_card_guarantee'] ? Str::random(4) : null,
+        ]);
 
         $roomType = RoomType::findOrFail($validated['room_type_id']);
         if ($roomType->hotel_id !== $hotel->id) {
@@ -201,8 +203,7 @@ class ReservationController extends Controller
         }
 
         try {
-            $reservation = Reservation::create([
-                'customer_id' => $customer->id,
+            $reservationData = [
                 'hotel_id' => $hotel->id,
                 'room_type_id' => $validated['room_type_id'],
                 // 'room_id' is NULL until check-in
@@ -216,11 +217,21 @@ class ReservationController extends Controller
                 'is_suite_booking' => $roomType->is_suite,
                 'suite_booking_period' => $suiteBookingPeriod,
                 'suite_rate_applied' => $suiteRateApplied,
-            ]);
+            ];
+
+
+            if($user->customer) {
+                $reservationData['customer_id'] = $reservationUser->id;
+            } elseif($user->travelCompany) {
+                $reservationData['travel_company_id'] = $reservationUser->id;
+            }
+
+            $reservation = Reservation::create($reservationData);
 
             $subject = 'Reservation Confirmation – ' . $hotel->name;
+            $name = $reservation->customer->first_name ?? $reservation->travelCompany->company_name;
 
-            $body = "Hi {$reservation->customer->first_name},
+            $body = "Hi {$name},
 
             Your reservation at {$hotel->name} has been confirmed!
 
@@ -233,7 +244,7 @@ class ReservationController extends Controller
 
             Thank you for booking with us!";
 
-            sendNotificationEmail($reservation->customer->contact_email, $subject, ($body));
+            sendNotificationEmail($reservationUser->contact_email, $subject, ($body));
 
             if (!empty($validated['optional_services'])) {
                 foreach ($validated['optional_services'] as $serviceId) {

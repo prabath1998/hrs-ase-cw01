@@ -28,13 +28,15 @@ class DashboardController extends Controller
         }
 
         if($user->customer) {
-            $customer = $user->customer;
+            $dashboardUser = $user->customer;
+        } elseif($user->travelCompany) {
+            $dashboardUser = $user->travelCompany;
         } else {
             return redirect()->route('home')->with('error', 'You must be a customer to access the dashboard.');
         }
 
-        $reservationData = $this->customerService->getCustomerDashboardData($customer);
-        $billData = $this->customerService->getCustomerBills($customer);
+        $reservationData = $this->customerService->getCustomerDashboardData($dashboardUser);
+        $billData = $this->customerService->getCustomerBills($dashboardUser);
 
         $reservations = $reservationData['reservations'];
         $totalReservations = $reservationData['totalReservations'];
@@ -51,7 +53,7 @@ class DashboardController extends Controller
             ];
         });
 
-        $customerDetails = $this->customerService->getCustomerDetails($customer);
+        $customerDetails = $this->customerService->getCustomerDetails($dashboardUser);
 
         return view('pages.dashboard.index', compact('reservations', 'bills', 'lastMonthReservationCount', 'totalSpent', 'totalReservations', 'totalReservationHotelCount', 'availableOptionalServices', 'customerDetails'));
     }
