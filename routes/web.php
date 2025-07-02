@@ -50,7 +50,7 @@ Route::post('/hotels/{hotel}/check-availability', [HotelController::class, 'chec
 /**
  * Customer Dashboard
  */
-Route::group(['middleware' => ['auth', 'role:Customer', 'role:Travel Company']], function () {
+Route::group(['middleware' => ['auth', 'role:Customer|Travel Company']], function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
     Route::post('profile/update', [CustomerDashboardController::class, 'updateProfile'])->name('profile.update');
 

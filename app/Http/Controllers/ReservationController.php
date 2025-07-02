@@ -195,7 +195,7 @@ class ReservationController extends Controller
                 $totalEstimatedRoomCharge = $roomType->suite_monthly_rate * ceil($numberOfNights / 28);
                 $suiteBookingPeriod = 'monthly';
                 $suiteRateApplied = $roomType->suite_monthly_rate;
-            } elseif ($numberOfNights >= 7 && $roomType->suite_weekly_rate > 0) {
+            } else {
                 $totalEstimatedRoomCharge = $roomType->suite_weekly_rate * ceil($numberOfNights / 7);
                 $suiteBookingPeriod = 'weekly';
                 $suiteRateApplied = $roomType->suite_weekly_rate;

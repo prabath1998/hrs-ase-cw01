@@ -48,13 +48,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-right">
-                                                        <p class="text-2xl font-bold text-blue-600">$<span
-                                                                x-model="roomBasePrice" x-text="roomBasePrice"></span></p>
-                                                        <p class="text-gray-400 text-xs">per night</p>
-                                                        @if (isset($appliedRateType) && $appliedRateType !== 'Nightly')
-                                                            <small class="text-muted fw-normal">({{ $appliedRateType }}
-                                                                Rate)</small>
-                                                        @endif
+
+                                                        <p class="text-2xl font-bold text-blue-600">
+                                                            <span x-model="appliedRate" x-text="'$' + appliedRate"></span>
+                                                            <span x-model="appliedRateType"
+                                                                x-text="' /' + appliedRateType"></span>
+                                                        </p>
+
+
                                                     </div>
                                                 </div>
                                                 <div class="mt-4">
@@ -504,8 +505,9 @@
                                 <div class="mb-4">
                                     <div class="flex justify-between mb-2">
                                         <span class="text-gray-500 text-xs">{{ $roomType->name }}</span>
-                                        <span class="font-medium text-xs">$<span x-text="roomBasePrice"></span> × <span
-                                                x-text="calculateNights()"></span> nights</span>
+                                        <span class="font-medium text-xs">$<span x-text="appliedRate"></span> × <span
+                                                x-text="multiplier"></span> <span
+                                                x-text="getAppliedRateText(appliedRateType)"></span></span>
                                     </div>
                                     <div class="flex justify-between mb-2">
                                         <span class="text-gray-500 text-xs">Number of Rooms</span>
@@ -622,6 +624,12 @@
             return {
                 optionalServices: {!! $optionalServices->toJson() !!},
                 roomBasePrice: {{ $roomType->base_price_per_night }},
+                isSuite: {{ $roomType->is_suite ? 'true' : 'false' }},
+                roomWeeklyRate: {{ $roomType->suite_weekly_rate ?? 0 }},
+                roomMonthlyRate: {{ $roomType->suite_monthly_rate ?? 0 }},
+                appliedRateType: '',
+                appliedRate: 0,
+                multiplier: 1,
                 // Form steps
                 currentStep: 1,
                 totalSteps: 3,
@@ -667,6 +675,7 @@
 
                 init() {
                     this.initializeDatePickers();
+                    this.updateRoomRate();
                 },
 
                 initializeDatePickers() {
@@ -686,6 +695,7 @@
                                 minCheckOut.setDate(minCheckOut.getDate() + 1);
                                 checkOutPicker.set('minDate', minCheckOut);
                             }
+                            this.updateRoomRate();
                         }
                     });
 
@@ -695,6 +705,7 @@
                         dateFormat: "Y-m-d",
                         onChange: (selectedDates, dateStr) => {
                             this.check_out_date = dateStr;
+                            this.updateRoomRate();
                         }
                     });
                 },
@@ -787,11 +798,9 @@
                 },
                 calculateServiceTotal(serviceId) {
                     const service = this.optionalServices.find(s => s.id === serviceId);
-                    console.log(service);
 
                     if (!service) return 0;
 
-                    const nights = this.calculateNights();
                     return service.price * this.amount;
                 },
 
@@ -807,15 +816,13 @@
                     return nights > 0 ? nights : 0;
                 },
 
-                calculateTaxes() {
-                    const subtotal = this.calculateSubtotal();
-                    // return 0;
+                calculateTaxes(subtotal) {
                     return Math.round(subtotal * 0.04); // 4% tax rate
                 },
 
                 calculateSubtotal() {
-                    const nights = this.calculateNights();
-                    const roomTotal = nights * this.roomBasePrice;
+                    // const nights = this.calculateNights();
+                    const roomTotal = this.multiplier * this.appliedRate;
 
                     let selectedServicesTotal = 0;
                     this.selectedServices = [];
@@ -831,7 +838,7 @@
 
                 calculateTotal() {
                     const subtotal = this.calculateSubtotal();
-                    const taxes = this.calculateTaxes();
+                    const taxes = this.calculateTaxes(subtotal);
                     return subtotal + taxes;
                 },
 
@@ -852,6 +859,43 @@
                     }
 
                     this.expiryDate = value;
+                },
+
+                updateRoomRate() {
+                    if (this.isSuite) {
+                        const checkIn = new Date(this.check_in_date);
+                        const checkOut = new Date(this.check_out_date);
+                        const timeDiff = checkOut.getTime() - checkIn.getTime();
+                        const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+                        if (nights >= 28) {
+                            this.appliedRateType = 'Monthly';
+                            this.appliedRate = this.roomMonthlyRate;
+                            this.multiplier = Math.ceil(nights / 28);
+                        } else {
+                            this.appliedRateType = 'Weekly';
+                            this.appliedRate = this.roomWeeklyRate;
+                            this.multiplier = Math.ceil(nights / 7);
+                        }
+                    } else {
+                        this.appliedRateType = 'Nightly';
+                        this.appliedRate = this.roomBasePrice;
+                        this.multiplier = nights;
+                    }
+
+                },
+
+                getAppliedRateText(appliedRateType) {
+                    switch (appliedRateType) {
+                        case 'Nightly':
+                            return 'Night';
+                        case 'Weekly':
+                            return 'Week';
+                        case 'Monthly':
+                            return 'Month';
+                        default:
+                            return 'Night';
+                    }
                 },
 
                 // Form submission

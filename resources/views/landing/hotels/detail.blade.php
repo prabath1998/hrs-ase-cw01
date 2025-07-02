@@ -66,8 +66,7 @@
                     <div class="col-span-2 relative rounded-lg overflow-hidden">
                         <img :src="hotel.images[selectedImageIndex] || '/placeholder.svg'" :alt="hotel.name"
                             class="object-cover w-full h-full absolute inset-0" />
-                        <div
-                            class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all cursor-pointer">
+                        <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all cursor-pointer">
                         </div>
                     </div>
                     <div class="col-span-2 grid grid-cols-2 gap-4">
@@ -223,19 +222,30 @@
                                                     <p class="text-gray-600" x-text="room.description"></p>
                                                 </div>
                                                 <div class="text-right">
-                                                    <template x-if="room.originalPrice">
-                                                        <span class="text-sm text-gray-500 line-through"
-                                                            x-text="'$' + room.originalPrice"></span>
+                                                    <p class="font-bold text-blue-600"
+                                                        x-text="'$' + room.originalPrice + '/Night'"
+                                                        :class="room.isSuite ? 'line-through text-sm text-gray-600' : 'text-xl'">
+                                                    </p>
+                                                    <template x-if="room.discount">
+                                                        <span class="text-sm text-red-600"
+                                                            x-text="'Save ' + room.discount + '%!'"></span>
                                                     </template>
-                                                    <p class="text-2xl font-bold text-blue-600"
-                                                        x-text="'$' + room.price + '/night'"></p>
+                                                    <template x-if="room.isSuite">
+                                                        <div>
+                                                            <p class="text-xl font-bold text-blue-600">
+                                                                {{-- Show weekly rate and monthly rate --}}
+                                                                <span
+                                                                    x-text="'$' + room.suiteWeeklyRate + '/Week'"></span><br>
+                                                                <span
+                                                                    x-text="'$' + room.suiteMonthlyRate + '/Month'"></span>
+                                                            </p>
+
+                                                        </div>
+                                                    </template>
                                                 </div>
                                             </div>
                                             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 text-sm text-gray-600">
-                                                {{-- <div x-text="'Size: ' + room.size"></div> --}}
                                                 <div x-text="'Max: ' + room.maxGuests + ' guests'"></div>
-                                                <div x-text="'Bed: ' + room.bedType"></div>
-                                                <div x-text="'Views: ' + room.views.join(', ')"></div>
                                             </div>
                                             <div class="flex flex-wrap gap-2 mb-4">
                                                 <template x-for="amenity in room.amenities" :key="amenity">
@@ -453,13 +463,13 @@
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <div class="flex justify-between text-sm mb-1">
                                     <span>Duration:</span>
-                                    <span x-text="nights + ' nights'"></span>
+                                    <span x-text="multiplier + ' ' + appliedRateType"></span>
                                 </div>
                                 <template x-if="selectedRoom">
                                     <div class="flex justify-between text-sm">
                                         <span>Room rate:</span>
                                         <span
-                                            x-text="'$' + (hotel.rooms.find(r => r.id === selectedRoom)?.price) + '/night'"></span>
+                                            x-text="'$' + appliedRate + '/' + getAppliedRateText(appliedRateType)"></span>
                                     </div>
                                 </template>
                                 <template x-if="availabilityCount > 0">
@@ -507,26 +517,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            flatpickr("#checkInDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                onChange: function(selectedDates, dateStr) {
-                    const checkOutPicker = flatpickr("#checkOutDate");
-                    checkOutPicker.set('minDate', selectedDates[0]);
-                    if (selectedDates.length > 0) {
-                        checkOutPicker.setDate(selectedDates[0], true);
-                    }
-                }
-            });
 
-            flatpickr("#checkOutDate", {
-                dateFormat: "Y-m-d",
-                minDate: "today",
-                onChange: function(selectedDates, dateStr) {
-                    const checkInPicker = flatpickr("#checkInDate");
-                    checkInPicker.set('maxDate', selectedDates[0]);
-                }
-            });
         });
 
 
@@ -570,15 +561,53 @@
                 guests: '2',
                 selectedRoom: null,
                 availabilityCount: 0,
+                appliedRateType: '',
+                appliedRate: 0,
+                multiplier: 1,
+
+                init() {
+                    flatpickr("#checkInDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        onChange: function(selectedDates, dateStr) {
+                            const checkOutPicker = flatpickr("#checkOutDate");
+                            checkOutPicker.set('minDate', selectedDates[0]);
+                            if (selectedDates.length > 0) {
+                                checkOutPicker.setDate(selectedDates[0], true);
+                            }
+                            if(this.selectedRoom) {
+                                this.updateRoomRate(this.selectedRoom);
+                            }
+                        }
+                    });
+
+                    flatpickr("#checkOutDate", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        onChange: function(selectedDates, dateStr) {
+                            const checkInPicker = flatpickr("#checkInDate");
+                            checkInPicker.set('maxDate', selectedDates[0]);
+                            if(this.selectedRoom) {
+                                this.updateRoomRate(this.selectedRoom);
+                            }
+                        }
+                    });
+
+                    this.$watch('selectedRoom', (newRoom) => {
+                        this.updateRoomRate(newRoom);
+                    });
+                },
+
                 get today() {
                     return new Date().toISOString().split('T')[0];
                 },
                 get nights() {
                     if (this.checkIn && this.checkOut) {
-                        const inDate = new Date(this.checkIn);
-                        const outDate = new Date(this.checkOut);
-                        const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
-                        return diff > 0 ? diff : 0;
+                        const checkIn = new Date(this.checkIn);
+                        const checkOut = new Date(this.checkOut);
+                        const timeDiff = checkOut.getTime() - checkIn.getTime();
+                        const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                        return nights > 0 ? nights : 0;
                     }
                     return 0;
                 },
@@ -629,7 +658,44 @@
                             console.error('Error checking availability:', error);
                             alert('An error occurred while checking availability. Please try again later.');
                         });
-                }
+                },
+
+                updateRoomRate(selectedRoomId) {
+                    const nights = this.nights;
+                    const selectedRoom = this.hotel.rooms.find(r => r.id === selectedRoomId);
+                    console.log(selectedRoom);
+                    
+                    if (selectedRoom.isSuite) {
+
+                        if (nights >= 28) {
+                            this.appliedRateType = 'Monthly';
+                            this.appliedRate = selectedRoom.suiteMonthlyRate;
+                            this.multiplier = Math.ceil(nights / 28);
+                        } else {
+                            this.appliedRateType = 'Weekly';
+                            this.appliedRate = selectedRoom.suiteWeeklyRate;
+                            this.multiplier = Math.ceil(nights / 7);
+                        }
+                    } else {
+                        this.appliedRateType = 'Nightly';
+                        this.appliedRate = selectedRoom.originalPrice;
+                        this.multiplier = nights;
+                    }
+
+                },
+
+                getAppliedRateText(appliedRateType) {
+                    switch (appliedRateType) {
+                        case 'Nightly':
+                            return 'Nights';
+                        case 'Weekly':
+                            return 'Weeks';
+                        case 'Monthly':
+                            return 'Months';
+                        default:
+                            return 'Nights';
+                    }
+                },
             };
         }
     </script>
