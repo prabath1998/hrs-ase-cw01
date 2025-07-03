@@ -99,7 +99,7 @@
                             <button :class="tab === 'overview' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
                                 @click="tab='overview'">Overview</button>
                             <button :class="tab === 'rooms' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
-                                @click="tab='rooms'">Rooms</button>
+                                @click="tab='rooms'">Rooms<p :class="selectedRoom == null ? 'text-red-500 text-xs p-0 m-0' : 'hidden'">Please select a room</p></button>
                             <button :class="tab === 'amenities' ? 'border-b-2 border-blue-600 font-bold' : ''"
                                 class="py-2" @click="tab='amenities'">Amenities</button>
                             <button :class="tab === 'location' ? 'border-b-2 border-blue-600 font-bold' : ''"
@@ -202,7 +202,7 @@
                         <!-- Rooms Tab -->
                         <div x-show="tab==='rooms'" class="space-y-6">
                             <template x-for="room in hotel.rooms" :key="room.id">
-                                <div @click="selectedRoom = room.id"
+                                <div @click="selectedRoom = room.id" x-model="selectedRoom"
                                     :class="selectedRoom === room.id ? 'ring-2 ring-blue-500' : ''"
                                     class="bg-white rounded-lg shadow p-6 cursor-pointer transition-all">
                                     <div class="grid md:grid-cols-3 gap-6">
@@ -466,10 +466,15 @@
                                     <span x-text="multiplier + ' ' + appliedRateType"></span>
                                 </div>
                                 <template x-if="selectedRoom">
-                                    <div class="flex justify-between text-sm">
-                                        <span>Room rate:</span>
-                                        <span
-                                            x-text="'$' + appliedRate + '/' + getAppliedRateText(appliedRateType)"></span>
+                                    <div>
+                                        <div class="flex justify-between text-sm">
+                                            <span>Room rate:</span>
+                                            <span x-text="'$' + appliedRate + '/' + getAppliedRateText(appliedRateType)"></span>
+                                        </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span>Total:</span>
+                                            <span x-text="'$' + (appliedRate * multiplier)"></span>
+                                        </div>
                                     </div>
                                 </template>
                                 <template x-if="availabilityCount > 0">
@@ -515,11 +520,6 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-
-        });
-
 
         function hotelPage() {
             // Example hotel data, replace with your own data source
@@ -564,6 +564,7 @@
                 appliedRateType: '',
                 appliedRate: 0,
                 multiplier: 1,
+                discountRate: {{ $discountRate ?? 0 }},
 
                 init() {
                     flatpickr("#checkInDate", {
@@ -588,8 +589,12 @@
                             const checkInPicker = flatpickr("#checkInDate");
                             checkInPicker.set('maxDate', selectedDates[0]);
                             if(this.selectedRoom) {
+                                console.log(586);
                                 this.updateRoomRate(this.selectedRoom);
+
                             }
+                            console.log(590);
+
                         }
                     });
 
@@ -664,7 +669,7 @@
                     const nights = this.nights;
                     const selectedRoom = this.hotel.rooms.find(r => r.id === selectedRoomId);
                     console.log(selectedRoom);
-                    
+
                     if (selectedRoom.isSuite) {
 
                         if (nights >= 28) {

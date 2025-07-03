@@ -111,17 +111,14 @@ class ReservationController extends Controller
         }
 
         $optionalServices = OptionalService::where('is_active', true)->get(); // Or filter by hotel if services are hotel-specific
-
+        $discountRate = auth()->user()->travelCompany ? auth()->user()->travelCompany->negotiated_discount_percentage : null;
         return view('pages.reservations.create', compact(
             'hotel',
             'roomType',
             'checkIn',
             'checkOut',
-            // 'searchParams',
-            // 'estimatedRoomPrice',
-            // 'numberOfNights',
             'optionalServices',
-            // 'appliedRateType'
+            'discountRate'
         ));
     }
 

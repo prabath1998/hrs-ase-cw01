@@ -523,6 +523,20 @@
                                 </div>
 
                                 <div class="border-t pt-4">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-500 text-xs">Subtotal</span>
+                                        <span class="font-medium text-xs">$<span x-text="calculateSubtotal()"></span></span>
+                                    </div>
+                                    <template x-if="discountRate > 0">
+                                        <div class="flex justify-between mb-2">
+                                            <span class="text-red-500 text-xs">Discount <span x-text="discountRate + '%'"></span></span>
+                                            <span class="text-red-500 font-medium text-xs" x-text="'- $' + calculateDiscountAmount(calculateSubtotal())"></span>
+                                        </div>
+                                    </template>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-gray-500 text-xs">Taxes & Fees</span>
+                                        <span class="font-medium text-xs">$<span x-text="calculateTaxes(calculateSubtotal() - calculateDiscountAmount(calculateSubtotal()))"></span></span>
+                                    </div>
                                     <div class="flex justify-between">
                                         <span class="font-semibold text-gray-800">Total</span>
                                         <span class="font-bold text-xl text-blue-700">$<span
@@ -630,6 +644,7 @@
                 appliedRateType: '',
                 appliedRate: 0,
                 multiplier: 1,
+                discountRate: {{ $discountRate ?? 0 }},
                 // Form steps
                 currentStep: 1,
                 totalSteps: 3,
@@ -837,9 +852,15 @@
                 },
 
                 calculateTotal() {
-                    const subtotal = this.calculateSubtotal();
+                    let subtotal = this.calculateSubtotal();
+                    subtotal = subtotal - this.calculateDiscountAmount(subtotal);
+                    subtotal = Math.max(subtotal, 0);
                     const taxes = this.calculateTaxes(subtotal);
                     return subtotal + taxes;
+                },
+
+                calculateDiscountAmount(subtotal) {
+                    return Math.round(subtotal * this.discountRate / 100);
                 },
 
                 formatCardNumber() {
@@ -862,12 +883,8 @@
                 },
 
                 updateRoomRate() {
+                    const nights = this.calculateNights();
                     if (this.isSuite) {
-                        const checkIn = new Date(this.check_in_date);
-                        const checkOut = new Date(this.check_out_date);
-                        const timeDiff = checkOut.getTime() - checkIn.getTime();
-                        const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
                         if (nights >= 28) {
                             this.appliedRateType = 'Monthly';
                             this.appliedRate = this.roomMonthlyRate;
