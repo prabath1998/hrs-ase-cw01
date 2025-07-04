@@ -128,7 +128,7 @@
                         </div>
 
                         <!-- Negotiated Discount Percentage -->
-                        {{-- <div class="col-span-2 md:col-span-1">
+                        <div class="col-span-2 md:col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1" for="negotiated_discount_percentage">
                                 Negotiated Discount (%)
                             </label>
@@ -143,7 +143,7 @@
                             @error('negotiated_discount_percentage')
                                 <p class="text-rose-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
-                        </div> --}}
+                        </div>
 
                         <!-- Company Type -->
                         <div class="col-span-2 md:col-span-1">

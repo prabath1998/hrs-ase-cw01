@@ -20,7 +20,7 @@ class TravelCompanyRegisterRequest extends FormRequest
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'registration_number' => 'nullable|string|max:255',
-            // 'negotiated_discount_percentage' => 'nullable|numeric|between:0,100',
+            'negotiated_discount_percentage' => 'nullable|numeric|between:0,100',
         ];
     }
 }

@@ -60,6 +60,22 @@
                 <p class="text-gray-700 text-lg" x-text="hotel.description"></p>
             </div>
 
+            @if ($discountRate > 0)
+                <div class="mb-6 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-white text-green-600 rounded-full p-2 mr-3">
+                                <span class="text-lg font-bold">{{ $discountRate }}%</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">Special Discount Available!</h3>
+                                <p class="text-green-100">Save 10% on all room bookings at this hotel</p>
+                            </div>
+                        </div>
+                        <span class="bg-white text-green-600 font-bold px-3 py-1 rounded text-sm"></span>
+                    </div>
+                </div>
+            @endif
             <!-- Image Gallery -->
             <div class="mb-8">
                 <div class="grid grid-cols-4 gap-4 h-96">
@@ -99,7 +115,9 @@
                             <button :class="tab === 'overview' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
                                 @click="tab='overview'">Overview</button>
                             <button :class="tab === 'rooms' ? 'border-b-2 border-blue-600 font-bold' : ''" class="py-2"
-                                @click="tab='rooms'">Rooms<p :class="selectedRoom == null ? 'text-red-500 text-xs p-0 m-0' : 'hidden'">Please select a room</p></button>
+                                @click="tab='rooms'">Rooms<p
+                                    :class="selectedRoom == null ? 'text-red-500 text-xs p-0 m-0' : 'hidden'">Please select
+                                    a room</p></button>
                             <button :class="tab === 'amenities' ? 'border-b-2 border-blue-600 font-bold' : ''"
                                 class="py-2" @click="tab='amenities'">Amenities</button>
                             <button :class="tab === 'location' ? 'border-b-2 border-blue-600 font-bold' : ''"
@@ -224,7 +242,7 @@
                                                 <div class="text-right">
                                                     <p class="font-bold text-blue-600"
                                                         x-text="'$' + room.originalPrice + '/Night'"
-                                                        :class="room.isSuite ? 'line-through text-sm text-gray-600' : 'text-xl'">
+                                                        :class="room.isSuite ? 'hidden text-sm text-gray-600' : 'text-xl'">
                                                     </p>
                                                     <template x-if="room.discount">
                                                         <span class="text-sm text-red-600"
@@ -449,31 +467,55 @@
                                 x-model="checkOut" :min="checkIn || today" />
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Guests</label>
-                            <select class="w-full border rounded px-3 py-2" x-model="guests">
-                                <option value="1">1 Guest</option>
-                                <option value="2">2 Guests</option>
-                                <option value="3">3 Guests</option>
-                                <option value="4">4 Guests</option>
-                                <option value="5">5 Guests</option>
-                                <option value="6">6+ Guests</option>
-                            </select>
+                            <label for="amount" class="block text-sm font-medium mb-2">Number of Rooms</label>
+                            <input type="number" min="1" max="5" id="amount"
+                                class="w-full border rounded px-3 py-2" x-model="amount" required>
                         </div>
-                        <template x-if="checkIn && checkOut">
+                        <div>
+                            <label for="guests" class="block text-sm font-medium mb-2">Number of Guests</label>
+                            <input type="number" min="1" max="40" id="guests" class="w-full border rounded px-3 py-2" x-model="guests" required>
+                        </div>
+
+                        @if ($discountRate > 0)
+                            <div class="bg-green-100 p-2 rounded-lg mb-4">
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-800 mr-2" fill="none" stroke="currentColor"
+                                        stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M9 12l2 2l4-4" />
+                                        <circle cx="12" cy="12" r="10" />
+                                    </svg>
+                                    <span class="text-green-800 font-bold text-sm">
+                                        {{ $discountRate }}% Discount Applied
+                                    </span>
+                                </div>
+
+                            </div>
+                        @endif
+
+                        <template x-if="checkIn && checkOut && selectedRoom">
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <div class="flex justify-between text-sm mb-1">
                                     <span>Duration:</span>
-                                    <span x-text="multiplier + ' ' + appliedRateType"></span>
+                                    <span x-text="multiplier + ' ' + getAppliedRateText(appliedRateType)"></span>
                                 </div>
                                 <template x-if="selectedRoom">
                                     <div>
                                         <div class="flex justify-between text-sm">
                                             <span>Room rate:</span>
-                                            <span x-text="'$' + appliedRate + '/' + getAppliedRateText(appliedRateType)"></span>
+                                            <span x-text="'$' + appliedRate + '/' + appliedRateType"></span>
                                         </div>
-                                        <div class="flex justify-between text-sm">
-                                            <span>Total:</span>
-                                            <span x-text="'$' + (appliedRate * multiplier)"></span>
+                                        <div class="flex justify-between text-sm text-gray-600">
+                                            <span>SubTotal:</span>
+                                            <span x-text="'$' + calculateSubtotal()"></span>
+                                        </div>
+                                        <div class="flex justify-between text-sm text-gray-600"
+                                            :class="isTravelCompany ? '' : 'hidden'">
+                                            <span>Saved:</span>
+                                            <span x-text="'- $' + calculateDiscountAmount(calculateSubtotal())"></span>
+                                        </div>
+                                        <div class="flex justify-between text-lg font-bold text-blue-600 mt-2">
+                                            <span>Estimated Total:</span>
+                                            <span x-text="'$' + calculateTotal()"></span>
                                         </div>
                                     </div>
                                 </template>
@@ -520,7 +562,6 @@
 
 @push('scripts')
     <script>
-
         function hotelPage() {
             // Example hotel data, replace with your own data source
             const hotel = {
@@ -564,7 +605,9 @@
                 appliedRateType: '',
                 appliedRate: 0,
                 multiplier: 1,
+                amount: 1,
                 discountRate: {{ $discountRate ?? 0 }},
+                isTravelCompany: {{ $isTravelCompany ? 'true' : 'false' }},
 
                 init() {
                     flatpickr("#checkInDate", {
@@ -576,8 +619,8 @@
                             if (selectedDates.length > 0) {
                                 checkOutPicker.setDate(selectedDates[0], true);
                             }
-                            if(this.selectedRoom) {
-                                this.updateRoomRate(this.selectedRoom);
+                            if (this.selectedRoom) {
+                                this.updateRoomRate();
                             }
                         }
                     });
@@ -588,9 +631,9 @@
                         onChange: function(selectedDates, dateStr) {
                             const checkInPicker = flatpickr("#checkInDate");
                             checkInPicker.set('maxDate', selectedDates[0]);
-                            if(this.selectedRoom) {
+                            if (this.selectedRoom) {
                                 console.log(586);
-                                this.updateRoomRate(this.selectedRoom);
+                                this.updateRoomRate();
 
                             }
                             console.log(590);
@@ -599,7 +642,15 @@
                     });
 
                     this.$watch('selectedRoom', (newRoom) => {
-                        this.updateRoomRate(newRoom);
+                        this.updateRoomRate();
+                    });
+
+                    this.$watch('checkOut', (newRoom) => {
+                        this.updateRoomRate();
+                    });
+
+                    this.$watch('checkIn', (newRoom) => {
+                        this.updateRoomRate();
                     });
                 },
 
@@ -665,7 +716,8 @@
                         });
                 },
 
-                updateRoomRate(selectedRoomId) {
+                updateRoomRate() {
+                    const selectedRoomId = this.selectedRoom;
                     const nights = this.nights;
                     const selectedRoom = this.hotel.rooms.find(r => r.id === selectedRoomId);
                     console.log(selectedRoom);
@@ -700,6 +752,23 @@
                         default:
                             return 'Nights';
                     }
+                },
+
+                calculateSubtotal() {
+                    const roomTotal = this.multiplier * this.appliedRate;
+
+                    return roomTotal * this.amount;
+                },
+
+                calculateTotal() {
+                    let subtotal = this.calculateSubtotal();
+                    subtotal = subtotal - this.calculateDiscountAmount(subtotal);
+                    subtotal = Math.max(subtotal, 0);
+                    return subtotal;
+                },
+
+                calculateDiscountAmount(subtotal) {
+                    return Math.round(subtotal * this.discountRate / 100);
                 },
             };
         }

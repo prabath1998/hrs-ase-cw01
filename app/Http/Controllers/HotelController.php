@@ -187,8 +187,9 @@ class HotelController extends Controller
         $hotel->default_check_out_time = Carbon::parse($hotel->default_check_out_time)->format('H:i');
 
         // dd($hotel->roomTypes);
-        $discountRate = auth()->user()->travelCompany ? auth()->user()->travelCompany->negotiated_discount_percentage : null;
-        return view('landing.hotels.detail', compact('hotel', 'priceFrom', 'optionalServices', 'discountRate'));
+        $isTravelCompany = auth()->user()->travelCompany ? true : false;
+        $discountRate = $isTravelCompany ? auth()->user()->travelCompany->negotiated_discount_percentage : null;
+        return view('landing.hotels.detail', compact('hotel', 'priceFrom', 'optionalServices', 'discountRate', 'isTravelCompany'));
     }
 
     public function checkRoomAvailability(Request $request, Hotel $hotel)

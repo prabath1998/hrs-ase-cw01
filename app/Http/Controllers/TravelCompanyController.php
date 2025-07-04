@@ -98,7 +98,7 @@ class TravelCompanyController extends Controller
             'phone_number' => $request->input('phone_number'),
             'address' => $request->input('address'),
             'registration_number' => $request->input('registration_number'),
-            // 'negotiated_discount_percentage' => $request->input('negotiated_discount_percentage'),
+            'negotiated_discount_percentage' => $request->input('negotiated_discount_percentage'),
         ]);
 
         return redirect()->back()->with('success', 'Travel Company registered successfully. Please wait for approval.');
