@@ -13,6 +13,7 @@ use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\ReservationService;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -28,67 +29,73 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ReservationController extends Controller
 {
+
+    public function __construct(private readonly ReservationService $reservationService)
+    {
+
+    }
+
     public function index(Request $request)
-{
-    $this->checkAuthorization(auth()->user(), ['reservation.manage']);
+    {
+        $this->checkAuthorization(auth()->user(), ['reservation.manage']);
 
-    $query = Reservation::with([
-        'customer',
-        'travelCompany',
-        'room',
-        'roomType',
-        'bookedBy',
-        'hotel',
-        'optionalServices',
-    ])->orderBy('created_at', 'desc');
+        $query = Reservation::with([
+            'customer',
+            'travelCompany',
+            'room',
+            'roomType',
+            'bookedBy',
+            'hotel',
+            'optionalServices',
+        ])->orderBy('created_at', 'desc');
 
-    // Search filter
-    if ($request->has('search') && !empty($request->search)) {
-        $search = $request->input('search');
-        $query->where(function($q) use ($search) {
-            $q->whereHas('customer', function($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            })
-            ->orWhereHas('travelCompany', function($q) use ($search) {
-                $q->where('company_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            })
-            ->orWhere('reference_number', 'like', "%{$search}%");
-        });
+        // Search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('customer', function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('travelCompany', function ($q) use ($search) {
+                        $q->where('company_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhere('reference_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('check_in_date') && !empty($request->check_in_date)) {
+            $query->whereDate('check_in_date', '>=', $request->check_in_date);
+        }
+
+        if ($request->has('check_out_date') && !empty($request->check_out_date)) {
+            $query->whereDate('check_out_date', '<=', $request->check_out_date);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('hotel_id') && !empty($request->hotel_id)) {
+            $query->where('hotel_id', $request->hotel_id);
+        }
+
+        $reservations = $query->paginate(10);
+
+        return view('backend.pages.reservations.index', [
+            'reservations' => $reservations,
+            'hotels' => Hotel::pluck('name', 'id'), // For hotel filter dropdown
+            'statuses' => [ // For status filter dropdown
+                'pending' => 'Pending',
+                'confirmed' => 'Confirmed',
+                'checked_in' => 'Checked In',
+                'checked_out' => 'Checked Out',
+                'cancelled' => 'Cancelled',
+            ],
+        ]);
     }
-
-    if ($request->has('check_in_date') && !empty($request->check_in_date)) {
-        $query->whereDate('check_in_date', '>=', $request->check_in_date);
-    }
-
-    if ($request->has('check_out_date') && !empty($request->check_out_date)) {
-        $query->whereDate('check_out_date', '<=', $request->check_out_date);
-    }
-
-    if ($request->has('status') && !empty($request->status)) {
-        $query->where('status', $request->status);
-    }
-
-    if ($request->has('hotel_id') && !empty($request->hotel_id)) {
-        $query->where('hotel_id', $request->hotel_id);
-    }
-
-    $reservations = $query->paginate(10);
-
-    return view('backend.pages.reservations.index', [
-        'reservations' => $reservations,
-        'hotels' => Hotel::pluck('name', 'id'), // For hotel filter dropdown
-        'statuses' => [ // For status filter dropdown
-            'pending' => 'Pending',
-            'confirmed' => 'Confirmed',
-            'checked_in' => 'Checked In',
-            'checked_out' => 'Checked Out',
-            'cancelled' => 'Cancelled',
-        ],
-    ]);
-}
 
     public function create(Request $request): Renderable
     {
@@ -217,9 +224,9 @@ class ReservationController extends Controller
             ];
 
 
-            if($user->customer) {
+            if ($user->customer) {
                 $reservationData['customer_id'] = $reservationUser->id;
-            } elseif($user->travelCompany) {
+            } elseif ($user->travelCompany) {
                 $reservationData['travel_company_id'] = $reservationUser->id;
             }
 
@@ -254,7 +261,7 @@ class ReservationController extends Controller
                     }
                 }
             }
-            $this->generateAndGetBill($reservation);
+            $this->reservationService->generateAndGetBill($reservation);
         } catch (\Exception $e) {
             Log::error('Error creating reservation: ' . $e->getMessage());
             return back()->withErrors(['reservation' => 'Failed to create reservation: ' . $e->getMessage()])->withInput();
@@ -418,7 +425,7 @@ class ReservationController extends Controller
 
         DB::transaction(function () use ($reservation) {
             if (!$reservation->bill) {
-                $this->generateAndGetBill($reservation);
+                $this->reservationService->generateAndGetBill($reservation);
             }
 
             $reservation->update([
@@ -453,44 +460,14 @@ class ReservationController extends Controller
             return back()->with('info', 'A bill already exists for this reservation.');
         }
 
-        $this->generateAndGetBill($reservation);
+        $this->reservationService->generateAndGetBill($reservation);
 
         return redirect()->route('admin.reservations.show', $reservation)
             ->with('success', 'Bill / Folio has been successfully created.');
     }
 
 
-    private function generateAndGetBill(Reservation $reservation): Bill
-    {
-        $roomCharges = $reservation->total_estimated_room_charge;
 
-        $optionalServiceCharges = $reservation->subTotalOptionalServices();
-
-        $subtotal = $roomCharges + $optionalServiceCharges;
-        $taxPercentage = Setting::where('option_name', 'tax_rate')->value('option_value') ?? 0;
-        $taxAmount = $subtotal * ($taxPercentage / 100);
-        $discountAmount = $subtotal * (($reservation->applied_discount_percentage ?? 0) / 100);
-        $grandTotal = ($subtotal - $discountAmount) + $taxAmount;
-
-        return Bill::create([
-            'reservation_id' => $reservation->id,
-            'customer_id' => $reservation->customer_id,
-            'travel_company_id' => $reservation->travel_company_id,
-            'bill_number' => 'INV-' . time() . '-' . $reservation->id,
-            'bill_date' => now('Asia/Colombo'),
-            'due_date' => now('Asia/Colombo')->addDays(30),
-            'subtotal_room_charges' => $roomCharges,
-            'subtotal_optional_services' => $optionalServiceCharges,
-            'total_amount' => $subtotal,
-            'tax_percentage_applied' => $taxPercentage,
-            'tax_amount' => $taxAmount,
-            'discount_amount_applied' => $discountAmount,
-            'grand_total' => $grandTotal,
-            'amount_paid' => 0,
-            'payment_status' => 'pending',
-            'generated_by_user_id' => auth()->id(),
-        ]);
-    }
 
     public function exportExcel(Request $request)
     {
@@ -499,15 +476,15 @@ class ReservationController extends Controller
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
-                $q->whereHas('customer', function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('customer', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%");
+                        ->orWhere('last_name', 'like', "%{$search}%");
                 })
-                ->orWhereHas('travelCompany', function($q) use ($search) {
-                    $q->where('company_name', 'like', "%{$search}%");
-                })
-                ->orWhere('reference_number', 'like', "%{$search}%");
+                    ->orWhereHas('travelCompany', function ($q) use ($search) {
+                        $q->where('company_name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('reference_number', 'like', "%{$search}%");
             });
         }
 

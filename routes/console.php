@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +13,14 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->describe('Display an inspiring quote');
+// Schedule::command('app:cancel-unconfirmed-reservations')
+//     ->dailyAt('19:00');
+
+// Schedule::command('app:process-no-shows')
+//     ->dailyAt('19:00');
+
+Schedule::command('app:cancel-unconfirmed-reservations')
+    ->everyMinute();
+
+Schedule::command('app:process-no-shows')
+    ->everyMinute();
