@@ -96,7 +96,7 @@
                                     </div>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                        <div>
+                                        <div :class="isTravelCompany ? 'hidden' : ''">
                                             <label for="amount" class="block text-xs font-medium text-gray-700 mb-1">Number of
                                                 Rooms</label>
                                             <input type="number" min="1" max="10" id="amount"
@@ -645,6 +645,8 @@
                 appliedRate: 0,
                 multiplier: 1,
                 discountRate: {{ $discountRate ?? 0 }},
+                roomMaxGuests: {{ $roomType->occupancy_limit }},
+                isTravelCompany: {{ $isTravelCompany ? 'true' : 'false' }},
                 // Form steps
                 currentStep: 1,
                 totalSteps: 3,
@@ -655,7 +657,7 @@
                 check_in_date: '{{ $checkIn }}',
                 check_out_date: '{{ $checkOut }}',
                 amount: 1,
-                guests: 1,
+                guests: {{ $guests }},
                 selectedServices: [],
                 special_requests: '',
 
@@ -691,6 +693,21 @@
                 init() {
                     this.initializeDatePickers();
                     this.updateRoomRate();
+
+                    // this.$watch('check_out_date', (newRoom) => {
+                    //     this.updateRoomRate();
+                    // });
+
+                    // this.$watch('check_in_date', (newRoom) => {
+                    //     this.updateRoomRate();
+                    // });
+
+                    this.$watch('guests', (newRoom) => {
+                        this.amount = Math.ceil(this.guests / this.roomMaxGuests);
+                        this.updateRoomRate();
+                    });
+
+                    this.amount = Math.ceil(this.guests / this.roomMaxGuests);
                 },
 
                 initializeDatePickers() {

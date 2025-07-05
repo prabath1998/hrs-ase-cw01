@@ -112,6 +112,7 @@ class ReservationController extends Controller
         $roomType = RoomType::findOrFail($searchParams['roomTypeId']);
         $checkIn = Carbon::parse($searchParams['checkIn'])->format('Y-m-d');
         $checkOut = Carbon::parse($searchParams['checkOut'])->format('Y-m-d');
+        $guests = $searchParams['guests'] ?? 1;
 
         if ($roomType->hotel_id !== $hotel->id) {
             abort(404, 'Room type not found for this hotel.');
@@ -119,13 +120,17 @@ class ReservationController extends Controller
 
         $optionalServices = OptionalService::where('is_active', true)->get(); // Or filter by hotel if services are hotel-specific
         $discountRate = auth()->user()->travelCompany ? auth()->user()->travelCompany->negotiated_discount_percentage : null;
+        $isTravelCompany = auth()->user()->travelCompany ? true : false;
+
         return view('pages.reservations.create', compact(
             'hotel',
             'roomType',
             'checkIn',
             'checkOut',
             'optionalServices',
-            'discountRate'
+            'discountRate',
+            'guests',
+            'isTravelCompany'
         ));
     }
 
