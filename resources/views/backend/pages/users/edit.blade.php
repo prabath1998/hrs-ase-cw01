@@ -77,7 +77,7 @@
                                 <div class="space-y-2">
                                     @foreach ($roles as $id => $name)
                                         <div class="flex items-center">
-                                            <input type="checkbox" name="roles[]" id="role_{{ $id }}"
+                                            <input type="radio" name="roles[]" id="role_{{ $id }}"
                                                 value="{{ $name }}"
                                                 {{ $user->roles->pluck('id')->contains($id) ? 'checked' : '' }}
                                                 class="h-4 w-4 text-brand-500 border-gray-300 rounded focus:ring-brand-400 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-brand-500">

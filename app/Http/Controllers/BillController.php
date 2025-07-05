@@ -28,7 +28,7 @@ class BillController extends Controller
                 ->diffInDays(Carbon::parse($reservation->check_out_date));
         }
 
-        $billedTo = $bill->customer ?? $bill->travel_company;
+        $billedTo = $bill->customer ?? $bill->travelCompany;
 
         return view('backend.pages.bills.show', [
             'bill' => $bill,
